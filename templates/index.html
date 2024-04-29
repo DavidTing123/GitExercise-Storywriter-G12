@@ -1,0 +1,29 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Writer</title>
+</head>
+<body>
+    <h1>Story Writer</h1>
+    <form action="/add_story" method="post">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" rows="10" cols="80" required placeholder="Write your story here..."></textarea><br><br>
+        <input type="submit" value="Submit">
+    </form>
+    <h2>Stories:</h2>
+    <ol>
+        {% for story in stories %}
+            <!-- <li><strong>{{ story.title }}</strong>: {{ story.content }}</li> -->
+            <!-- <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li> -->
+            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
+            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
+        {% endfor %}
+    </ol>
+</body>
+</html>

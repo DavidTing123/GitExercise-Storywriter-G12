@@ -9,13 +9,15 @@ body{
 
 .overall{
     background-color: white;
-    border:3px solid black;
     padding: 60px 100px;
     margin-top: 120px;
     border-radius:6px;
 
 }
 
+h2{
+    color:#4a60b9;
+}
 .signedupdetails{
     height:25px;
     margin-top: 0px;
@@ -34,7 +36,7 @@ body{
     width: 330px;
     height: 40px;
     font-size:20px;
-    color:black;
+    color:white;
     background-color: #5c72cb;
 }
 
@@ -50,5 +52,6 @@ body{
 
 .title{
     text-align: center;
+    color:blue;
 }
 

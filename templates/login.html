@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang = "en">
 <head>
-    <link rel="stylesheet" href="Login.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
     <title>Login Page</title>
 </head>
 <body>
@@ -14,7 +14,7 @@
             <p>New user? <a href ="#">Sign up now!</a></p>
         </div>
         <div class="image">
-            <img src ="login_img.jpg" width="600px" height ="500px">
+            <img src="{{ url_for('static', filename='login_img.jpg') }}" width="600px" height="500px " alt="Image">
         </div>
     </div>
 </body>

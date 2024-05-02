@@ -12,7 +12,7 @@ def signup():
     return render_template("signup.html")
 
 @app.route("/resetp")
-def signup():
+def resetpassword():
     return render_template("forgetpass.html")
 
 if __name__ == "__main__":

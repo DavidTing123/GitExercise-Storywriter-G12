@@ -11,15 +11,7 @@
 #      https://www.geeksforgeeks.org/how-to-build-a-random-story-generator-using-python/
 #  4. HTML Form Elements
 #     https://www.w3schools.com/html/html_form_elements.asp
-#  5. Python Text To Speech | pyttsx module
-#      https://www.geeksforgeeks.org/python-text-to-speech-pyttsx-module/?ref=lbp
-#  6. Build a Text to Speech Service with Python Flask Framework
-#      https://dev.to/siddheshshankar/build-a-text-to-speech-service-with-python-flask-framework-3966
-#  7. Flask - Calling python function on button OnClick event
-#      https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event
-#  8. 10 Lines Short Stories With Moral Lessons for Kids
-#      https://ofhsoupkitchen.org/short-stories-with-morals#:~:text=The%20Dog%20and%20the%20Bone,a%20bone%20in%20its%20mouth.
-# 
+#
 
 from flask import Flask, render_template, request, redirect, url_for
 import csv
@@ -28,9 +20,7 @@ import pyttsx3   # a simple text-to-speech converter library in Python
 app = Flask(__name__)
 
 # CSV file - to store the stories data.
-CSV_FILE = 'C:\\Users\\tingk\\OneDrive\\Documents\\GitHub\\DavidTing123-GitExercise-GroupTT1L-12\\stories.csv'
-#CSV_FILE = '.\\stories.csv'
-#CSV_FILE = 'C:\\Users\\tingk\\OneDrive\\Desktop\\TKL\\Python\\Project\\StoryWriter\\stories.csv'
+CSV_FILE = '.\\stories.csv'
 
 # Function to write story to CSV file
 def write_to_csv(title, content):

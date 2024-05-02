@@ -1,23 +1,23 @@
 #https://youtu.be/pJ8V51XJuf0?si=JHO1ROHlo5-LgVa4 (An introduction to Python and Flask Templates) tutorial video that I learn from and reference from
 
-from flask import Flask, render_template,request, redirect, url_for, session
-from flask_mysqldb import MySQL
+from flask import Flask, render_template,request
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-import MySQLdb.cursors
-import re
-
-
 
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] ="mysql://root:Cyc2255!@localhost:3306/Signup"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+db =SQLAlchemy(app)
+
+class Signup (db.Model):
+    id = db.Column(db.Integer,primary_key = True)
+    email = db.Column(db.String(25))
+    username = db.Column(db.String(25))
+    password =db.Column(db.String(25))
 
 
-app.config["MYSQL_HOST"] = 'localhost'
-app.config["MYSQL_USER"] ='root'
-app.config["MYSQL_PASSWORD"] ='Cyc2255!'
-app.config["MYSQL_DB"] ='sign up'
-
-mysql = MySQL(app)
 
 @app.route("/" , methods =["GET" , "POST"])
 def login():
@@ -30,6 +30,15 @@ def signup():
 @app.route("/resetp")
 def resetpassword():
     return render_template("forgetpass.html")
+
+@app.route("/process", methods=["POST"])
+def process():
+    email = request.form['email']
+    username = request.form['username']
+    password= request.form['password']
+
+
+    return "Congrates! You have successfully sign up as a user. "
 
 if __name__ == "__main__":
     app.run(debug=True) 

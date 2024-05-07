@@ -10,7 +10,7 @@ app.config["SECRET_KEY"] = "c1f15fb9b451ddfe14ae6e2baa65d787"
 
 @app.route("/")
 def home():
-    return "Welcome home!"
+    return render_template("home.html",title="Home")
 
 @app.route("/login" , methods =["GET","POST"])
 def login():

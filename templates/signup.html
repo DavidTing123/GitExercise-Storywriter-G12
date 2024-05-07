@@ -6,33 +6,42 @@
 
 </header>
 <body>
+    {%extends "signup.html"%}
+    {%block content%}
     <div class = "overall">
-        <form method="post" action="/process">
+        <form method="post" action="">
+            {{ form.hidden_tag()}}
             <div class="title"><h1>SIGN UP</h1></div>
             <h2>Email</h2>
             <div class = "signedupdetails">
-                <input type="email" name ="email" placeholder="ex: joeting24@gmail.com "required>
+                {{form.email.label(class="label")}}
+                {{form.email(class="form-control-lg")}}
             </div>
             <h2>Username</h2>
             <div class = "signedupdetails">
-                <input type="text" name ="username" placeholder="ex: Joe Ting "required>
+                {{form.username.label(class="label")}}
+                {{form.username(class="form-control-lg")}}
             </div> 
             <h2>Password</h2>
             <div class="signedupdetails">
-                <input name ="password" type="password" required>
-                </div>
+                {{form.password.label(class="label")}}
+                {{form.password(class="form-control-lg")}}
+            </div>
             <h2>Confirm Password</h2>
             <div class="signedupdetails">
-                <input type="password" required>
+                {{form.confirm_password.label(class="label")}}
+                {{form.confirm_password(class="form-control-lg")}}
             </div>
-            <div class = "change password">
-                <p>Forgot password? <a href="/resetp">Click here to reset!</a> </p>
-                <p>Not a new user? <a href ="/">login here! </a><p>
+            <div class="signedupdetails">
+                {{form.submit(class="button")}}
             </div>
-            <button class="button">Sign Up</button>
-            
         </form>
-        
+     </div>
+     <div class = "change password">
+        <p>Forgot password? <a href="{{url_for('resetpassword') }}">Click here to reset!</a> </p>
+        <p>Not a new user? <a href ="{{url_for('login') }}"></a>>login here! </a><p>
+    </div> 
+    {%endblock content%}
         
 </body>
 </html>

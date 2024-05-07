@@ -127,3 +127,27 @@ p{
 img{
     width: 400;
 }
+
+.flash-messages ul li{
+    list-style-type:none;
+}
+
+.flash-messages {
+    margin: 20px 0;
+}
+
+.flash-messages {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.flash-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.flash-error {
+    background-color: #f44336;
+    color: white;
+}

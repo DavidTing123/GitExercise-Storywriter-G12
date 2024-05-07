@@ -44,3 +44,22 @@ nav ul li a{
     font-size: 18px;
 }
 
+.flash-messages {
+    margin: 20px 0;
+}
+
+.flash-message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.flash-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.flash-error {
+    background-color: #f44336;
+    color: white;
+}

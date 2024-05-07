@@ -12,7 +12,7 @@ app.config["SECRET_KEY"] = "c1f15fb9b451ddfe14ae6e2baa65d787"
 def home():
     return "Welcome home!"
 
-@app.route("/login" , methods =["POST"])
+@app.route("/login" , methods =["GET","POST"])
 def login():
     form =LogInForm()
     return render_template("login.html", title="Log In", form=form)

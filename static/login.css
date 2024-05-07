@@ -133,11 +133,8 @@ img{
 }
 
 .flash-messages {
-    margin: 20px 0;
-}
-
-.flash-messages {
     padding: 10px;
+    margin-top:10px;
     margin-bottom: 10px;
     border-radius: 5px;
 }

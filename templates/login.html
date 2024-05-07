@@ -17,7 +17,13 @@
             <div class="flash-messages">
                 <ul>
                     {% for message in messages %}
-                        <li>{{ message }}</li>
+                        {% if 'success' in message %}
+                            <li class="flash-success">{{ message }}</li>
+                        {% elif 'error' in message %}
+                            <li class="flash-error">{{ message }}</li>
+                        {% else %}
+                            <li>{{ message }}</li>
+                        {%endif%}
                     {% endfor %}
                 </ul>
             </div>

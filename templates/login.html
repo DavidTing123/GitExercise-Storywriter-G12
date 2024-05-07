@@ -35,10 +35,27 @@
             <div class="logininfo">
                 <h3>Login</h3>
                 <div class="inputbox">
-                    {{form.username(class="inputfield" , placeholder="Username")}}
+                    {%if form.username.errors%}
+                        {{form.username(class="inputbox is invalid")}}
+                        <div class="invalid-input">
+                            {%for error in form.username.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.username(class="inputbox", placeholder="Username")}}
+                    {%endif%}
                 </div>
                 <div class="inputbox">
-                    {{form.password(class="inputfield", placeholder="Password")}}
+                    {%if form.password.errors%}
+                        {{form.password(class="inputbox is invalid")}}
+                        <div class="invalid-input">
+                            {%for error in form.password.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.password(class="inputbox" , placeholder="Password")}}
                 </div>
                 <div class="button1">
                     {{form.submit(class="button")}}

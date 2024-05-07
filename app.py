@@ -1,6 +1,7 @@
 #https://youtu.be/pJ8V51XJuf0?si=JHO1ROHlo5-LgVa4 (An introduction to Python and Flask Templates) tutorial video that I learn from and reference from
 
 from flask import Flask, render_template, request
+from forms import SignUpForm, LogInForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import bcrypt
 
@@ -20,13 +21,16 @@ class Signup (db.Model):
 
 
 
-@app.route("/" , methods =["POST"])
+@app.route("/login" , methods =["POST"])
 def login():
-    return render_template("login.html")
+    form =LogInForm()
+    return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["POST"])
 def signup():
-    return render_template("signup.html")
+    form = SignUpForm()
+    return render_template("signup.html",title="Sign Up", form=form)
+
 
 @app.route("/resetp")
 def resetpassword():
@@ -39,7 +43,7 @@ def process():
     password= request.form['password']
 
 
-    return "Congrates! You have successfully sign up as a user. "
+    return "Congrats! You have successfully sign up as a user. "
 
 if __name__ == "__main__":
     app.run(debug=True) 

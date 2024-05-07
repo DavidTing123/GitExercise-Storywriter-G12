@@ -1,4 +1,3 @@
-from app import SignUpForm, LogInForm
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField,SubmitField, BooleanField

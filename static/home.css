@@ -46,7 +46,7 @@ nav ul li a{
 
 
 .flash-message {
-    padding: 10px;
+    padding: 20px;
     margin-top:10px;
     margin-bottom: 10px;
     border-radius: 5px;
@@ -54,10 +54,10 @@ nav ul li a{
 
 .flash-success {
     background-color: #4CAF50;
-    color: white;
+    color: black;
 }
 
 .flash-error {
     background-color: #f44336;
-    color: white;
+    color: black;
 }

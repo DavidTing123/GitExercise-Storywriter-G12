@@ -21,7 +21,6 @@ def login():
             return redirect(url_for("home"))
         else:
             flash(f"Log in unsuccessfully.","error")
-            return redirect(url_for("login"))
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

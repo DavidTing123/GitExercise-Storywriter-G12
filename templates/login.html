@@ -13,13 +13,22 @@
 </head>
 <body>
     <div class="bigbox">
-        <div class="logininfo">
-            <h3>Login</h3>
-            {{form.username.label(class="label")}}
-            {{form.password.label(class="label")}}
-            <button>Login</button>
-            <p>New user? <a href ="/signup">Sign up now!</a></p>
-        </div>
+        <form method="post" action="">
+            {{ form.hidden_tag()}}
+            <div class="logininfo">
+                <h3>Login</h3>
+                <div class="inputbox">
+                    {{form.username(class="inputfield" , placeholder="Username")}}
+                </div>
+                <div class="inputbox">
+                    {{form.password(class="inputfield", placeholder="Password")}}
+                </div>
+                <div class="button1">
+                    {{form.submit(class="button")}}
+                </div>
+                <p>New user? <a href ="/signup">Sign up now!</a></p>
+            </div>
+        </form>
         <div class="image">
             <img src="{{ url_for('static', filename='login_img.jpg') }}" width="600px" height="500px " alt="Image">
         </div>

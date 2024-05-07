@@ -15,6 +15,13 @@ def home():
 @app.route("/login" , methods =["GET","POST"])
 def login():
     form =LogInForm()
+    if form.validate_on_submit():
+        if form.username.data =="chensx1@gmail.com" and form.password.data =="ABC123":
+            flash(f"Successfully log in!")
+            return redirect(url_for("home"))
+        else:
+            flash(f"Log in unsuccessfully.")
+            return redirect(url_for("signup"))
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

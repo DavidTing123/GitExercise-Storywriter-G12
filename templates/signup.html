@@ -7,32 +7,71 @@
 </header>
 <body>
     <div class = "overall">
-        <form method="post" action="">
+        <form method="post" action="" novalidate>
             {{ form.hidden_tag()}}
             <div class="title"><h1>SIGN UP</h1></div>
             <div class = "smallt">
                 {{form.email.label(class="label")}}
             </div>
             <div class = "signedupdetails">
-                {{form.email(class="inputbox")}}
+                {%if form.email.errors%}
+                    {{form.email(class="inputbox is invalid")}}
+                    <div class="invalid-input">
+                        {%for error in form.email.errors %}
+                            <span>{{error}}</span>
+                        {%endfor%}
+                    </div>
+                {%else%}
+                    {{form.email(class="inputbox")}}
+                {%endif%}
             </div>
+
             <div class = "smallt">
                 {{form.username.label(class="label")}}
             </div>
             <div class = "signedupdetails">
-                {{form.username(class="inputbox")}}
+                {%if form.username.errors%}
+                    {{form.username(class="inputbox is invalid")}}
+                    <div class="invalid-input">
+                        {%for error in form.username.errors %}
+                            <span>{{error}}</span>
+                        {%endfor%}
+                    </div>
+                {%else%}
+                    {{form.username(class="inputbox")}}
+                {%endif%}
+
             </div> 
             <div class="smallt">
                 {{form.password.label(class="label")}}
             </div>
             <div class = "signedupdetails">
-                {{form.password(class="inputbox")}}
+                {%if form.password.errors%}
+                    {{form.password(class="inputbox is invalid")}}
+                    <div class="invalid-input">
+                        {%for error in form.password.errors %}
+                            <span>{{error}}</span>
+                        {%endfor%}
+                    </div>
+                {%else%}
+                    {{form.password(class="inputbox")}}
+                {%endif%}
             </div>
+
             <div class="smallt">
                 {{form.confirm_password.label(class="label")}}
             </div>   
             <div class = "signedupdetails">
-                {{form.confirm_password(class="inputbox")}}
+                {%if form.confirm_password.errors%}
+                {{form.confirm_password(class="inputbox is invalid")}}
+                <div class="invalid-input">
+                    {%for error in form.confirm_password.errors %}
+                        <span>{{error}}</span>
+                    {%endfor%}
+                </div>
+                {%else%}
+                    {{form.confirm_password(class="inputbox")}}
+                {%endif%}
             </div>
             <div class = "change password">
                 <p>Forgot password? <a href="/resetpass">Click here to reset!</a> </p>

@@ -30,9 +30,6 @@ def signup():
 def resetpassword():
     return render_template("forgetpass.html")
 
-@app.route("/process", methods=["POST"])
-def process():
-    return "Congrats! You have successfully sign up as a user. "
 
 if __name__ == "__main__":
     app.run(debug=True) 

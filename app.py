@@ -16,7 +16,7 @@ def home():
 def login():
     form =LogInForm()
     if form.validate_on_submit():
-        if form.username.data =="chensx1@gmail.com" and form.password.data =="ABC123":
+        if form.username.data =="joel ting" and form.password.data =="ABC123":
             flash(f"Successfully log in!")
             return redirect(url_for("home"))
         else:

@@ -21,7 +21,7 @@ def login():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
-        flash(f"Account created for {form.username.data}!", "success")
+        flash(f"Congrats! Account has been successfully created for {form.username.data}!")
         return redirect(url_for("home"))
     return render_template("signup.html",title="Sign Up", form=form)
 

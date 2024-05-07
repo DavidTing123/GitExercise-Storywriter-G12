@@ -13,21 +13,21 @@
 </head>
 <body>
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
             <div class="flash-messages">
                 <ul>
-                    {% for message in messages %}
-                        {% if 'success' in message %}
-                            <li class="flash-success">{{ message }}</li>
-                        {% elif 'error' in message %}
-                            <li class="flash-error">{{ message }}</li>
-                        {% else %}
-                            <li>{{ message }}</li>
-                        {%endif%}
-                    {% endfor %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            {% if 'success' in message %}
+                                <li class="flash-success">{{ message }}</li>
+                            {% elif 'error' in message %}
+                                <li class="flash-error">{{ message }}</li>
+                            {% else %}
+                                <li>{{ message }}</li>
+                            {%endif%}
+                        {% endfor %}
+                    {% endif %}
                 </ul>
             </div>
-        {% endif %}
-    {% endwith %}
+     {% endwith %}
 </body>
 </html>

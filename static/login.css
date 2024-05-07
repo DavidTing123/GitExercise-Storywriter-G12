@@ -128,8 +128,8 @@ img{
     width: 400;
 }
 
-.flash-messages ul li{
-    list-style-type:none;
+.flash-messages li{
+    list-style:none;
 }
 
 .flash-messages {
@@ -137,6 +137,10 @@ img{
     margin-top:10px;
     margin-bottom: 10px;
     border-radius: 5px;
+}
+
+.flash-messages li{
+    font-weight: bold;
 }
 
 .flash-success {

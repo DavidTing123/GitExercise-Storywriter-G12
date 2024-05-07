@@ -8,7 +8,7 @@
 }
 
 head{
-    font-family:Verdana, Geneva, Tahoma, sans-serif
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
 }
 
 nav{
@@ -45,19 +45,25 @@ nav ul li a{
 }
 
 
-.flash-message {
+.flash-messages {
     padding: 20px;
     margin-top:10px;
     margin-bottom: 10px;
     border-radius: 5px;
 }
 
+.flash-messages li{
+    font-weight: bold;
+    font-size: 18px;
+}
 .flash-success {
     background-color: #4CAF50;
+    padding: 20px;
     color: black;
 }
 
 .flash-error {
     background-color: #f44336;
+    padding: 20px;
     color: black;
 }

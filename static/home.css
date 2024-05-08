@@ -18,13 +18,13 @@
     font-weight: bold;
     font-size: 18px;
 }
-.flash-success {
+.flash-s {
     background-color: #4CAF50;
     padding: 15px;
     color: black;
 }
 
-.flash-error {
+.flash-e {
     background-color: #f44336;
     padding: 15px;
     color: black;

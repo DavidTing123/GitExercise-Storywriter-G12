@@ -12,16 +12,15 @@
         <div class="flash-messages">
             {% if messages %}
                 {% for message in messages %}
-                {% if 'success' in message %}
-                    <li class="flash-success">{{ message }}</li>
-                {% else %}
-                    <li class="flash-error">{{ message }}</li>
-                {%endif%}
+                    {% if 'success' in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
                 {% endfor %}
             {%endif%}
         </div>
     {% endwith%}
 {%endblock%}
-</div>
 </body>
 </html>

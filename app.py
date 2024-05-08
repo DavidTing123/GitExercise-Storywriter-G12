@@ -17,10 +17,10 @@ def login():
     form =LogInForm()
     if form.validate_on_submit():
         if form.username.data =="joel ting" and form.password.data =="ABC123":
-            #flash(f"Successfully log in!", "success")
+            flash("Successfully log in!", "success")
             return redirect(url_for("home"))
         else:
-            flash(f"Log in unsuccessfully.","error")
+            flash("Log in unsuccessfully.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

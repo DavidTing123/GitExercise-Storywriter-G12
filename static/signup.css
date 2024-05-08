@@ -65,3 +65,8 @@ body{
 p{
     font-size: 14px;
 }
+
+.invalid-input{
+    font-size: 12px;
+    color: red;
+}

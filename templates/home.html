@@ -12,7 +12,7 @@
         {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
-                    {% if 'success' in message %}
+                    {% if "success" in message %}
                         <li class="flash-s">{{ message }}</li>
                     {% else %}
                         <li class="flash-e">{{ message }}</li>

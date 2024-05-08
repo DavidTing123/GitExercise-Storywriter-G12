@@ -8,19 +8,16 @@
 <body>
 {% block title %}Home Page{% endblock %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
             <div class="flash-messages">
                 <ul>
                     {% if messages %}
-                        {% for message in messages %}
-                            {% if 'success' in message %}
-                                <li class="flash-success">{{ message }}</li>
-                            {% else %}
-                                <li class="flash-error">{{ message }}</li>
-                            {%endif%}
-                        {% endfor %}
-                    {% endif %}
-                </ul>
+                        {% for category, message in messages %}
+                        <div class="result{{}}">
+                            {{message}}
+                        </div>
+                        {%endfor%}
+                    {%endif%}
             </div>
      {% endwith %}
 {% endblock%}

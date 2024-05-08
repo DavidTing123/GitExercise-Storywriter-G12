@@ -20,7 +20,7 @@ def login():
             flash(f"Successfully log in!","success")
             return redirect(url_for("home"))
         else:
-            flash(f"Log in unsuccessfully.","error")
+            flash(f"Log in unsuccessfully.","danger")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

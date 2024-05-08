@@ -8,8 +8,8 @@
 <body>
 {% block title %}Home Page{% endblock %}
 {% block content %}
-    {% with messages = get_flashed_messages() %}
-        <div class="flash-messages">
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
             {% if messages %}
                 {% for message in messages %}
                     {% if 'success' in message %}
@@ -19,8 +19,8 @@
                     {%endif%}
                 {% endfor %}
             {%endif%}
-        </div>
-    {% endwith%}
+        {% endwith%}
+    </div>
 {%endblock%}
 </body>
 </html>

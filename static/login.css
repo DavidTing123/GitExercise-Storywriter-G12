@@ -141,14 +141,17 @@ img{
 
 .flash-messages li{
     font-weight: bold;
+    font-size: 18px;
 }
 
 .flash-success {
     background-color: #4CAF50;
+    padding: 15px;
     color: black;
 }
 
 .flash-error {
     background-color: #f44336;
+    padding: 15px;
     color: black;
 }

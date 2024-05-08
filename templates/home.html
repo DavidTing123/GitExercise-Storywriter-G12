@@ -19,10 +19,8 @@
                         {% for message in messages %}
                             {% if 'success' in message %}
                                 <li class="flash-success">{{ message }}</li>
-                            {% elif 'error' in message %}
-                                <li class="flash-error">{{ message }}</li>
                             {% else %}
-                                <li>{{ message }}</li>
+                                <li class="flash-error">{{ message }}</li>
                             {%endif%}
                         {% endfor %}
                     {% endif %}

@@ -58,12 +58,12 @@ nav ul li a{
 }
 .flash-success {
     background-color: #4CAF50;
-    padding: 20px;
+    padding: 15px;
     color: black;
 }
 
 .flash-error {
     background-color: #f44336;
-    padding: 20px;
+    padding: 15px;
     color: black;
 }

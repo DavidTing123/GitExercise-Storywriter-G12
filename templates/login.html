@@ -3,15 +3,11 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
     <title>Login Page</title>
-    <nav>
-        <label class="logo">StoryWriter</label>
-        <ul class="navbar">
-            <li><a href="/login">Login</a></li>
-            <li><a href="#">profile</a></li>
-        </ul>
-    </nav>
 </head>
 <body>
+{% extends "nav.html" %}
+{% block title %}Login Page{% endblock %}
+{% block content %}
     {% with messages = get_flashed_messages() %}
             <div class="flash-messages">
                 <ul>
@@ -66,4 +62,5 @@
             <img src="{{ url_for('static', filename='login_img.jpg') }}" width="600px" height="500px " alt="Image">
         </div>
     </div>
+{%endblock%}
 </body>

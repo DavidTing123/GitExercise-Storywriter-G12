@@ -79,11 +79,11 @@ const userName = document.querySelector(".user");
         USERID.date = new Date().toLocaleString();
         let published = 
         `<div class="parents">
-            <img src="${USERID.image}">
+            <img src="${USERID.image}" width=25>
             <div>
                 <h1>${USERID.name}</h1>
                 <p>${USERID.message}</p>
-                <div class="engagements"><img src="like.png" id="like"><img src="share.png" alt=""></div>
+                <div class="engagements"><img src="like.png" id="like" width=25><img src="share.png" alt="" width= 25></div>
                 <span class="date">${USERID.date}</span>
             </div>    
         </div>`

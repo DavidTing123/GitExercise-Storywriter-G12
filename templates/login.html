@@ -3,9 +3,9 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
     <title>Login Page</title>
+    {% extends "nav.html" %}
 </head>
 <body>
-{% extends "nav.html" %}
 {% block title %}Login Page{% endblock %}
 {% block content %}
     {% with messages = get_flashed_messages() %}

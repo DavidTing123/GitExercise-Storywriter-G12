@@ -18,7 +18,7 @@ def login():
     if form.validate_on_submit():
         if form.username.data =="joel ting" and form.password.data =="ABC123":
             flash("Successfully log in!", "success")
-            return redirect(url_for("home"))
+            return redirect(url_for("index"))
         else:
             flash("Log in unsuccessfully.","error")
     return render_template("login.html", title="Log In", form=form)
@@ -28,7 +28,7 @@ def signup():
     form = SignUpForm()
     if form.validate_on_submit():
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
-        return redirect(url_for("home"))
+        return redirect(url_for("index"))
     return render_template("signup.html",title="Sign Up", form=form)
 
 

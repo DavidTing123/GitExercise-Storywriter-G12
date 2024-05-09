@@ -6,8 +6,26 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>Story Writer</title>
+    {% extends "nav.html" %}
 </head>
 <body>
+{% block title %}Home Page{% endblock %}
+{% block content %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
+                {% endfor %}
+            {%endif%}
+        {% endwith%}
+    </div>
+{%endblock%}
+
     <h1>Story Writer</h1>
     <form action="/add_story" method="post">
         <label for="title">Title:</label>

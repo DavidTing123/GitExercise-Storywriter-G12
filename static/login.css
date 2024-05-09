@@ -1,0 +1,107 @@
+*{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    display:flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: #c5e1f8;
+}
+
+.bigbox{
+    width: 800px;
+    height: 500px;
+    display:flex;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 5px 7px 20px;
+    overflow: hidden;
+    margin: auto;
+}
+
+
+.logininfo{
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 70px;
+    margin-bottom:70px;
+    
+}
+
+h3{
+    font-weight: bold;
+    color:blue;
+    font-size: 30px;
+}
+
+
+
+.inputfield{
+    
+    width: 260px;
+    display:flex;
+    font-size: 18px;
+    padding-top: 15px;
+    margin-top: 30px;
+    color:rgb(68, 68, 199);
+    border:none;
+    outline: none;
+    border-bottom: 2px solid;
+
+}
+
+.inputfield::placeholder{
+    color:rgb(155, 165, 255);
+}
+
+.button{
+    margin-top: 40px;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 260px;
+    height: 40px;
+    font-size:20px;
+    color:white;
+    background-color: #5c72cb;
+    border: none;
+}
+
+button:hover{
+    opacity:0.8;
+    transition: opacity 0.15s;
+}
+
+button:active{
+    opacity: 0.6;
+}
+
+p{
+    padding-top: 20px;
+
+}
+
+img{
+    width: 400;
+}
+
+.flash-messages li{
+    list-style:none;
+}
+
+.flash-messages {
+    padding: 20px;
+    margin-top:10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.flash-messages li{
+    font-weight: bold;
+    font-size: 18px;
+}
+

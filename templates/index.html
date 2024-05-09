@@ -4,18 +4,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>Story Writer</title>
 </head>
 <body>
     <h1>Story Writer</h1>
     <form action="/add_story" method="post">
-        <label for="title">Title:</label><br>
+        <label for="title">Title:</label>
         <input type="text" id="title" name="title" size="50" required placeholder="Enter your title here"><br><br>
         <label for="content">Content:</label><br>
-        <textarea id="content" name="content" rows="10" cols="80" required placeholder="Write your story here"></textarea><br><br>
-        <input type="submit" value="Save the story above">
+        <textarea id="content" name="content" rows="10" cols="80" required placeholder="Write your story here"></textarea><br>
+        <input type="submit" value="Save the new story into file"><br><br>
     </form>
-    <h2>Stories Saved:</h2>
+    <h2>Stories Archive:</h2>
     <ol>
         {% for story in stories %}
             <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>

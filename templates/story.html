@@ -4,6 +4,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>{{ story.title }}</title>
 </head>
 <body>
@@ -11,9 +12,12 @@
     <p>{{ story.content }}</p>
 
     <form method="post" action="{{ url_for('speech_text') }}">
-      <button type="submit">Speech the Text</button><br><br>
-    </form>
+      <button type="submit">Speak the text above</button>
+    </form><br>
 
-    <a href="/">Back to Stories</a>
+    <a href="/">Back to main screen</a><br>
+    
+    <img src="{{ url_for('static', filename='images/bookworm.gif') }}" alt="Bookworm GIF" width=150>
+    
 </body>
 </html>

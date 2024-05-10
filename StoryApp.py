@@ -35,6 +35,19 @@ import pyttsx3   # a simple text-to-speech converter library in Python
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "c1f15fb9b451ddfe14ae6e2baa65d787"
+app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite://site.db'
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id =db.Column(db.Integer,primary_key=True)
+    email = db.Column(db.String(25),unique=True, nullable=False)
+    username = db.Column(db.String(20),unique=True, nullable=False)
+    password = db.Column(db.String(40), nullable=False)
+    image_file = db.Column(db.String(20), nullable=False, default="default.jpg")
+
+    def __repr__(self):
+        return f"User('{self.username}, '{self.email}' ,'{self.image_file}')"
+    
 
 # CSV file - to store the stories data.
 CSV_FILE = 'stories.csv'
@@ -80,8 +93,12 @@ def login():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(email=form.email.data, username=form.username.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
-        return redirect(url_for("index"))
+        return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
 

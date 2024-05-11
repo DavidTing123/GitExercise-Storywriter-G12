@@ -1,7 +1,7 @@
 #https://youtu.be/pJ8V51XJuf0?si=JHO1ROHlo5-LgVa4 (An introduction to Python and Flask Templates) tutorial video that I learn from and reference from
 
 from flask import Flask, render_template,url_for, request, flash, redirect
-from forms import SignUpForm, LogInForm
+from StoryApp.forms import SignUpForm, LogInForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import bcrypt
 

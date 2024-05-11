@@ -25,12 +25,16 @@
 #      https://www.w3schools.com/css/css_text_shadow.asp
 #
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template,url_for, request, flash, redirect
+from forms import SignUpForm, LogInForm
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import bcrypt
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "c1f15fb9b451ddfe14ae6e2baa65d787"
 
 # CSV file - to store the stories data.
 CSV_FILE = 'stories.csv'
@@ -60,6 +64,30 @@ def get_story(title):
             if row[0] == title:
                 return {'title': row[0], 'content': row[1]}
     return None
+
+@app.route("/login" , methods =["GET","POST"])
+def login():
+    form =LogInForm()
+    if form.validate_on_submit():
+        if form.username.data =="joel ting" and form.password.data =="ABC123":
+            flash("Successfully log in!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("Log in unsuccessfully.","error")
+    return render_template("login.html", title="Log In", form=form)
+
+@app.route("/signup" , methods =["GET","POST"])
+def signup():
+    form = SignUpForm()
+    if form.validate_on_submit():
+        flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
+        return redirect(url_for("index"))
+    return render_template("signup.html",title="Sign Up", form=form)
+
+
+@app.route("/resetp")
+def resetpassword():
+    return render_template("forgetpass.html")
 
 
 @app.route('/')

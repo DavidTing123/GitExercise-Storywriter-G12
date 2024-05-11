@@ -1,4 +1,25 @@
 /* templates/styles.css */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    text-decoration: none;
+    list-style: none;
+
+}
+
+.flash-messages {
+    padding: 10px;
+    margin-top:10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.flash-messages li{
+    font-weight: bold;
+    font-size: 14px;
+}
+
 
 body {
     font-family: Verdana, Arial, sans-serif;
@@ -55,10 +76,6 @@ li {
 /* a:local-link, */
 a:link {
     color: blue;
-}
-
-a:visited {
-    color: #8c8c9d;
 }
 
 a:hover {

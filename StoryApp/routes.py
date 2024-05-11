@@ -111,5 +111,3 @@ def speech_text():
     return render_template('story.html', story=story)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)

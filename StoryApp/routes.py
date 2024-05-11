@@ -7,7 +7,7 @@ import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
 
 # CSV file - to store the stories data.
-CSV_FILE = 'stories.csv'
+CSV_FILE = 'StoryApp/stories.csv'
 
 # print(os.getcwd())
 

@@ -50,10 +50,6 @@ def login():
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(email=form.email.data, username=form.username.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)

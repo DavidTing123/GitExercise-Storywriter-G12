@@ -35,7 +35,7 @@ import pyttsx3   # a simple text-to-speech converter library in Python
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "c1f15fb9b451ddfe14ae6e2baa65d787"
-app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite://site.db'
+app.config['SQLALCHEMY_DATABASE_URI'] ='sqlite:///site.db'
 db = SQLAlchemy(app)
 
 class User(db.Model):

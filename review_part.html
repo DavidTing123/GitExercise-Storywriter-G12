@@ -90,6 +90,9 @@ const userName = document.querySelector(".user");
 
         comments.innerHTML += published;
         userComment.value = "";
+
+        let commentsNum = document.querySelectorAll(".parents").length;
+        document.getElementById("comment").textContent = commentsNum;
     }
 
     publishBtn.addEventListener("click", addPost);

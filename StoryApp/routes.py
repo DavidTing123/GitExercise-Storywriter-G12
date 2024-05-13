@@ -1,8 +1,8 @@
-from flask import render_template,url_for, request, flash, redirect
+from flask import render_template,url_for, request, flash, redirect, request
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm
 from StoryApp.models import User
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user,login_required
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
@@ -45,7 +45,8 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for("index"))
+            next_page = request.args.get("next")
+            return redirect(next_page) if next_page else redirect(url_for("index"))
         else:
             flash(f"Log in unsuccessfully. Please ensure that you type your username and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)
@@ -75,6 +76,8 @@ def logout():
     return redirect(url_for("index"))
 
 @app.route("/profile")
+#decorator
+@login_required
 def profile():
     return render_template("profile.html",title="Profile",)
 

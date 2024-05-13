@@ -1,5 +1,5 @@
 from flask import render_template,url_for, request, flash, redirect
-from StoryApp import app
+from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm
 from StoryApp.models import User
 import csv
@@ -39,17 +39,19 @@ def get_story(title):
 def login():
     form =LogInForm()
     if form.validate_on_submit():
-        if form.username.data =="joel ting" and form.password.data =="ABC123":
-            flash("Successfully log in!", "success")
-            return redirect(url_for("index"))
-        else:
-            flash("Log in unsuccessfully.","error")
+        flash("Successfully log in!", "success")
+        return redirect(url_for("index"))
+        flash("Log in unsuccessfully.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        db.session.add(user)
+        db.session.commit()
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)

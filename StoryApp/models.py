@@ -1,4 +1,5 @@
 from StoryApp import db
+from StoryApp import db, login_manager
 
 class User(db.Model):
     id =db.Column(db.Integer,primary_key=True)

@@ -15,12 +15,12 @@ class SignUpForm(FlaskForm):
 
         user = User.query.filter_by(email=email.data).first()
         if user:
-            raise ValidationError('Email already signed up. Please signed up with another email.')
+            raise ValidationError('This email is already taken. Please signed up with another email.')
     
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
         if user:
-            raise ValidationError('This username is taken. Please choose another one.')
+            raise ValidationError('This username is already taken. Please choose another one.')
 
 class LogInForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired(), Length(min=5, max=20)])

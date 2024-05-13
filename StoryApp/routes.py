@@ -2,7 +2,7 @@ from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm
 from StoryApp.models import User
-from flask_login import login_user
+from flask_login import login_user, current_user
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
@@ -38,6 +38,8 @@ def get_story(title):
 
 @app.route("/login" , methods =["GET","POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
     form =LogInForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -50,6 +52,8 @@ def login():
 
 @app.route("/signup" , methods =["GET","POST"])
 def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
     form = SignUpForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')

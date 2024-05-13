@@ -7,9 +7,13 @@
     <nav>
         <label class="logo">StoryWriter</label>
         <ul class="navbar">
-            <li><a href="/login">Login</a></li>
-            <li><a href="/signup">Sign Up</a></li>
-            <li><a href="#">Profile</a></li>
+            {%if current_user.is_authenticated%}
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">SignUp</a></li>
+                <li><a href="#">Profile</a></li>
+            {% endif %}
         </ul>
     </nav>
     {% block content %}{% endblock %}

@@ -2,7 +2,7 @@ from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm
 from StoryApp.models import User
-from flask_login import login_user, current_user
+from flask_login import login_user, current_user, logout_user
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
@@ -68,6 +68,11 @@ def signup():
 @app.route("/resetp")
 def resetpassword():
     return render_template("forgetpass.html")
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
 
 
 @app.route('/')

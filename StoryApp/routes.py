@@ -1,39 +1,13 @@
-# Program name: StoryApp.py
-#
-# Description: A flask web application for story writer
-#
-# References:
-#  1. Flask – (Creating first simple application)
-#      https://www.geeksforgeeks.org/flask-creating-first-simple-application/
-#  2. Story Generator App Using Python
-#      https://www.geeksforgeeks.org/story-generator-app-using-python/
-#  3. How to build a Random Story Generator using Python?
-#      https://www.geeksforgeeks.org/how-to-build-a-random-story-generator-using-python/
-#  4. HTML Form Elements
-#     https://www.w3schools.com/html/html_form_elements.asp
-#  5. Python Text To Speech | pyttsx module
-#      https://www.geeksforgeeks.org/python-text-to-speech-pyttsx-module/?ref=lbp
-#  6. Build a Text to Speech Service with Python Flask Framework
-#      https://dev.to/siddheshshankar/build-a-text-to-speech-service-with-python-flask-framework-3966
-#  7. Flask - Calling python function on button OnClick event
-#      https://stackoverflow.com/questions/42601478/flask-calling-python-function-on-button-onclick-event
-#  8. 10 Lines Short Stories With Moral Lessons for Kids
-#      https://ofhsoupkitchen.org/short-stories-with-morals#:~:text=The%20Dog%20and%20the%20Bone,a%20bone%20in%20its%20mouth.
-#  9. CSS Links
-#      https://www.w3schools.com/css/css_link.asp
-# 10. CSS Text Shadow
-#      https://www.w3schools.com/css/css_text_shadow.asp
-#
-
-from flask import Flask, render_template, request, redirect, url_for
+from flask import render_template,url_for, request, flash, redirect
+from StoryApp import app
+from StoryApp.forms import SignUpForm, LogInForm
+from StoryApp.models import User
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
 
-app = Flask(__name__)
-
 # CSV file - to store the stories data.
-CSV_FILE = 'stories.csv'
+CSV_FILE = 'StoryApp/stories.csv'
 
 # print(os.getcwd())
 
@@ -60,6 +34,30 @@ def get_story(title):
             if row[0] == title:
                 return {'title': row[0], 'content': row[1]}
     return None
+
+@app.route("/login" , methods =["GET","POST"])
+def login():
+    form =LogInForm()
+    if form.validate_on_submit():
+        if form.username.data =="joel ting" and form.password.data =="ABC123":
+            flash("Successfully log in!", "success")
+            return redirect(url_for("index"))
+        else:
+            flash("Log in unsuccessfully.","error")
+    return render_template("login.html", title="Log In", form=form)
+
+@app.route("/signup" , methods =["GET","POST"])
+def signup():
+    form = SignUpForm()
+    if form.validate_on_submit():
+        flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
+        return redirect(url_for("login"))
+    return render_template("signup.html",title="Sign Up", form=form)
+
+
+@app.route("/resetp")
+def resetpassword():
+    return render_template("forgetpass.html")
 
 
 @app.route('/')
@@ -113,5 +111,3 @@ def speech_text():
     return render_template('story.html', story=story)
 
 
-if __name__ == '__main__':
-    app.run(debug=True)

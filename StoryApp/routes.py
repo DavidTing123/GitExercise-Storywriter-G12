@@ -2,6 +2,7 @@ from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm
 from StoryApp.models import User
+from flask_login import login_user
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 # import os
@@ -39,11 +40,12 @@ def get_story(title):
 def login():
     form =LogInForm()
     if form.validate_on_submit():
-        if form.username.data =="joel ting" and form.password.data == "ABC123":
-            flash(f"Successfully log in!", "success")
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user)
             return redirect(url_for("index"))
         else:
-            flash(f"Log in unsuccessfully.","error")
+            flash(f"Log in unsuccessfully. Please ensure that you type your username and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

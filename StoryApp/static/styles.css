@@ -1,0 +1,96 @@
+/* templates/styles.css */
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    text-decoration: none;
+    list-style: none;
+
+}
+
+.flash-messages {
+    padding: 10px;
+    margin-top:10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.flash-messages li{
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+body {
+    font-family: Verdana, Arial, sans-serif;
+    background-color: lightblue;
+}
+
+h1, h2 {
+    color: Blue;
+    /* add a color (red, 2px) to the shadow; add a blur effect (5px) to the shadow. */
+    text-shadow: 2px 2px 5px red;
+}
+
+label {
+    font-weight: bold;
+}
+
+input[type="text"],
+textarea {
+  /*  background-color: lightgray; */
+    width: 40%;
+    padding: 10px;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+textarea {
+    width: 75%;
+}
+
+input[type="submit"] {
+    background-color: #5c72cb;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;     /* Set rounded corners */
+    border-style: ridge;    /* Specifies a 3D ridged border */
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+
+/* a:local-link, */
+a:link {
+    color: blue;
+}
+
+a:hover {
+    color: #f15a51;
+}
+
+button {
+    background-color: #5c72cb;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    border-style: ridge;
+}
+
+button:hover {
+    background-color: #45a049;
+}

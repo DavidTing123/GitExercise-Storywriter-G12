@@ -1,0 +1,44 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Story Writer</title>
+    {% extends "nav.html" %}
+</head>
+<body>
+{% block title %}Home Page{% endblock %}
+{% block content %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
+                {% endfor %}
+            {%endif%}
+        {% endwith%}
+    </div>
+
+    <h1>Story Writer</h1>
+    <form action="/add_story" method="post">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" size="50" required placeholder="Enter your title here"><br><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" rows="10" cols="80" required placeholder="Write your story here"></textarea><br>
+        <input type="submit" value="Save the new story into file"><br><br>
+    </form>
+    <h2>Stories Archive:</h2>
+    <ol>
+        {% for story in stories %}
+            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
+        {% endfor %}
+    </ol>
+{%endblock%}
+</body>
+</html>

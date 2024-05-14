@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+    <title>Login Page</title>
+    {% extends "nav.html" %}
+</head>
+<body>
+{% block title %}Login Page{% endblock %}
+{% block content %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                     {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div class="bigbox">
+        <form method="post" action="">
+            {{ form.hidden_tag()}}
+            <div class="logininfo">
+                <h3>Login</h3>
+                <div class="inputbox">
+                    {%if form.username.errors%}
+                        {{form.username(class="inputfield is invalid")}}
+                        <div class="invalid-input">
+                            {%for error in form.username.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.username(class="inputfield", placeholder="Username")}}
+                    {%endif%}
+                </div>
+                <div class="inputbox">
+                    {%if form.password.errors%}
+                        {{form.password(class="inputfield is invalid")}}
+                        <div class="invalid-input">
+                            {%for error in form.password.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.password(class="inputfield" , placeholder="Password")}}
+                    {%endif%}
+                </div>
+                <div class="button1">
+                    {{form.submit(class="button")}}
+                </div>
+                <p>New user? <a href ="/signup">Sign up now!</a></p>
+            </div>
+        </form>
+        <div class="image">
+            <img src="{{ url_for('static', filename='login_img.jpg') }}" width="600px" height="500px " alt="Image">
+        </div>
+    </div>
+{%endblock%}
+</body>

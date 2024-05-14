@@ -9,56 +9,50 @@
 <body>
 {% block title %}Profile Page{% endblock %}
 {% block content %}
-        <div class="content">
-            <div class="media">
-                <img class="rounded-circle profile-img align-self-start" src="{{ image_file }}" width="200" height="175">
-                <div class="media-body">
-                    <h2 class="profile-heading">{{ current_user.username }}</h2>
-                    <p class="text-secondary">{{ current_user.email }}</p>
-                </div>
+    <div class="content">
+        <div class="media">
+             <img class="rounded-circle profile-img align-self-start" src="{{ image_file }}" width="200" height="175">
+             <div class="media-body">
+                <h2 class="profile-heading">{{ current_user.username }}</h2>
+                <p class="text-secondary">{{ current_user.email }}</p>
             </div>
         </div>
-        <div class = "overall">
-            <form method="post" action="">
-                {{ form.hidden_tag()}}
-                <div class="title"><h1>Profile Info</h1></div>
-                <div class = "smallt">
-                    {{form.email.label(class="label")}}
-                </div>
-                <div class = "signedupdetails">
-                    {%if form.email.errors%}
-                        {{form.email(class="inputbox is invalid",value="")}}
-                        <div class="invalid-input">
-                            {%for error in form.email.errors %}
-                                <span>{{error}}</span>
-                            {%endfor%}
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Profile</legend>
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+
+                    {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
                         </div>
-                    {%else%}
-                        {{form.email(class="inputbox")}}
-                    {%endif%}
+                    {% else %}
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
                 </div>
-    
-                <div class = "smallt">
-                    {{form.username.label(class="label")}}
-                </div>
-                <div class = "signedupdetails">
-                    {%if form.username.errors%}
-                        {{form.username(class="inputbox is invalid")}}
-                        <div class="invalid-input">
-                            {%for error in form.username.errors %}
-                                <span>{{error}}</span>
-                            {%endfor%}
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
                         </div>
-                    {%else%}
-                        {{form.username(class="inputbox")}}
-                    {%endif%}
-    
-                </div> 
-                <div class="button1">
-                    {{form.submit(class="button")}}
+                    {% else %}
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
                 </div>
-            </form>
-         </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
     </div>
 {%endblock content%}
 

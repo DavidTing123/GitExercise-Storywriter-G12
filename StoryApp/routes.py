@@ -1,4 +1,4 @@
-from flask import render_template,url_for, request, flash, redirect, request
+from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
 from StoryApp.models import User

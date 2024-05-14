@@ -1,14 +1,7 @@
 <!-- templates/index.html -->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Story Writer</title>
-    {% extends "nav.html" %}
-</head>
-<body>
+{% extends "nav.html" %}
+
 {% block title %}Home Page{% endblock %}
 {% block content %}
     <div class="flash-messages">
@@ -25,20 +18,21 @@
         {% endwith%}
     </div>
 
-    <h1>Story Writer</h1>
+    <h2>Story Writer</h2>
     <form action="/add_story" method="post">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" size="50" required placeholder="Enter your title here"><br><br>
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" size="50" required placeholder="Enter your title here">
+        <br><br>
         <label for="content">Content:</label><br>
         <textarea id="content" name="content" rows="10" cols="80" required placeholder="Write your story here"></textarea><br>
-        <input type="submit" value="Save the new story into file"><br><br>
+        <input type="submit" value="Save the story above"><br>
     </form>
-    <h2>Stories Archive:</h2>
-    <ol>
-        {% for story in stories %}
-            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
-        {% endfor %}
-    </ol>
+
+    <img src="{{ url_for('static', filename='images/writing.gif') }}" width=120>    
+    
 {%endblock content%}
+
+<!--
 </body>
 </html>
+-->

@@ -1,0 +1,37 @@
+<!-- templates/archive.html -->
+
+{% extends "nav.html" %}
+
+{% block content %}
+
+    <h2>Stories Archive</h2>
+    
+    <div class="archive-item">
+
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Title</th>
+                <th>Delete</th>
+            </tr>  
+            {% for story in stories %}
+                <form action="/delete_story" method="post">
+                    <tr>
+                        <td>{{ story.index+1 }}</td>
+                        <td>{{ story.title }}</td>
+                        <td>
+                            <button class="btn-dustbin" type="submit" name="button_index" value="{{ story.index }}">
+                                <img class=".img-button" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
+                            </button>        
+                        </td>
+                    </tr>
+                </form>
+            {% endfor %}
+        </table>
+
+    </div><br>
+
+  <!-- <a href="/success">Home</a><br><br> -->
+    <img src="{{ url_for('static', filename='images/trash-can.gif') }}" width=100>
+
+{%endblock%}

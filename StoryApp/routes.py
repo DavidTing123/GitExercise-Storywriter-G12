@@ -1,6 +1,6 @@
-from flask import render_template,url_for, request, flash, redirect, request
+from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 import csv
@@ -75,11 +75,22 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-@app.route("/profile")
+@app.route("/profile" , methods =["GET","POST"])
 #decorator
 @login_required
 def profile():
-    return render_template("profile.html",title="Profile",)
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash("Your profile has been updated!","success")
+        return redirect(url_for('profile'))
+    elif request.method =="GET":
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template("profile.html",title="Profile", image_file=image_file, form=form)
 
 
 @app.route('/')

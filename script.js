@@ -31,8 +31,8 @@ function updateWordCount() {
     for (const target of targets) {
         if (wordCount >= target.count && !reachedTargets[target.count]) {
             showPopup(target.message);
-            reachedTargets[target.count] = true; // Mark target as reached
-            break; // Exit loop after showing the first popup
+            reachedTargets[target.count] = true;
+            break;
         }
     }
 

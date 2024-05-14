@@ -1,6 +1,6 @@
 from flask import render_template,url_for, request, flash, redirect, request
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 import csv
@@ -79,7 +79,9 @@ def logout():
 #decorator
 @login_required
 def profile():
-    return render_template("profile.html",title="Profile",)
+    form = UpdateProfileForm()
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template("profile.html",title="Profile", image_file=image_file, form=form)
 
 
 @app.route('/')

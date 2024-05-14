@@ -8,5 +8,55 @@
 <body>
 {% block title %}Profile Page{% endblock %}
 {% block content %}
-    <h1>{{ current_user.username}}</h1>
+    <div class="content">
+        <div class="profilepic">
+            <img src="{{image_file}}" alt="Image">
+            <div class="pbody">
+                <h2 class="account-heading">{{current_user.username}}</h2>
+                <p class="profile_info">{{current_user.email}}</p>
+            </div>
+        </div>
+        <div class = "overall">
+            <form method="post" action="">
+                {{ form.hidden_tag()}}
+                <div class="title"><h1>Profile Info</h1></div>
+                <div class = "smallt">
+                    {{form.email.label(class="label")}}
+                </div>
+                <div class = "signedupdetails">
+                    {%if form.email.errors%}
+                        {{form.email(class="inputbox is invalid",value="")}}
+                        <div class="invalid-input">
+                            {%for error in form.email.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.email(class="inputbox")}}
+                    {%endif%}
+                </div>
+    
+                <div class = "smallt">
+                    {{form.username.label(class="label")}}
+                </div>
+                <div class = "signedupdetails">
+                    {%if form.username.errors%}
+                        {{form.username(class="inputbox is invalid")}}
+                        <div class="invalid-input">
+                            {%for error in form.username.errors %}
+                                <span>{{error}}</span>
+                            {%endfor%}
+                        </div>
+                    {%else%}
+                        {{form.username(class="inputbox")}}
+                    {%endif%}
+    
+                </div> 
+                <div class="button1">
+                    {{form.submit(class="button")}}
+                </div>
+            </form>
+         </div>
+    </div>
 {%endblock content%}
+

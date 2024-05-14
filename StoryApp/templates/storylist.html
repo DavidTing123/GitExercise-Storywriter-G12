@@ -1,0 +1,23 @@
+<!-- templates/storylist.html -->
+
+{% extends "nav.html" %}
+
+{% block title %}
+    Story Listing
+{% endblock %}
+
+{% block content %}
+
+    <h2>Story Listing</h2>
+    <ol>
+        {% for story in stories %}
+            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
+        {% endfor %}
+    </ol>
+
+<!--
+    <br>
+    <img src="{{ url_for('static', filename='images/storytime.gif') }}" width=120>
+-->
+
+{%endblock%}

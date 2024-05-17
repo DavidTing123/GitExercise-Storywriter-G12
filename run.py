@@ -24,6 +24,33 @@
 # 10. CSS Text Shadow
 #      https://www.w3schools.com/css/css_text_shadow.asp
 #
+# -------------------------------------------------------------------------------------------------------------------------
+# Program Listing:
+#   1. StoryApp.py (merge with app.py program)
+#   2. templates/archive.html - ok
+#   3. templates/forgetpass.html
+#   4. templates/home.html
+#   5. templates/index.html - ok
+#   6. templates/login.html
+#   7. templates/nav.html --> templates/base.html - not yet
+#   8. templates/signup.html
+#   9. templates/story.html - ok2
+#  10. templates/storylist.html - ok2
+#  11. static/login.css
+#  12. static/nav.css --> static/base.css - not yet
+#  13. static/signup.css
+#  14. static/styles.css --> static/base.css - not yet
+#  15. static/images/bookworm.gif - ok2
+#  16. static/images/dustbin.jpg - ok2
+#  17. static/images/text-to-speech.jpg - ok2
+#  18. static/images/writing.gif - ok2
+#  19. static/images/trash-can.gif - ok2
+#  20. static/images/storytime.gif - ok2
+#  21. static/login_img.jpg (suggest to move to static\images folder)
+#  22. stories.csv (create automatically by StoryApp.py)
+#  
+# -------------------------------------------------------------------------------------------------------------------------
+
 
 from StoryApp import app
 

@@ -1,0 +1,28 @@
+<!-- templates/storylist.html -->
+
+{% extends "nav.html" %}
+
+{% block title %}
+    Story Listing
+{% endblock %}
+
+{% block content %}
+
+    <h2>Story Listing</h2>
+    <ol>
+        {% for story in stories %}
+        <!-- Change the following "li" line below # TZX002 -->
+        <li>
+            <a href="{{ url_for('read_story', timestamp=story.timestamp) }}">
+                {{ story.title }} -- Author: {{ story.author }}; Creation Date: {{ story.timestamp }} 
+            </a>
+        </li>
+        {% endfor %}
+    </ol>
+
+<!--
+    <br>
+    <img src="{{ url_for('static', filename='images/storytime.gif') }}" width=120>
+-->
+
+{%endblock%}

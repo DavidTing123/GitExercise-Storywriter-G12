@@ -1,0 +1,44 @@
+<!-- templates/archive.html -->
+
+{% extends "nav.html" %}
+
+{% block content %}
+
+    <h2>Stories Archive</h2>
+    
+    <div class="archive-item">
+
+        <table>
+            <tr>
+                <th>No.</th>
+                <th>Title</th>
+                <!-- Add the following 2 lines below. # TZX002 -->                
+                <th>Author</th>
+                <th>Timestamp</th>
+                <th>Delete</th>
+            </tr>  
+            {% for story in stories %}
+                <form action="/delete_story" method="post">
+                    <tr>
+                        <td>{{ loop.index }}.</td>      <!-- # TZX002 added -->
+                        <td>{{ story.title }}</td>
+                        <!-- Add the following 2 lines below. # TZX002 -->
+                        <td>{{ story.author }}</td>
+                        <td>{{ story.timestamp }}</td>                        
+                        <td>
+           <!-- Chg line below: "story.index" replaced with "story.title"; "button_index" replaced with "button_value"  # TZX002 -->                            
+                            <button class="btn-dustbin" type="submit" name="button_value" value="{{ story.timestamp }}">                                
+                                <img class=".img-button" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
+                            </button>        
+                        </td>
+                    </tr>
+                </form>
+            {% endfor %}
+        </table>
+
+    </div><br>
+
+  <!-- <a href="/success">Home</a><br><br> -->
+    <img src="{{ url_for('static', filename='images/trash-can.gif') }}" width=100>
+
+{%endblock%}

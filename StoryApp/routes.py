@@ -8,10 +8,92 @@ from flask_login import login_user, current_user, logout_user,login_required
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 from pygame import mixer    # Sound effect
+## from flask_sqlalchemy import SQLAlchemy     # TZX002
+from sqlalchemy import exc                  # TZX002
+from datetime import datetime               # TZX002
+import winsound                             # TZX002
+import markdown                             # TZX003
+from StoryApp.models import Story           # TZX003a
 
 
 # CSV file - to store the stories data.
 CSV_FILE = 'StoryApp/stories.csv'
+
+# TZX002 program changes (start) ----------------------------------------------------------------
+## app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///stories.db'          # TZX002
+## db = SQLAlchemy(app)                                                    # TZX002
+
+
+# Create tables if they don't exist.    # TZX002
+with app.app_context():                 # TZX002
+    db.create_all()                     # TZX002
+
+
+'''
+# Define a "Story" model with columns for title and content.            # TZX002
+class Story(db.Model):                                                  # TZX002
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)    # TZX002
+    title = db.Column(db.String(50))                                    # TZX002
+    content = db.Column(db.String(500))                                 # TZX002
+    # Use username as an author name.                                   # TZX002
+    author = db.Column(db.String(20), nullable=False)                   # TZX002
+    # To deal with multiple stories that share the same title,          # TZX002
+    # I decided to use the creation timestamp as an unique key          # TZX002
+    # to retrieve (and to delete) the story record.                     # TZX002 
+    timestamp = db.Column(db.String(19))                                # TZX002
+
+def __init__(self, id, title, content, author, timestamp):      # TZX002
+    self.id = id                                                # TZX002
+    self.title = title                                          # TZX002
+    self.content = content                                      # TZX002
+    self.author = author                                        # TZX002
+    self.timestamp = timestamp                                  # TZX002
+'''
+
+# Adds a new story to the database.                             # TZX002
+def write_to_db(title, content, author, timestamp):             # TZX002
+    try:                                                        # TZX002
+        record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        db.session.add(record)                                  # TZX002
+        db.session.commit()                                     # TZX002
+    except exc.IntegrityError as err:                           # TZX002
+        winsound.Beep(1000, 500)                            # TZX002
+        # check if error is related to author.              # TZX002
+        if "author" in str(err):                            # TZX002
+            print("Error: Story author cannot be null")     # TZX002
+
+# Retrieves all stories from database.      # TZX002
+def read_from_db():                         # TZX002
+    all_stories = Story.query.all()         # TZX002
+    print('all_stories', all_stories)       # TZX002
+    return all_stories                      # TZX002
+
+# Retrieves a story by its title from database.         # TZX002
+def get_story_by_timestamp(timestamp):                          # TZX002
+    return Story.query.filter_by(timestamp=timestamp).first()   # TZX002
+
+# Deletes a record from database based on timestamp.    # TZX002
+def delete_story_by_timestamp(timestamp):               # TZX002
+    try:                                                # TZX002
+        #story = Story.query.get(timestamp)                  # TZX002
+        story = Story.query.filter(Story.timestamp == timestamp).first()    # TZX002
+    
+        if story:                                           # TZX002
+            # Delete the story and commit the change        # TZX002
+            db.session.delete(story)                        # TZX002
+            db.session.commit()                             # TZX002
+            return True                                     # TZX002
+        else:                                               # TZX002
+            winsound.Beep(1000, 500)                        # TZX002
+            print("Timestamp not found.")                   # TZX002
+            return False                                    # TZX002
+        
+    except Exception as e:                                  # TZX002
+        print(f"An error occurred while deleting the story: {e}")   # TZX002
+        return False                                                # TZX002
+
+# TZX002 program changes (end) ----------------------------------------------------------------
+
 
 # Function to write story to CSV file
 def write_to_csv(title, content):
@@ -65,6 +147,8 @@ def home():
 
 @app.route("/login" , methods =["GET","POST"])
 def login():
+    global username     # TZX002
+
     if current_user.is_authenticated:
         return redirect(url_for("index"))
     form =LogInForm()
@@ -151,20 +235,37 @@ def index():
 def add_story():
     title = request.form['title']
     content = request.form['content']
-    write_to_csv(title, content)
+
+    # Get the current timestamp                                 # TZX002
+    current_timestamp = datetime.now()                          # TZX002
+    # Format it as a string (e.g., "YYYY-MM-DD HH:MM:SS")       # TZX002
+    DateTime = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")  # TZX002
+
+    try:                                                        # TZX002
+        print('username', username)                             # TZX002
+    except NameError:                                           # TZX002
+        print("The username variable was NOT defined.")         # TZX002
+    else:                                                       # TZX002
+        print("The username variable was defined.")             # TZX002
+
+    #write_to_csv(title, content)                               # TZX002
+    write_to_db(title, content, username, DateTime)             # TZX002
+
     #return redirect(url_for('index'))
     return redirect(url_for('index'))
 
 
 @app.route('/storylist')
 def storylist():
-    stories = read_from_csv()
+    #stories = read_from_csv()
+    stories = read_from_db()    # TZX002
     return render_template('storylist.html', stories=stories)
 
 
 @app.route('/archive')
 def archive():
-    stories = read_from_csv()
+    #stories = read_from_csv()
+    stories = read_from_db()    # TZX002
     return render_template('archive.html', stories=stories)
     '''
     print("username:", username)
@@ -180,19 +281,34 @@ def archive():
     '''
 
 
-#@app.route('/story/<title>')
-@app.route('/read_story/<title>')
-def read_story(title):
+#@app.route('/read_story/<title>')
+@app.route('/read_story/<timestamp>')           # TZX002
+#def read_story(title):
+def read_story(timestamp):                      # TZX002
     global story
-    story = get_story(title)
+
+    #story = get_story(title)
+    story = get_story_by_timestamp(timestamp)   # TZX002
+
+    #------------------------------------------------------ # TZX003
+    # For Markdown changes.                                 # TZX003
+    #------------------------------------------------------ # TZX003
+    # Reference: https://icecreamcode.org/posts/python/markdown/
+    data = {}                                               # TZX003
+    data["page_title"] = story.title                        # TZX003
+    data["html"] = markdown.markdown(story.content)         # TZX003
+    data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
+    return render_template('story_page.html', data=data)    # TZX003
+
+'''
     if story:
         return render_template('story.html', story=story)
     else:
         return "Story not found."
+'''
 
 
 @app.route('/speech_text', methods=['POST'])
-#@app.route('/speech_text')
 def speech_text():
     
     # Initialize the TTS engine
@@ -208,9 +324,11 @@ def speech_text():
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[1].id)   # index 0 for male and 1 for female
 
-    text1 = story["title"]          # Retrieve title of story
+    #text1 = story["title"]          # Retrieve title of story
+    text1 = story.title             # Retrieve title of story  # TZX002
     engine.say(text1)               # Perform the text-to-speech conversion
-    text2 = story["content"]        # Retrieve the content of story
+    #text2 = story["content"]        # Retrieve the content of story
+    text2 = story.content           # Retrieve the content of story  # TZX002
     engine.say(text2)               # Perform the text-to-speech conversion
     engine.runAndWait()             # Wait for the speech to finish
 
@@ -222,9 +340,14 @@ def delete_story():
     index = 0
     if request.method == "POST":
         # Get the input value from the HTML form
-        record_index = int(request.form.get('button_index'))
+        #record_index = int(request.form.get('button_index'))
+        record_timestamp = request.form.get('button_value')     # TZX002 added
+
         # Process the value as needed (e.g., print it)
-        print(f'Record index is {record_index}')
-        delete_csv_record(record_index)
+        #print(f'Record index is {record_index}')
+        print(f'Record timestamp is {record_timestamp}')        # TZX002 changes
+        
+        #delete_csv_record(record_index)
+        delete_story_by_timestamp(record_timestamp)   # TZX002
         
     return redirect(url_for('archive'))

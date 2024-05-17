@@ -11,7 +11,12 @@
     <h2>Story Listing</h2>
     <ol>
         {% for story in stories %}
-            <li><a href="{{ url_for('read_story', title=story.title) }}">{{ story.title }}</a></li>
+        <!-- Change the following "li" line below # TZX002 -->
+        <li>
+            <a href="{{ url_for('read_story', timestamp=story.timestamp) }}">
+                {{ story.title }} -- Author: {{ story.author }}; Creation Date: {{ story.timestamp }} 
+            </a>
+        </li>
         {% endfor %}
     </ol>
 

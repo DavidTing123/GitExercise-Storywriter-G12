@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang = "en">
 <head>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='reset_request.css') }}">
     <title>Reset Password</title>
     {% extends "nav.html" %}
 </head>
 <body>
-{% block title %}Login Page{% endblock %}
+{% block title %}Reset Password{% endblock %}
 {% block content %}
     <div class="flash-messages">
         {% with messages = get_flashed_messages() %}
@@ -41,12 +41,7 @@
                 <div class="button1">
                     {{form.submit(class="button")}}
                 </div>
-                <p>New user? <a href ="/signup">Sign up now!</a></p>
-            </div>
         </form>
-        <div class="image">
-            <img src="{{ url_for('static', filename='login_img.jpg') }}" width="600px" height="500px " alt="Image">
-        </div>
     </div>
 {%endblock content%}
 </body>

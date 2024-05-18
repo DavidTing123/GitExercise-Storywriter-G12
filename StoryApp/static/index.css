@@ -77,6 +77,44 @@ p {
     margin-bottom: 10px; 
 }
 
+input[type="text"],
+textarea {
+    margin-left: 20px;
+    padding: 8px;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background-color: #5c72cb;
+    color: white;
+    padding: 8px;
+    margin-left: 40px;
+    margin-top: 5px;
+    cursor: pointer;
+    border-radius: 5px;     
+    border-style: ridge;    
+    width: 200px;           
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+    transform: scale(1.2,1.2);
+}
+
+button {
+    color: white;
+    cursor: pointer;
+    border-radius: 5px; 
+    border-style: ridge;
+    margin-left: 50px;
+}
+
+button:hover {
+    transform: scale(1.2,1.2);
+}
+
 ol {
     list-style: decimal;
 }

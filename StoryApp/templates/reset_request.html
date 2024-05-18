@@ -22,10 +22,10 @@
         {% endwith %}
     </div>
     <div class="bigbox">
-        <form method="post" action="">
+        <form method="post" action="" class="login-form">
             {{ form.hidden_tag()}}
             <div class="logininfo">
-                <h3>Login</h3>
+                <h3>Reset Password</h3>
                 <div class="inputbox">
                     {%if form.email.errors%}
                         {{form.email(class="inputfield is invalid")}}
@@ -41,6 +41,7 @@
                 <div class="button1">
                     {{form.submit(class="button")}}
                 </div>
+            </div>
         </form>
     </div>
 {%endblock content%}

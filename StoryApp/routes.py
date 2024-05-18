@@ -191,6 +191,7 @@ def send_reset_email(user):
 
 If you did not make this request, simply ignore this email and no changes will be made.
 '''
+    mail.send(msg)
 
 @app.route("/resetp" , methods =["GET","POST"])
 def resetpassword():
@@ -198,7 +199,7 @@ def resetpassword():
         return redirect(url_for("index"))
     form = RequestResetForm()
     if form.validate_on_submit():
-        user =user.query.filter_by(email=form.email.data).first()
+        user =User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
         flash("An email has been sent to reset your password.", "info")
         return redirect(url_for("login"))

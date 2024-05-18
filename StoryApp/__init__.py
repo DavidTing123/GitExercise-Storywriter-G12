@@ -16,7 +16,7 @@ app.config['Mail_SERVER'] = 'smtp.googlemail.com'
 app.config['Mail_PORT'] = 587
 app.config['Mail_USE_TLS'] = True 
 app.config['Mail_USERNAME'] = os.environ.get('EMAIL_USER')
-app.config['Mail_USERNAME'] = os.environ.get('EMAIL_PASS')
+app.config['Mail_PASSWORD'] = os.environ.get('EMAIL_PASS')
 mail = Mail(app)
 
 from StoryApp import routes

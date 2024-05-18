@@ -2,10 +2,11 @@ import os
 import secrets 
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
-from StoryApp import app,db, bcrypt
+from StoryApp import app,db, bcrypt, mail
 from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
+from flask_mail import Message
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 from pygame import mixer    # Sound effect
@@ -182,11 +183,25 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message("Password Reset Request", sender="noreply@demo.com", recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for("reset_token", token=token, _external=True)}
+
+If you did not make this request, simply ignore this email and no changes will be made.
+'''
+
 @app.route("/resetp" , methods =["GET","POST"])
 def resetpassword():
     if current_user.is_authenticated:
         return redirect(url_for("index"))
     form = RequestResetForm()
+    if form.validate_on_submit():
+        user =user.query.filter_by(email=form.email.data).first()
+        send_reset_email(user)
+        flash("An email has been sent to reset your password.", "info")
+        return redirect(url_for("login"))
     return render_template("reset_request.html",title="Reset Password", form=form)
 
 @app.route("/resetp/<token>" , methods =["GET","POST"])

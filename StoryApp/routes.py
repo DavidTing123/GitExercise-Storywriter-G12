@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 import csv
@@ -182,11 +182,25 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
-
-@app.route("/resetp")
+@app.route("/resetp" , methods =["GET","POST"])
 def resetpassword():
-    return render_template("forgetpass.html")
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+    form = RequestResetForm()
+    return render_template("reset_request.html",title="Reset Password", form=form)
 
+@app.route("/resetp/<token>" , methods =["GET","POST"])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for("index"))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash("The token is invalid or already expired.", "warning")
+        return redirect(url_for('resetpassword'))
+    form = ResetPasswordForm()
+    return render_template("reset_token.html",title="Reset Password", form=form)
+
+    
 @app.route("/logout")
 def logout():
     logout_user()
@@ -225,7 +239,6 @@ def profile():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template("profile.html",title="Profile", image_file=image_file, form=form)
-
 
 #@app.route('/')
 @app.route('/success')

@@ -141,31 +141,31 @@ def delete_csv_record(index):
 
 @app.route('/')
 def home():
-    #global username     # TZX001
+    global username     # TZX001
     
     return render_template("home.html",title="Home")
 
 
 @app.route("/login" , methods =["GET","POST"])
 def login():
-    global username     # TZX002
+    #global username     # TZX002
 
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+       return redirect(url_for("index"))
     form =LogInForm()
 
-    user = form.username.data       # TZX001
-    password = form.password.data       # TZX001
-    print('User:', user)
+    #user = form.username.data       # TZX001
+    #password = form.password.data       # TZX001
+    #print('User:', user)
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("index"))
         else:
-            flash(f"Log in unsuccessfully. Please ensure that you type your username and password correctly.","error")
+            flash(f"Log in unsuccessfully. Please ensure that you type your email and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])

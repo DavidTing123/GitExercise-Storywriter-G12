@@ -27,15 +27,15 @@
             <div class="logininfo">
                 <h3>Login</h3>
                 <div class="inputbox">
-                    {%if form.username.errors%}
-                        {{form.username(class="inputfield is invalid")}}
+                    {%if form.email.errors%}
+                        {{form.email(class="inputfield is invalid")}}
                         <div class="invalid-input">
-                            {%for error in form.username.errors %}
+                            {%for error in form.email.errors %}
                                 <span>{{error}}</span>
                             {%endfor%}
                         </div>
                     {%else%}
-                        {{form.username(class="inputfield", placeholder="Username")}}
+                        {{form.email(class="inputfield", placeholder="Email")}}
                     {%endif%}
                 </div>
                 <div class="inputbox">

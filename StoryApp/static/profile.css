@@ -1,4 +1,35 @@
 .button{
     background-color: #5c72cb;
     color:white;
+    border-radius:2px;
+    cursor: pointer;
+    width: 100px;
+    height: 30px;
+    font-size:16px;
+    border:none;
+}
+
+.form-control-label{
+    font-size:16px;
+    color:blue;
+    padding-left: 0px;
+}
+
+.profile-heading{
+    color:black;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.text-secondary{
+    color:rgb(18, 18, 19);
+    font-size: 14px;
+}
+
+.form-group{
+    margin-top: 20px;
+}
+
+.content{
+    margin-top: 30px;
 }

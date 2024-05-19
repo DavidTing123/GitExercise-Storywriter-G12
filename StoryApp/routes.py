@@ -1,4 +1,5 @@
 import os
+import smtplib
 import secrets 
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
@@ -140,6 +141,19 @@ def delete_csv_record(index):
 
     return None
 
+@app.route('/test_smtp')
+def test_smtp():
+    try:
+        server = smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
+        server.starttls()  # Use TLS encryption
+        server.login(app.config['MAIL_USER'], app.config['MAIL_PASS'])
+        print("SMTP connection successful!")
+    except Exception as e:
+        print("SMTP connection failed:", e)
+    finally:
+        server.quit()
+    return "Check console for SMTP connection status"
+
 @app.route('/')
 def home():
     global username     # TZX001
@@ -164,7 +178,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
-            return redirect(next_page) if next_page else redirect(url_for("index"))
+            return redirect(next_page) if next_page else redirect(url_for("test_smtp"))
         else:
             flash(f"Log in unsuccessfully. Please ensure that you type your email and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)

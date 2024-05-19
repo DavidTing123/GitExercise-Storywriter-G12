@@ -143,6 +143,8 @@ def delete_csv_record(index):
 
 @app.route('/test_smtp')
 def test_smtp():
+    server = None  # Initialize the server variable outside the try block
+
     try:
         server = smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
         server.starttls()  # Use TLS encryption
@@ -151,8 +153,8 @@ def test_smtp():
     except Exception as e:
         print("SMTP connection failed:", e)
     finally:
-        server.quit()
-    return "Check console for SMTP connection status"
+        if server:
+            server.quit()
 
 @app.route('/')
 def home():

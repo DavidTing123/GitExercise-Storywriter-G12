@@ -216,12 +216,7 @@ def profile():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
-        
-        bio_html = markdown.markdown(form.bio.data)
-
-        sanitized_bio_html = clean(bio_html, tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
-
-        current_user.bio = sanitized_bio_html
+        current_user.bio = form.bio.data
         db.session.commit()
         flash("Your profile has been updated!","success")
         return redirect(url_for('profile'))

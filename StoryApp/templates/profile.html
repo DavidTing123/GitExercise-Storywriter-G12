@@ -31,7 +31,7 @@
                 <div class="media-body ml-3">
                     <h3 class="profile-heading">{{ current_user.username }}</h3>
                     <h5 class="text-secondary">{{ current_user.email }}</h5>
-                    <h4 class="bio">{{current_user.bio}}</h4>
+                    <h4 class="bio">{{current_user.bio| safe }}</h4>
                 </div>
             </div>
 

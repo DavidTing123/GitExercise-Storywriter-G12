@@ -8,6 +8,8 @@ from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestRese
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
+import bleach
+from bleach import clean
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 from pygame import mixer    # Sound effect
@@ -214,7 +216,12 @@ def profile():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
-        current_user.bio = form.bio.data
+        
+        bio_html = markdown.markdown(form.bio.data)
+
+        sanitized_bio_html = clean(bio_html, tags=bleach.ALLOWED_TAGS, attributes=bleach.ALLOWED_ATTRIBUTES)
+
+        current_user.bio = sanitized_bio_html
         db.session.commit()
         flash("Your profile has been updated!","success")
         return redirect(url_for('profile'))

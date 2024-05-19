@@ -225,6 +225,7 @@ def profile():
         form.email.data = current_user.email
         form.bio.data = current_user.bio
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    html_bio = markdown.markdown(current_user.bio)
     return render_template("profile.html",title="Profile", image_file=image_file, form=form)
 
 #@app.route('/')

@@ -184,46 +184,6 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message("Password Reset Request", sender="chengyc25@gmail.com", recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link:
-{url_for("reset_token", token=token, _external=True)}
-
-If you did not make this request, simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
-
-@app.route("/resetp" , methods =["GET","POST"])
-def resetpassword():
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-    form = RequestResetForm()
-    if form.validate_on_submit():
-        user =User.query.filter_by(email=form.email.data).first()
-        send_reset_email(user)
-        flash("An email has been sent to reset your password.", "info")
-        return redirect(url_for("login"))
-    return render_template("reset_request.html",title="Reset Password", form=form)
-
-@app.route("/resetp/<token>" , methods =["GET","POST"])
-def reset_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for("index"))
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash("The token is invalid or already expired.", "warning")
-        return redirect(url_for('resetpassword'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user.password = hashed_password
-        db.session.commit()
-        flash(f"Your password has been updated! You are now able to log in.",'success')
-        return redirect(url_for("login"))
-    return render_template("reset_token.html",title="Reset Password", form=form)
-
-    
 @app.route("/logout")
 def logout():
     logout_user()

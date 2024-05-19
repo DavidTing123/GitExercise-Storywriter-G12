@@ -12,11 +12,13 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-app.config['Mail_SERVER'] = 'smtp.gmail.com'
+'''
+#app.config['Mail_SERVER'] = 'smtp.gmail.com'
 app.config['Mail_PORT'] = 587
 app.config['Mail_USE_TLS'] = True 
 app.config['Mail_USERNAME'] = os.environ.get('EMAIL_USER')
 app.config['Mail_PASSWORD'] = os.environ.get('EMAIL_PASS')
 mail = Mail(app)
+'''
 
 from StoryApp import routes

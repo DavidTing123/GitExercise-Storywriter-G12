@@ -141,21 +141,6 @@ def delete_csv_record(index):
 
     return None
 
-@app.route('/test_smtp')
-def test_smtp():
-    server = None  # Initialize the server variable outside the try block
-
-    try:
-        server = smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
-        server.starttls()  # Use TLS encryption
-        server.login(app.config['MAIL_USER'], app.config['MAIL_PASS'])
-        print("SMTP connection successful!")
-    except Exception as e:
-        print("SMTP connection failed:", e)
-    finally:
-        if server:
-            server.quit()
-
 @app.route('/')
 def home():
     global username     # TZX001
@@ -180,7 +165,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
-            return redirect(next_page) if next_page else redirect(url_for("test_smtp"))
+            return redirect(next_page) if next_page else redirect(url_for("index"))
         else:
             flash(f"Log in unsuccessfully. Please ensure that you type your email and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)

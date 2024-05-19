@@ -34,8 +34,9 @@
     margin-top: 30px;
 }
 
-.bio{
+.media-body .bio {
     font-size: 16px;
-    color:blueviolet;
-
+    color: blueviolet;
+    padding-left: 0px;
+    padding-top: 10px;
 }

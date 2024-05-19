@@ -40,3 +40,8 @@
     padding-left: 0px;
     padding-top: 10px;
 }
+
+.bio mark {
+    background-color: rgb(145, 198, 215);
+    color: blueviolet; 
+}

@@ -40,7 +40,7 @@
                 {{ form.hidden_tag() }}
                 <fieldset class="form-group">
                     <div class="form-group">
-                        {{ form.username.label(class="form-control-label") }}
+                        <label for="username" class="form-control-label">Pen name</label>
                         {% if form.username.errors %}
                             {{ form.username(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">

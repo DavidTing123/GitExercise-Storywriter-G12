@@ -1,3 +1,6 @@
+import os
+import secrets 
+from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
@@ -151,9 +154,9 @@ def login():
         return redirect(url_for("index"))
     form =LogInForm()
 
-    username = form.username.data       # TZX001
+    user = form.username.data       # TZX001
     password = form.password.data       # TZX001
-    print('User:', username)
+    print('User:', user)
 
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -190,12 +193,28 @@ def logout():
     #return redirect(url_for("index"))
     return redirect(url_for("login"))
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext =os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path =os.path.join(app.root_path, "static/profile_pics", picture_fn)
+    
+    output_size =(256,256)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
 @app.route("/profile" , methods =["GET","POST"])
 #decorator
 @login_required
 def profile():
     form = UpdateProfileForm()
     if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()

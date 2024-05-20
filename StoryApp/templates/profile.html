@@ -10,7 +10,6 @@
 {% block title %}Profile Page{% endblock %}
 {% block content %}
     <div class="container mt-4">
-        <!-- Flash Messages -->
         <div class="flash-messages">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -64,6 +63,17 @@
                             </div>
                         {% else %}
                             {{ form.email(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.picture.label() }}
+                        {{ form.picture(class="form-control-file") }}
+                        {% if form.picture.errors %}
+                            <div class="text-danger">
+                                {% for error in form.picture.errors %}
+                                    <span>{{ error }}</span><br>
+                                {% endfor %}
+                            </div>
                         {% endif %}
                     </div>
                 </fieldset>

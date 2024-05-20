@@ -1,11 +1,15 @@
 import os
+import smtplib
 import secrets 
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
+from flask_mail import Message
+import bleach
+from bleach import clean
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 from pygame import mixer    # Sound effect
@@ -141,31 +145,31 @@ def delete_csv_record(index):
 
 @app.route('/')
 def home():
-    #global username     # TZX001
+    global username     # TZX001
     
     return render_template("home.html",title="Home")
 
 
 @app.route("/login" , methods =["GET","POST"])
 def login():
-    global username     # TZX002
+    #global username     # TZX002
 
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+       return redirect(url_for("index"))
     form =LogInForm()
 
-    user = form.username.data       # TZX001
-    password = form.password.data       # TZX001
-    print('User:', user)
+    #user = form.username.data       # TZX001
+    #password = form.password.data       # TZX001
+    #print('User:', user)
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("index"))
         else:
-            flash(f"Log in unsuccessfully. Please ensure that you type your username and password correctly.","error")
+            flash(f"Log in unsuccessfully. Please ensure that you type your email and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])
@@ -181,11 +185,6 @@ def signup():
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
-
-
-@app.route("/resetp")
-def resetpassword():
-    return render_template("forgetpass.html")
 
 @app.route("/logout")
 def logout():
@@ -217,15 +216,17 @@ def profile():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
+        current_user.bio = form.bio.data
         db.session.commit()
         flash("Your profile has been updated!","success")
         return redirect(url_for('profile'))
     elif request.method =="GET":
         form.username.data = current_user.username
         form.email.data = current_user.email
+        form.bio.data = current_user.bio
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template("profile.html",title="Profile", image_file=image_file, form=form)
-
+    html_bio = markdown.markdown(current_user.bio)
+    return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
 #@app.route('/')
 @app.route('/success')

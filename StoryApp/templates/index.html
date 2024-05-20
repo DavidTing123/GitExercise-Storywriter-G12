@@ -1,6 +1,12 @@
 <!-- templates/index.html -->
-
-{% extends "nav.html" %}
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}">
+    <title>Login Page</title>
+    {% extends "nav.html" %}
+</head>
+<body>
 
 {% block title %}Home Page{% endblock %}
 {% block content %}
@@ -31,7 +37,8 @@
     <img src="{{ url_for('static', filename='images/writing.gif') }}" width=120>    
     
 {%endblock content%}
-
+</body>
+</html>
 <!--
 </body>
 </html>

@@ -14,23 +14,17 @@ body{
 }
 
 .bigbox{
-    width: 800px;
-    height: 500px;
+    width: 500px;
+    height: 300px;
     display:flex;
     background-color: white;
-    border-radius: 5px;
-    box-shadow: 5px 7px 20px;
     overflow: hidden;
     margin: auto;
+    justify-content: center; 
+    align-items: center; 
 }
 
-.logininfo{
-    margin-left: 40px;
-    margin-right: 40px;
-    margin-top: 70px;
-    margin-bottom:70px;
-    
-}
+
 
 h3{
     font-weight: bold;

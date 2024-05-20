@@ -179,7 +179,7 @@ def signup():
     form = SignUpForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password, bio='')
         db.session.add(user)
         db.session.commit()
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
@@ -216,16 +216,16 @@ def profile():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
-        current_user.bio = form.bio.data
+        current_user.bio = form.bio.data if form.bio.data else ''
         db.session.commit()
         flash("Your profile has been updated!","success")
         return redirect(url_for('profile'))
     elif request.method =="GET":
         form.username.data = current_user.username
         form.email.data = current_user.email
-        form.bio.data = current_user.bio
+        form.bio.data = current_user.bio if current_user.bio else ''
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    html_bio = markdown.markdown(current_user.bio)
+    html_bio = markdown.markdown(current_user.bio or '')
     return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
 #@app.route('/')

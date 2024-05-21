@@ -12,7 +12,7 @@ import bleach
 from bleach import clean
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
-from pygame import mixer    # Sound effect
+#from pygame import mixer    # Sound effect
 ## from flask_sqlalchemy import SQLAlchemy     # TZX002
 from sqlalchemy import exc                  # TZX002
 from datetime import datetime               # TZX002
@@ -24,36 +24,9 @@ from StoryApp.models import Story           # TZX003a
 # CSV file - to store the stories data.
 CSV_FILE = 'StoryApp/stories.csv'
 
-# TZX002 program changes (start) ----------------------------------------------------------------
-## app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///stories.db'          # TZX002
-## db = SQLAlchemy(app)                                                    # TZX002
-
-
 # Create tables if they don't exist.    # TZX002
 with app.app_context():                 # TZX002
     db.create_all()                     # TZX002
-
-
-'''
-# Define a "Story" model with columns for title and content.            # TZX002
-class Story(db.Model):                                                  # TZX002
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)    # TZX002
-    title = db.Column(db.String(50))                                    # TZX002
-    content = db.Column(db.String(500))                                 # TZX002
-    # Use username as an author name.                                   # TZX002
-    author = db.Column(db.String(20), nullable=False)                   # TZX002
-    # To deal with multiple stories that share the same title,          # TZX002
-    # I decided to use the creation timestamp as an unique key          # TZX002
-    # to retrieve (and to delete) the story record.                     # TZX002 
-    timestamp = db.Column(db.String(19))                                # TZX002
-
-def __init__(self, id, title, content, author, timestamp):      # TZX002
-    self.id = id                                                # TZX002
-    self.title = title                                          # TZX002
-    self.content = content                                      # TZX002
-    self.author = author                                        # TZX002
-    self.timestamp = timestamp                                  # TZX002
-'''
 
 # Adds a new story to the database.                             # TZX002
 def write_to_db(title, content, author, timestamp):             # TZX002
@@ -99,6 +72,14 @@ def delete_story_by_timestamp(timestamp):               # TZX002
 
 # TZX002 program changes (end) ----------------------------------------------------------------
 
+# TZX005 program changes (end) ----------------------------------------------------------------
+def get_all_stories():
+    return db.session.query(Story).all()  # Retrieve all stories
+
+def sort_stories(field):
+    return db.session.query(Story).order_by(getattr(Story, field)).all()  # Sort based on selected field
+
+# TZX005 program changes (end) ----------------------------------------------------------------
 
 # Function to write story to CSV file
 def write_to_csv(title, content):
@@ -145,14 +126,14 @@ def delete_csv_record(index):
 
 @app.route('/')
 def home():
-    global username     # TZX001
+    #global username     # TZX001
     
     return render_template("home.html",title="Home")
 
 
 @app.route("/login" , methods =["GET","POST"])
 def login():
-    #global username     # TZX002
+    global username     # TZX002
 
     if current_user.is_authenticated:
        return redirect(url_for("index"))
@@ -161,6 +142,10 @@ def login():
     #user = form.username.data       # TZX001
     #password = form.password.data       # TZX001
     #print('User:', user)
+
+    # We need to keep the username !!!  # TZX004
+    username = form.email.data          # TZX004
+    print('Username:', username)        # TZX004
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -279,10 +264,7 @@ def archive():
         stories = read_from_csv()
         return render_template('archive.html', stories=stories)
     else:
-        # Playing a simple beep sound
-        mixer.init() 
-        sound=mixer.Sound("negative_beeps-6008.mp3")
-        sound.play()
+        winsound.Beep(1000, 500)                            # TZX004
         return redirect(url_for('home'))
     '''
 
@@ -302,9 +284,13 @@ def read_story(timestamp):                      # TZX002
     # Reference: https://icecreamcode.org/posts/python/markdown/
     data = {}                                               # TZX003
     data["page_title"] = story.title                        # TZX003
+    data["author"] = story.author                           # TZX004
+    data["timestamp"] = story.timestamp                     # TZX004
     data["html"] = markdown.markdown(story.content)         # TZX003
-    data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
-    return render_template('story_page.html', data=data)    # TZX003
+    #data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
+    data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
+    #return render_template('story_page.html', data=data)    # TZX003
+    return render_template('story_page.html', story=story, data=data)    # TZX005
 
 '''
     if story:
@@ -314,8 +300,11 @@ def read_story(timestamp):                      # TZX002
 '''
 
 
-@app.route('/speech_text', methods=['POST'])
-def speech_text():
+#@app.route('/speech_text', methods=['POST'])
+#def speech_text():
+@app.route('/speech_text/<timestamp>', methods=['POST'])    # TZX004
+def speech_text(timestamp):                                 # TZX004
+
     
     # Initialize the TTS engine
     engine = pyttsx3.init()
@@ -338,7 +327,8 @@ def speech_text():
     engine.say(text2)               # Perform the text-to-speech conversion
     engine.runAndWait()             # Wait for the speech to finish
 
-    return render_template('story.html', story=story)
+    #return render_template('story.html', story=story)
+    return redirect(url_for('read_story', timestamp=timestamp))     # TZX004
 
 
 @app.route('/delete_story', methods=['GET', 'POST'])
@@ -357,3 +347,29 @@ def delete_story():
         delete_story_by_timestamp(record_timestamp)   # TZX002
         
     return redirect(url_for('archive'))
+
+#--- TZX005 -------------------------------------------------------------------
+#
+@app.route('/sort_record', methods=['GET', 'POST'])
+def sort_record():
+
+    '''
+    # Available sort fields
+    sort_fields = ['title', 'author', 'timestamp']  # Assuming you want to allow sorting by these fields
+    '''
+    # Available sort fields
+    sort_fields = [field.name for field in Story.__table__.columns if field.name != 'id']
+
+    # Default sort field
+    selected_field = sort_fields[0]
+
+    # Handle POST request (sort based on selected field)
+    if request.method == 'POST':
+        selected_field = request.form.get('sort_field')
+        sorted_records = sort_stories(selected_field)  # Call a new function for sorting
+    else:
+        sorted_records = get_all_stories()  # Call a new function to retrieve all stories
+
+    return render_template('storylist.html', stories=sorted_records)
+
+#--- TZX005 -------------------------------------------------------------------

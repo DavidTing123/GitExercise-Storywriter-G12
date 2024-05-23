@@ -34,7 +34,7 @@
 #   6. templates/login.html
 #   7. templates/nav.html --> templates/base.html - not yet
 #   8. templates/signup.html
-#   9. templates/story.html - ok2
+#   9. templates/story.html - ok2which python
 #  10. templates/storylist.html - ok2
 #  11. static/login.css
 #  12. static/nav.css --> static/base.css - not yet

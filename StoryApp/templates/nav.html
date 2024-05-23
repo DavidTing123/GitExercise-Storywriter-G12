@@ -8,18 +8,18 @@
         <label class="logo">StoryWriter</label>
         <ul class="navbar">
             {%if current_user.is_authenticated%}
-                <li><a href="/">Home</a></li>
-                <!-- TZX001 Added 3 lines below -->
-                <li><a href="/success">Writer</a></li>
-                <li><a href="/storylist">Story</a></li>
-                <li><a href="/archive">Admin</a></li>
-                <li><a href="/profile">Profile</a></li>
-                <li><a href="/logout">Logout</a></li>
+
+                <li class="nav-list"><a class="nav-item" href="/">Home</a></li>               <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/success">Writer</a></li>      <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/storylist">Story</a></li>     <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/archive">Admin</a></li>       <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/profile">Profile</a></li>     <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/logout">Logout</a></li>         <!--TZX004-->
             {% else %}
-                <li><a href="/">Home</a></li>
-                <li><a href="/login">LogIn</a></li>
-                <li><a href="/signup">SignUp</a></li>
-                <li><a href="/profile">Profile</a></li>
+                <li class="nav-list"><a class="nav-item" href="/">Home</a></li>
+                <li class="nav-list"><a class="nav-item" href="/login">LogIn</a></li>
+                <li class="nav-list"><a class="nav-item" href="/signup">SignUp</a></li>
+                <li class="nav-list"><a class="nav-item" href="/profile">Profile</a></li>
 
             {% endif %}
         </ul>

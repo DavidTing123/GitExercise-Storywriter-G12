@@ -6,6 +6,9 @@
     
     <h2>{{ story.title }}</h2>
     <p>{{ story.content }}</p>
+    <!-- Added 2 lines below. # TZX002 -->
+    <p>Author: {{ story.author }} </p>
+    <p>Creation timestamp: {{ story.timestamp }} </p>
 
     <form method="post" action="{{ url_for('speech_text') }}">
         <button class="btn-speech" type="submit">

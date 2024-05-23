@@ -58,6 +58,7 @@ body {
     background-color: #c5e1f8;
 }
 
+/* Commented by TZX004
 h1, h2 {
     padding-top: 20px;
     padding-left: 20px;
@@ -65,7 +66,9 @@ h1, h2 {
     color: Blue;
     text-shadow: 2px 2px 5px red;
 }
+*/
 
+/* Commented by TZX004
 label {
     padding-left: 20px;
     font-weight: bold;
@@ -76,45 +79,9 @@ p {
     margin-right: 100px;
     margin-bottom: 10px; 
 }
+*/
 
-input[type="text"],
-textarea {
-    margin-left: 20px;
-    padding: 8px;
-    border: 2px solid #cccccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-input[type="submit"] {
-    background-color: #5c72cb;
-    color: white;
-    padding: 8px;
-    margin-left: 40px;
-    margin-top: 5px;
-    cursor: pointer;
-    border-radius: 5px;     
-    border-style: ridge;    
-    width: 200px;           
-}
-
-input[type="submit"]:hover {
-    background-color: #45a049;
-    transform: scale(1.2,1.2);
-}
-
-button {
-    color: white;
-    cursor: pointer;
-    border-radius: 5px; 
-    border-style: ridge;
-    margin-left: 50px;
-}
-
-button:hover {
-    transform: scale(1.2,1.2);
-}
-
+/* Commented by TZX004
 ol {
     list-style: decimal;
 }
@@ -146,11 +113,13 @@ td {
 img {
     padding-left: 0;
 }
+*/
 
 .archive-item {
     margin-left: 20px;
 }
 
+/* Commented by TZX004
 .btn-dustbin {
     margin-left: 10px;
     margin-bottom: 10px;
@@ -160,5 +129,252 @@ img {
     margin-left: 10px;
     margin-bottom: 10px;
 }
+*/
 
 /* TZX001 added the above lines */
+
+/*-- TZX004 (start) -----------------------------------------------------------------------------*/
+.hgroup-1 {
+    padding-left: 30px;
+    margin-right: 100px;
+    margin-bottom: 10px; 
+}
+
+.Text-p {
+    padding-left: 30px;
+    margin-right: 100px;
+    margin-bottom: 10px;
+}
+
+
+.p-Text-1 {
+    padding-left: 30px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.Label-1 {
+    padding-left: 20px;
+    font-weight: bold;
+}
+
+.Label-grey-1 {
+    padding-left: 3px;
+    font-weight: lighter;
+    font-size: small;
+    color: grey;
+}
+
+.Label-grey-2 {
+    padding-left: 25px;
+    font-weight: lighter;
+    font-size: small;
+    color: grey;
+}
+
+.Input-text-1 {
+    margin-left: 20px;
+    padding: 8px;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+
+}
+
+.Textarea-1 {
+    margin-top: 0;
+    margin-left: 20px;
+    padding: 8px;
+    padding-top: 0;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.Input-submit-1 {
+    background-color: #5c72cb;
+    color: white;
+    padding: 8px;
+    margin-left: 40px;
+    margin-top: 5px;
+    cursor: pointer;
+    border-radius: 5px;     /* Set rounded corners */
+    border-style: ridge;    /* Specifies a 3D ridged border */
+    width: 150px;           /* Specifies the width of input button */
+}
+
+.Input-submit-1:hover {
+    background-color: #45a049;
+    transform: scale(1.1,1.1);
+}
+
+.hyperlink-1 {
+    padding-left: 2px;   
+    text-decoration: underline;
+}
+
+.hyperlink-1:link {
+    color: blue;
+}
+
+.hyperlink-1:visited {
+    color: #8c8c9d;
+}
+
+.hyperlink-1:hover {
+    color: #f15a51;
+}
+
+.hyperlink-2 {
+    padding-left: 2px;
+    font-size: small;
+    text-decoration: underline;
+    color: blue;
+}
+
+.hyperlink-2:hover {
+    color: #f15a51;
+}
+
+/*-- TZX004 (end) -----------------------------------------------------------------------------*/
+
+/*-- TZX004 (start) ------------------------------------------------------------------------------------- */
+.Text-shadow-1 {
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    color: Blue;
+    /* add a color (red, 2px) to the shadow; add a blur effect (5px) to the shadow. */
+    text-shadow: 2px 2px 5px yellow;
+    -webkit-text-stroke: 2px green;  
+}
+
+.Img-bottom-1 {
+    margin-left: 30px;
+    margin-right: 10px;
+}
+
+.Img-margin-0 {
+    margin: 0;
+    padding: 0;
+}
+
+.OrderList-1 {
+    padding-left: 30px;
+    padding-bottom: 5px;
+    list-style: decimal;    /* Not Working !! Why? */
+}
+
+.Table-1 {
+    border: 1px solid grey;
+    border-collapse: collapse;
+}
+
+.Table-td-1 {
+    font-family:'Times New Roman', Times, serif;
+    background-color: White;
+    color: blue;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 0;
+}
+
+.Table-td-2 {
+    font-family:'Times New Roman', Times, serif;
+    font-size: small;
+    font-style: italic;
+    background-color: White;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 0;
+}
+
+.Table-th-1 {
+    background-color: lightgreen;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 5px;             
+    padding-bottom: 5px;          
+}
+
+.Btn-speech {
+    margin-left: 30px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    padding-left: 0;
+    padding-right: 0;
+
+}
+
+.Btn-speech:hover {
+    transform: scale(1.5,1.5);
+}
+
+.Btn-dustbin {
+    margin: 2px;
+}
+
+.Btn-dustbin:hover {
+    transform: scale(1.2,1.2);
+}
+
+.Btn-onclick-1 {
+    margin-left: 30px;
+    margin-top: 10px;
+    width: 160px;
+    height: 40px;
+}
+
+/*-- TZX004 (end) ------------------------------------------------------------------------------------- */
+
+/*-- TZX005 (start) ------------------------------------------------------------------------------------- */
+
+ .Fixed-container-1 {
+    position: fixed;
+    top: 16%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.Select-1 {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.Btn-submit-1 {
+    /* margin: 10px 0; */
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 0;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.Form-1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.ol-class-1 {
+    list-style: decimal;   /* Not Working !! Why? */
+}
+
+/*
+ol li {
+    padding-left: 50px;
+    padding-bottom: 10px;
+}
+*/
+
+ /*-- TZX005 (end) ------------------------ */

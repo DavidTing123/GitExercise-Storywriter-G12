@@ -4,7 +4,7 @@ import secrets
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
@@ -212,6 +212,23 @@ def profile():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     html_bio = markdown.markdown(current_user.bio or '')
     return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
+
+@app.route("/search", methods=["POST"])
+def search():
+    form = SearchForm()
+    posts = Story.query
+    if form.validate_on_submit():
+        searched_query = form.searched.data
+        posts = Story.query.filter(Story.content.like('%' + searched_query + '%')).order_by(Story.title).all()
+        return render_template("search.html", form=form, searched=searched_query, posts=posts)
+    return render_template("search.html", form=form)
+
+
+@app.context_processor 
+def base():
+    form = SearchForm()
+    return dict(form=form)
+        
 
 #@app.route('/')
 @app.route('/success')

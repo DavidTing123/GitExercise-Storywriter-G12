@@ -5,14 +5,14 @@
     {% if posts %}
         <ul>
             {% for story in posts %}
-                <li>{{ story.title }}</li>
+                <li><a href="{{ url_for('read_story', timestamp=story.timestamp) }}">{{ story.title }}</a></li>
             {% endfor %}
         </ul>
     {% else %}
         <p>No results found for "{{ searched }}"</p>
     {% endif %}
 
-    <form action="/search" method="POST">
+    <form action="{{ url_for('search') }}" method="POST">
         {{ form.hidden_tag() }}
         {{ form.searched.label }} {{ form.searched(size=20) }}
         {{ form.submit() }}

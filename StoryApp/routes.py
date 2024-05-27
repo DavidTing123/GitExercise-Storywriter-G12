@@ -14,7 +14,7 @@ import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
 #from pygame import mixer    # Sound effect
 ## from flask_sqlalchemy import SQLAlchemy     # TZX002
-from sqlalchemy import exc                  # TZX002
+from sqlalchemy import exc, func , or_           # TZX002
 from datetime import datetime               # TZX002
 import winsound                             # TZX002
 import markdown                             # TZX003
@@ -213,16 +213,27 @@ def profile():
     html_bio = markdown.markdown(current_user.bio or '')
     return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
-@app.route("/search", methods=["POST"])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    posts = Story.query
+    posts = []  # Initialize posts as an empty list
     if form.validate_on_submit():
-        searched_query = form.searched.data
-        posts = Story.query.filter(Story.content.like('%' + searched_query + '%')).order_by(Story.title).all()
+        searched_query = form.searched.data.lower()  # Convert the search query to lowercase
+        # Split the search query into individual words
+        search_words = searched_query.split()
+        # Initialize the query to retrieve stories
+        query = Story.query
+        # Iterate over each word in the search query
+        for word in search_words:
+            # Filter stories that contain the word in either the title or the content
+            query = query.filter(or_(
+                func.lower(Story.title).like(func.lower(f"%{word}%")),
+                func.lower(Story.content).like(func.lower(f"%{word}%"))
+            ))
+        # Execute the query to retrieve the matching stories
+        posts = query.order_by(Story.title).all()
         return render_template("search.html", form=form, searched=searched_query, posts=posts)
-    return render_template("search.html", form=form)
-
+    return render_template("search.html", form=form, searched="", posts=posts)
 
 @app.context_processor 
 def base():

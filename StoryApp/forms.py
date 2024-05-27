@@ -69,3 +69,7 @@ class ResetPasswordForm(FlaskForm):
 class SearchForm(FlaskForm):
     searched = StringField("Searched", validators=[DataRequired()])
     submit = SubmitField("Search")
+
+class DeleteAccountForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Delete Account')

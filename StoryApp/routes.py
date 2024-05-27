@@ -4,7 +4,7 @@ import secrets
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
@@ -239,6 +239,22 @@ def search():
 def base():
     form = SearchForm()
     return dict(form=form)
+
+@app.route("/delete_account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(id=current_user.id).first()
+        if bcrypt.check_password_hash(user.password, form.password.data):
+            db.session.delete(user)
+            db.session.commit()
+            logout_user
+            flash('Your account has been successfully deleted.', 'success')
+            return redirect(url_for('signup'))
+        else:
+            flash('Password is incorrect. Please try again.', 'danger')
+    return render_template("delete_account.html", title="Delete Account", form=form)
         
 
 #@app.route('/')

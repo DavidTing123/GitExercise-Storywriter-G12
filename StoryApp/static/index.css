@@ -1,0 +1,164 @@
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    text-decoration: none;
+    list-style: none;
+
+}
+
+head{
+    font-family:"poppins",sans-serif;
+}
+
+nav{
+    background: #9191d8;
+    height: 70px;
+    width:100%;
+    
+}
+
+label.logo{
+    color: white;
+    font-size:30px;
+    line-height:70px;
+    padding:0 50px;
+    font-weight:bold;
+
+}
+
+nav ul{
+    float: right;
+    margin-right: 30px;
+
+}
+
+nav ul li{
+    display:inline-block;
+    line-height:70px;
+    margin: 0 5px;
+    color:white;
+}
+
+nav ul li a{
+    color: white;
+    font-size: 18px;
+}
+
+/* TZX001 added the following lines */
+.nav-list {
+    display: inline-block;
+    line-height: 70px;
+    padding-left: 25px;       
+    padding-right: 25px;
+    border-right: 1px solid #bbb;
+}
+
+body {
+    background-color: #c5e1f8;
+}
+
+h1, h2 {
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-bottom: 20px;
+    color: Blue;
+    text-shadow: 2px 2px 5px red;
+}
+
+label {
+    padding-left: 20px;
+    font-weight: bold;
+}
+
+p {
+    padding-left: 30px;
+    margin-right: 100px;
+    margin-bottom: 10px; 
+}
+
+input[type="text"],
+textarea {
+    margin-left: 20px;
+    padding: 8px;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    background-color: #5c72cb;
+    color: white;
+    padding: 8px;
+    margin-left: 40px;
+    margin-top: 5px;
+    cursor: pointer;
+    border-radius: 5px;     
+    border-style: ridge;    
+    width: 200px;           
+}
+
+input[type="submit"]:hover {
+    background-color: #45a049;
+    transform: scale(1.2,1.2);
+}
+
+button {
+    color: white;
+    cursor: pointer;
+    border-radius: 5px; 
+    border-style: ridge;
+    margin-left: 50px;
+}
+
+button:hover {
+    transform: scale(1.2,1.2);
+}
+
+ol {
+    list-style: decimal;
+}
+
+ol li {
+    padding-left: 50px;
+    padding-bottom: 10px;
+}
+
+table, th, td {
+    background-color: white;
+    border: 1px solid grey;
+}
+
+th {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+td {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+img {
+    padding-left: 0;
+}
+
+.archive-item {
+    margin-left: 20px;
+}
+
+.btn-dustbin {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+.btn-speech {
+    margin-left: 10px;
+    margin-bottom: 10px;
+}
+
+/* TZX001 added the above lines */

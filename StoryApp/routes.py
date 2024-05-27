@@ -1,15 +1,20 @@
 import os
+import smtplib
 import secrets 
+from PIL import Image
 from flask import render_template,url_for, request, flash, redirect
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
 from StoryApp.models import User
 from flask_login import login_user, current_user, logout_user,login_required
+from flask_mail import Message
+import bleach
+from bleach import clean
 import csv
 import pyttsx3   # a simple text-to-speech converter library in Python
-from pygame import mixer    # Sound effect
+#from pygame import mixer    # Sound effect
 ## from flask_sqlalchemy import SQLAlchemy     # TZX002
-from sqlalchemy import exc                  # TZX002
+from sqlalchemy import exc, func , or_           # TZX002
 from datetime import datetime               # TZX002
 import winsound                             # TZX002
 import markdown                             # TZX003
@@ -19,36 +24,9 @@ from StoryApp.models import Story           # TZX003a
 # CSV file - to store the stories data.
 CSV_FILE = 'StoryApp/stories.csv'
 
-# TZX002 program changes (start) ----------------------------------------------------------------
-## app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///stories.db'          # TZX002
-## db = SQLAlchemy(app)                                                    # TZX002
-
-
 # Create tables if they don't exist.    # TZX002
 with app.app_context():                 # TZX002
     db.create_all()                     # TZX002
-
-
-'''
-# Define a "Story" model with columns for title and content.            # TZX002
-class Story(db.Model):                                                  # TZX002
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)    # TZX002
-    title = db.Column(db.String(50))                                    # TZX002
-    content = db.Column(db.String(500))                                 # TZX002
-    # Use username as an author name.                                   # TZX002
-    author = db.Column(db.String(20), nullable=False)                   # TZX002
-    # To deal with multiple stories that share the same title,          # TZX002
-    # I decided to use the creation timestamp as an unique key          # TZX002
-    # to retrieve (and to delete) the story record.                     # TZX002 
-    timestamp = db.Column(db.String(19))                                # TZX002
-
-def __init__(self, id, title, content, author, timestamp):      # TZX002
-    self.id = id                                                # TZX002
-    self.title = title                                          # TZX002
-    self.content = content                                      # TZX002
-    self.author = author                                        # TZX002
-    self.timestamp = timestamp                                  # TZX002
-'''
 
 # Adds a new story to the database.                             # TZX002
 def write_to_db(title, content, author, timestamp):             # TZX002
@@ -94,6 +72,14 @@ def delete_story_by_timestamp(timestamp):               # TZX002
 
 # TZX002 program changes (end) ----------------------------------------------------------------
 
+# TZX005 program changes (end) ----------------------------------------------------------------
+def get_all_stories():
+    return db.session.query(Story).all()  # Retrieve all stories
+
+def sort_stories(field):
+    return db.session.query(Story).order_by(getattr(Story, field)).all()  # Sort based on selected field
+
+# TZX005 program changes (end) ----------------------------------------------------------------
 
 # Function to write story to CSV file
 def write_to_csv(title, content):
@@ -150,21 +136,25 @@ def login():
     global username     # TZX002
 
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+       return redirect(url_for("index"))
     form =LogInForm()
 
-    user = form.username.data       # TZX001
-    password = form.password.data       # TZX001
-    print('User:', user)
+    #user = form.username.data       # TZX001
+    #password = form.password.data       # TZX001
+    #print('User:', user)
+
+    # We need to keep the username !!!  # TZX004
+    username = form.email.data          # TZX004
+    print('Username:', username)        # TZX004
 
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page) if next_page else redirect(url_for("index"))
         else:
-            flash(f"Log in unsuccessfully. Please ensure that you type your username and password correctly.","error")
+            flash(f"Log in unsuccessfully. Please ensure that you type your email and password correctly.","error")
     return render_template("login.html", title="Log In", form=form)
 
 @app.route("/signup" , methods =["GET","POST"])
@@ -174,17 +164,12 @@ def signup():
     form = SignUpForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password, bio='')
         db.session.add(user)
         db.session.commit()
         flash(f"Congrats! Account has been successfully created for {form.username.data}!",'success')
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
-
-
-@app.route("/resetp")
-def resetpassword():
-    return render_template("forgetpass.html")
 
 @app.route("/logout")
 def logout():
@@ -197,7 +182,11 @@ def save_picture(form_picture):
     _, f_ext =os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
     picture_path =os.path.join(app.root_path, "static/profile_pics", picture_fn)
-    form_picture.save(picture_path)
+    
+    output_size =(256,256)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
 
     return picture_fn
 
@@ -212,15 +201,61 @@ def profile():
             current_user.image_file = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
+        current_user.bio = form.bio.data if form.bio.data else ''
         db.session.commit()
         flash("Your profile has been updated!","success")
         return redirect(url_for('profile'))
     elif request.method =="GET":
         form.username.data = current_user.username
         form.email.data = current_user.email
+        form.bio.data = current_user.bio if current_user.bio else ''
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template("profile.html",title="Profile", image_file=image_file, form=form)
+    html_bio = markdown.markdown(current_user.bio or '')
+    return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    form = SearchForm()
+    posts = []  # Initialize posts as an empty list
+    if form.validate_on_submit():
+        searched_query = form.searched.data.lower()  # Convert the search query to lowercase
+        # Split the search query into individual words
+        search_words = searched_query.split()
+        # Initialize the query to retrieve stories
+        query = Story.query
+        # Iterate over each word in the search query
+        for word in search_words:
+            # Filter stories that contain the word in either the title or the content
+            query = query.filter(or_(
+                func.lower(Story.title).like(func.lower(f"%{word}%")),
+                func.lower(Story.content).like(func.lower(f"%{word}%"))
+            ))
+        # Execute the query to retrieve the matching stories
+        posts = query.order_by(Story.title).all()
+        return render_template("search.html", form=form, searched=searched_query, posts=posts)
+    return render_template("search.html", form=form, searched="", posts=posts)
+
+@app.context_processor 
+def base():
+    form = SearchForm()
+    return dict(form=form)
+
+@app.route("/delete_account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(id=current_user.id).first()
+        if bcrypt.check_password_hash(user.password, form.password.data):
+            db.session.delete(user)
+            db.session.commit()
+            logout_user
+            flash('Your account has been successfully deleted.', 'success')
+            return redirect(url_for('signup'))
+        else:
+            flash('Password is incorrect. Please try again.', 'danger')
+    return render_template("delete_account.html", title="Delete Account", form=form)
+        
 
 #@app.route('/')
 @app.route('/success')
@@ -273,10 +308,7 @@ def archive():
         stories = read_from_csv()
         return render_template('archive.html', stories=stories)
     else:
-        # Playing a simple beep sound
-        mixer.init() 
-        sound=mixer.Sound("negative_beeps-6008.mp3")
-        sound.play()
+        winsound.Beep(1000, 500)                            # TZX004
         return redirect(url_for('home'))
     '''
 
@@ -296,9 +328,13 @@ def read_story(timestamp):                      # TZX002
     # Reference: https://icecreamcode.org/posts/python/markdown/
     data = {}                                               # TZX003
     data["page_title"] = story.title                        # TZX003
+    data["author"] = story.author                           # TZX004
+    data["timestamp"] = story.timestamp                     # TZX004
     data["html"] = markdown.markdown(story.content)         # TZX003
-    data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
-    return render_template('story_page.html', data=data)    # TZX003
+    #data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
+    data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
+    #return render_template('story_page.html', data=data)    # TZX003
+    return render_template('story_page.html', story=story, data=data)    # TZX005
 
 '''
     if story:
@@ -308,8 +344,11 @@ def read_story(timestamp):                      # TZX002
 '''
 
 
-@app.route('/speech_text', methods=['POST'])
-def speech_text():
+#@app.route('/speech_text', methods=['POST'])
+#def speech_text():
+@app.route('/speech_text/<timestamp>', methods=['POST'])    # TZX004
+def speech_text(timestamp):                                 # TZX004
+
     
     # Initialize the TTS engine
     engine = pyttsx3.init()
@@ -332,7 +371,8 @@ def speech_text():
     engine.say(text2)               # Perform the text-to-speech conversion
     engine.runAndWait()             # Wait for the speech to finish
 
-    return render_template('story.html', story=story)
+    #return render_template('story.html', story=story)
+    return redirect(url_for('read_story', timestamp=timestamp))     # TZX004
 
 
 @app.route('/delete_story', methods=['GET', 'POST'])
@@ -351,3 +391,29 @@ def delete_story():
         delete_story_by_timestamp(record_timestamp)   # TZX002
         
     return redirect(url_for('archive'))
+
+#--- TZX005 -------------------------------------------------------------------
+#
+@app.route('/sort_record', methods=['GET', 'POST'])
+def sort_record():
+
+    '''
+    # Available sort fields
+    sort_fields = ['title', 'author', 'timestamp']  # Assuming you want to allow sorting by these fields
+    '''
+    # Available sort fields
+    sort_fields = [field.name for field in Story.__table__.columns if field.name != 'id']
+
+    # Default sort field
+    selected_field = sort_fields[0]
+
+    # Handle POST request (sort based on selected field)
+    if request.method == 'POST':
+        selected_field = request.form.get('sort_field')
+        sorted_records = sort_stories(selected_field)  # Call a new function for sorting
+    else:
+        sorted_records = get_all_stories()  # Call a new function to retrieve all stories
+
+    return render_template('storylist.html', stories=sorted_records)
+
+#--- TZX005 -------------------------------------------------------------------

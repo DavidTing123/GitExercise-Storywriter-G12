@@ -4,31 +4,28 @@
 
 {% block content %}
 
-    <h2>Stories Archive</h2>
+    <!-- TZX004 -->
+    <h1 class="Text-shadow-1">Stories Archive</h1>
     
     <div class="archive-item">
-
         <table>
             <tr>
-                <th>No.</th>
-                <th>Title</th>
-                <!-- Add the following 2 lines below. # TZX002 -->                
-                <th>Author</th>
-                <th>Timestamp</th>
-                <th>Delete</th>
+                <th class="Table-th-1">No.</th>
+                <th class="Table-th-1">Title</th>
+                <th class="Table-th-1">Author</th>
+                <th class="Table-th-1">Timestamp</th>
+                <th class="Table-th-1">Delete</th>
             </tr>  
             {% for story in stories %}
                 <form action="/delete_story" method="post">
                     <tr>
-                        <td>{{ loop.index }}.</td>      <!-- # TZX002 added -->
-                        <td>{{ story.title }}</td>
-                        <!-- Add the following 2 lines below. # TZX002 -->
-                        <td>{{ story.author }}</td>
-                        <td>{{ story.timestamp }}</td>                        
-                        <td>
-           <!-- Chg line below: "story.index" replaced with "story.title"; "button_index" replaced with "button_value"  # TZX002 -->                            
-                            <button class="btn-dustbin" type="submit" name="button_value" value="{{ story.timestamp }}">                                
-                                <img class=".img-button" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
+                        <td class="Table-td-1">{{ loop.index }}.</td>      
+                        <td class="Table-td-1">{{ story.title }}</td>
+                        <td class="Table-td-2">{{ story.author }}</td>
+                        <td class="Table-td-2">{{ story.timestamp }}</td>
+                        <td class="Table-td-2">
+                            <button class="Btn-dustbin" type="submit" name="button_value" value="{{ story.timestamp }}">
+                                <img class="Img-margin-0" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
                             </button>        
                         </td>
                     </tr>
@@ -39,6 +36,7 @@
     </div><br>
 
   <!-- <a href="/success">Home</a><br><br> -->
-    <img src="{{ url_for('static', filename='images/trash-can.gif') }}" width=100>
+  
+    <img class="Img-bottom-1" src="{{ url_for('static', filename='images/trash-can.gif') }}" width=80>
 
 {%endblock%}

@@ -3,14 +3,18 @@
 
 {% extends "nav.html" %}
 
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% endblock %}
+
 {% block content %}
 
-	<h1 class="Text-shadow-1">{{ data.page_title }}</h1>
+    <h1 class="Text-shadow-1">{{ data.page_title }}</h1>
     <hgroup class="hgroup-1">    
         {{ data.html|safe }}
     </hgroup>
     
-	<!-- Text-To-Speech (TTS) button: pass the timestamp parameter. # TZX004 - 5 lines below -->
+    <!-- Text-To-Speech (TTS) button: pass the timestamp parameter. # TZX004 - 5 lines below -->
     <form method="post" action="{{ url_for('speech_text', timestamp=data.timestamp) }}">
         <button class="Btn-speech" type="submit">
             <img class="Img-margin-0" src="{{ url_for('static', filename='images/text-to-speech.jpg') }}" width="50" height="40">
@@ -23,18 +27,102 @@
     <textarea class="Textarea-1" id="myTextarea" cols="80" rows="10" disabled>{{ story.content }}</textarea><br>
     <button class="Btn-onclick-1" onclick="enableTextarea()">Enable Textarea</button><hr>
 
-	<!-- Go back to "Story List" html page --> <!-- # TZX004 -->
+    <!-- Go back to "Story List" html page --> <!-- # TZX004 -->
     <img class="Img-bottom-1" src="{{ url_for('static', filename='images/bookworm.gif') }}" width=50>
     {{ data.back|safe }}
 
-    <script>
-        function enableTextarea() {
-          /*  document.getElementById("myTextarea").disabled = false; */
-          document.getElementById('myTextarea').disabled = false;
-            const myElement = document.getElementById("myTextarea")
-            myElement.style.color = "red";
-            myElement.attributes = true;
-        }
-    </script>
+    <!-- Comment Section -->
+    <head><link rel="stylesheet" href="{{ url_for('static', filename='css/review.css') }}"></head>
+    <body>
+        <div class="bodyy"></div>
+             <div class="container">
+            <div class="head"><h1>Post a Comment</h1></div>
+            <div><span id="comment">0</span> Comments</div>
+            <div class="text"><p>We are happy to hear from you</p></div>
+            <div class="comments"></div>
+            <div class="commentbox">
+                <img src="{{ url_for('static', filename='images/profile.jpg') }}" alt="">
+                <div class="content">
+                    <h2>Comment as: </h2>
+                    <input type="text" value="Anonymous" class="user">
     
-{%endblock%}
+                    <div class="commentinput">
+                        <input type="text" placeholder="Enter comment" class="usercomment">
+                        <div class="buttons">
+                            <button type="submit" disabled id="publish">Publish</button>
+                            <div class="notify">
+                                <input type="checkbox" class="notifyinput"> <span>Notify me</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="policy">This site is procted by reCAPTCHA and the Google <a href="">privacy policy</a> and <a href="">Terms of Service</a> apply.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    
+    
+    
+    const USERID = {
+        name: null,
+        identity: null,
+        image: null,
+        message: null,
+        date: null
+    }
+    
+    const userComment = document.querySelector(".usercomment");
+    const publishBtn = document.querySelector("#publish");
+    const comments = document.querySelector(".comments");
+    const userName = document.querySelector(".user");
+    
+    
+        userComment.addEventListener("input", e => {
+            if(!userComment.value) {
+                publishBtn.setAttribute("disabled", "disabled");
+                publishBtn.classList.remove("abled")
+            }else {
+                publishBtn.removeAttribute("disabled");
+                publishBtn.classList.add("abled")
+            }
+        })
+    
+        function addPost() {
+            console.log("The Button Works!!!")
+            if(!userComment.value) return;
+            USERID.name = userName.value;
+            if(USERID.name === "Anonymous") {
+                USERID.identity = false;
+                USERID.image = "{{ url_for('static', filename='images/anonymous.jpg') }}";
+            }else {
+                USERID.identity = true;
+                USERID.image = "{{ url_for('static', filename='images/user.png') }}";
+            }
+    
+            USERID.message = userComment.value;
+            USERID.date = new Date().toLocaleString();
+            let published = 
+            `<div class="parents">
+                <img src="${USERID.image}" width=25>
+                <div>
+                    <h1>${USERID.name}</h1>
+                    <p>${USERID.message}</p>
+                    <div class="engagements"><img src="{{ url_for('static', filename='images/like.png') }}" id="like" width=25><img src="{{ url_for('static', filename='images/share.png') }}" alt="" width=25></div>
+                    <span class="date">${USERID.date}</span>
+                </div>    
+            </div>`
+    
+            comments.innerHTML += published;
+            userComment.value = "";
+    
+            let commentsNum = document.querySelectorAll(".parents").length;
+            document.getElementById("comment").textContent = commentsNum;
+        }
+    
+        publishBtn.addEventListener("click", addPost);
+    
+    </script>
+
+{% endblock %}

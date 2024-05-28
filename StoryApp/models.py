@@ -37,9 +37,9 @@ def __repr__(self):
 class Story(db.Model):                                                  # TZX002
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)    # TZX002
     title = db.Column(db.String(50))                                    # TZX002
-    content = db.Column(db.String(500))                                 # TZX002
+    content = db.Column(db.String(1000))                                # TZX006
     # Use username as an author name.                                   # TZX002
-    author = db.Column(db.String(20), nullable=False)                   # TZX002
+    author = db.Column(db.String(50), nullable=False)                   # TZX006
     # To deal with multiple stories that share the same title,          # TZX002
     # I decided to use the creation timestamp as an unique key          # TZX002
     # to retrieve (and to delete) the story record.                     # TZX002 

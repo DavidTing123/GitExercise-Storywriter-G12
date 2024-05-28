@@ -2,7 +2,7 @@ import os
 import smtplib
 import secrets 
 from PIL import Image
-from flask import render_template,url_for, request, flash, redirect
+from flask import render_template,url_for, request, flash, redirect, session
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
 from StoryApp.models import User
@@ -18,6 +18,7 @@ from sqlalchemy import exc, func , or_           # TZX002
 from datetime import datetime               # TZX002
 import winsound                             # TZX002
 import markdown                             # TZX003
+from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
 
 
@@ -46,9 +47,43 @@ def read_from_db():                         # TZX002
     print('all_stories', all_stories)       # TZX002
     return all_stories                      # TZX002
 
-# Retrieves a story by its title from database.         # TZX002
+# Retrieves a story from database based on timestamp.           # TZX006
 def get_story_by_timestamp(timestamp):                          # TZX002
     return Story.query.filter_by(timestamp=timestamp).first()   # TZX002
+
+
+#--- TZX006 (Start) ------------------------------------------------------
+# Retrieves ALL stories created by specified author.            # TZX006
+'''
+def get_story_by_author(author):                                # TZX006
+    return Story.query.filter_by(author=author).all()           # TZX006
+'''
+def get_story_by_author(author):                                    # TZX006
+    return db.session.query(Story).filter_by(author=author).all()   # TZX006
+
+def markdown_to_plain_text(markdown_text):                          # TZX006
+    # Convert markdown to HTML                                      # TZX006
+    #html = markdown2.markdown(markdown_text)                       # TZX006
+    # Based on testing, markdown2 NOT support "###"                 # TZX006
+    # markdown module support "###"                                 # TZX006
+
+
+    # By default, the markdown module doesn't convert single        # TZX006
+    # newlines to <br> tags. We need double newlines.               # TZX006
+    #html = markdown.markdown(markdown_text)                         # TZX006
+    # NOTE: markdown library not supported "\n"             # TZX006
+    # Replace newline characters, "\n" with <br> tags       # TZX006
+    text1 = markdown_text                                   # TZX006
+    text2 = text1.replace('\\n', '<br>')                    # TZX006
+    html = markdown.markdown(text2)                         # TZX006
+
+    # Parse HTML and extract text                   # TZX006
+    soup = BeautifulSoup(html, 'html.parser')       # TZX006
+    plain_text = soup.get_text()                    # TZX006
+    
+    return plain_text                               # TZX006
+#--- TZX006 (End) ------------------------------------------------------
+
 
 # Deletes a record from database based on timestamp.    # TZX002
 def delete_story_by_timestamp(timestamp):               # TZX002
@@ -257,12 +292,11 @@ def delete_account():
     return render_template("delete_account.html", title="Delete Account", form=form)
         
 
-#@app.route('/')
 @app.route('/success')
 def index():
-#def success():
-    #stories = read_from_csv()
-    #return render_template('index.html', stories=stories)
+    global EditMode                         # TZX006
+
+    EditMode = False                        # TZX006    
     return render_template('index.html')
 
 
@@ -292,9 +326,73 @@ def add_story():
 
 @app.route('/storylist')
 def storylist():
-    #stories = read_from_csv()
-    stories = read_from_db()    # TZX002
-    return render_template('storylist.html', stories=stories)
+
+    stories = read_from_db()                                    # TZX002
+    # Store EditMode in Session                                 # TZX006
+    session['EditMode'] = EditMode                              # TZX006
+
+    #return render_template('storylist.html', stories=stories)
+    return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+
+
+# -- TZX006 (start) -------------------------------------------------------------
+# If "Edit" Navigation Menu pressed, route to this "editrecord" function.   # TZX006
+@app.route('/editrecord')                                                   # TZX006
+def editrecord():                                                           # TZX006
+    try:                                                                    # TZX006
+        # This will raise a NameError because 'username' is not defined.    # TZX006
+        print(username)                                                     # TZX006
+    except NameError:                                                       # TZX006
+        flash("An error occurred: 'username' is not defined. Please log in to your account.", "error")     # TZX006
+        return render_template('home.html')                                     # TZX006
+                
+    # Proceed if not NameError...                                               # TZX006
+    EditMode = True                                                             # TZX006            
+    stories = get_story_by_author(username)                                     # TZX006
+
+    # Store EditMode in Session                                     # TZX006
+    session['EditMode'] = EditMode                                  # TZX006
+
+    return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+
+
+@app.route('/edit_story/<timestamp>')                               # TZX006
+def edit_story(timestamp):                                          # TZX006
+    global primary_key                                              # TZX006
+
+    story = get_story_by_timestamp(timestamp)                       # TZX006
+    print('story.id:', story.id)                                    # TZX006
+    primary_key = story.id                                          # TZX006
+    return render_template('edit_story.html', story=story)          # TZX006
+
+
+# All the following lines are NEW added, not verify yet !!!!            # TZX006 !!!
+#@app.route('/update_story/<timestamp>', methods=['GET', 'POST'])       # TZX006
+@app.route('/update_story', methods=['POST'])                           # TZX006
+def update_story():                                                     # TZX006
+    
+    # Testing...                                                # TZX006
+    #msg = 'Debug msg: primary_key = ' + str(primary_key)        # TZX006 
+    #flash(msg, 'success')                                       # TZX006
+    #return redirect(url_for('home'))                            # TZX006
+
+    #story = get_story_by_timestamp(timestamp)                           # TZX006
+    story = Story.query.get(primary_key)                                # TZX006
+    
+    if story:                                                           # TZX006
+        if request.method == 'POST':                                    # TZX006
+            new_content = request.form['content']                       # TZX006
+            story.content = new_content                                 # TZX006
+            db.session.commit()                                         # TZX006
+            flash('Story has been updated successfully!', 'success')    # TZX006
+            return redirect(url_for('home'))                            # TZX006
+        return render_template('edit_story.html', story=story)          # TZX006
+    else:                                                               # TZX006
+        flash('Story not found!', 'danger')                             # TZX006
+        return redirect(url_for('home'))                                # TZX006
+
+# -- TZX006 (start) -------------------------------------------------------------
+
 
 
 @app.route('/archive')
@@ -330,18 +428,21 @@ def read_story(timestamp):                      # TZX002
     data["page_title"] = story.title                        # TZX003
     data["author"] = story.author                           # TZX004
     data["timestamp"] = story.timestamp                     # TZX004
-    data["html"] = markdown.markdown(story.content)         # TZX003
-    #data["back"] = "<a href='/storylist'>Back</a>"          # TZX003
-    data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
-    #return render_template('story_page.html', data=data)    # TZX003
-    return render_template('story_page.html', story=story, data=data)    # TZX005
 
-'''
-    if story:
-        return render_template('story.html', story=story)
-    else:
-        return "Story not found."
-'''
+    # Based on my testing, markdown2 module NOT support "###".      # TZX006
+    # markdown module support "###"                                 # TZX006
+    # By default, the markdown module doesn't convert single        # TZX006
+    # newlines to <br> tags. We need double newlines.               # TZX006
+
+    #data["html"] = markdown.markdown(story.content)         # TZX003
+    # NOTE: markdown library not supported "\n"             # TZX006
+    # Replace newline characters, "\n" with <br> tags       # TZX006
+    text1 = story.content                                   # TZX006
+    text2 = text1.replace("\\n", "<br>")                    # TZX006
+    data["html"] = markdown.markdown(text2)                 # TZX006
+
+    data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
+    return render_template('story_page.html', story=story, data=data)    # TZX005
 
 
 #@app.route('/speech_text', methods=['POST'])
@@ -363,15 +464,18 @@ def speech_text(timestamp):                                 # TZX004
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[1].id)   # index 0 for male and 1 for female
 
-    #text1 = story["title"]          # Retrieve title of story
     text1 = story.title             # Retrieve title of story  # TZX002
     engine.say(text1)               # Perform the text-to-speech conversion
-    #text2 = story["content"]        # Retrieve the content of story
     text2 = story.content           # Retrieve the content of story  # TZX002
-    engine.say(text2)               # Perform the text-to-speech conversion
+
+    # Convert Markdown to readable plain text.  # TZX006
+    plain_text = markdown_to_plain_text(text2)  # TZX006
+    print(plain_text)                           # TZX006
+
+    #engine.say(text2)               # Perform the text-to-speech conversion
+    engine.say(plain_text)          # Perform the text-to-speech conversion # TZX006
     engine.runAndWait()             # Wait for the speech to finish
 
-    #return render_template('story.html', story=story)
     return redirect(url_for('read_story', timestamp=timestamp))     # TZX004
 
 
@@ -397,6 +501,16 @@ def delete_story():
 @app.route('/sort_record', methods=['GET', 'POST'])
 def sort_record():
 
+# Understanding Flask session:                                                      # TZX006
+# The session object in Flask is a dictionary-like object that allows you to store  # TZX006 
+# information on the server side between requests. This is useful for keeping       # TZX006
+# user-specific data across multiple requests (such as during a user session).      # TZX006
+# The get method is a built-in Python dictionary method that retrieves a value      # TZX006 
+# for a given key. If the key does not exist, it returns a default value.           # TZX006
+
+    # Retrieve EditMode from session                                                # TZX006
+    EditMode = session.get('EditMode', False)  # Default to False if not set        # TZX006
+
     '''
     # Available sort fields
     sort_fields = ['title', 'author', 'timestamp']  # Assuming you want to allow sorting by these fields
@@ -414,6 +528,7 @@ def sort_record():
     else:
         sorted_records = get_all_stories()  # Call a new function to retrieve all stories
 
-    return render_template('storylist.html', stories=sorted_records)
+    #return render_template('storylist.html', stories=sorted_records)
+    return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
 
 #--- TZX005 -------------------------------------------------------------------

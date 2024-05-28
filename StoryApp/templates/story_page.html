@@ -5,36 +5,24 @@
 
 {% block content %}
 
-	<h1 class="Text-shadow-1">{{ data.page_title }}</h1>
-    <hgroup class="hgroup-1">    
-        {{ data.html|safe }}
-    </hgroup>
+    <!-- 7 lines chg below # TZX006 -->
+    <h1 class="Text-shadow-1">Story</h1>
+    <div class="StoryBook">
+        <h1 class="StoryTitle">{{ data.page_title }}</h1>
+        <hgroup class="Content-1">    
+            {{ data.html|safe }}
+        </hgroup>
+    </div>
+
     
 	<!-- Text-To-Speech (TTS) button: pass the timestamp parameter. # TZX004 - 5 lines below -->
     <form method="post" action="{{ url_for('speech_text', timestamp=data.timestamp) }}">
-        <button class="Btn-speech" type="submit">
+        <button class="Speech" type="submit">
             <img class="Img-margin-0" src="{{ url_for('static', filename='images/text-to-speech.jpg') }}" width="50" height="40">
         </button>
     </form>
-    
-    <p class="Text-p"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p><hr>
 
-    <br><p class="p-Text-1" >Original Data:</p><br>
-    <textarea class="Textarea-1" id="myTextarea" cols="80" rows="10" disabled>{{ story.content }}</textarea><br>
-    <button class="Btn-onclick-1" onclick="enableTextarea()">Enable Textarea</button><hr>
-
-	<!-- Go back to "Story List" html page --> <!-- # TZX004 -->
-    <img class="Img-bottom-1" src="{{ url_for('static', filename='images/bookworm.gif') }}" width=50>
-    {{ data.back|safe }}
-
-    <script>
-        function enableTextarea() {
-          /*  document.getElementById("myTextarea").disabled = false; */
-          document.getElementById('myTextarea').disabled = false;
-            const myElement = document.getElementById("myTextarea")
-            myElement.style.color = "red";
-            myElement.attributes = true;
-        }
-    </script>
+    <!-- TZX006 : Chg 1 lines below  -->
+    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p><hr><br>
     
 {%endblock%}

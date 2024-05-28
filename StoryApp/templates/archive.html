@@ -24,7 +24,8 @@
                         <td class="Table-td-2">{{ story.author }}</td>
                         <td class="Table-td-2">{{ story.timestamp }}</td>
                         <td class="Table-td-2">
-                            <button class="Btn-dustbin" type="submit" name="button_value" value="{{ story.timestamp }}">
+                            <!-- Chg 1 line below: TZX006 -->
+                            <button class="Dustbin-1" type="submit" name="button_value" value="{{ story.timestamp }}">
                                 <img class="Img-margin-0" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
                             </button>        
                         </td>

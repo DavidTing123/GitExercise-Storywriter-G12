@@ -1,0 +1,95 @@
+<!-- templates/edit_story.html -->
+<!-- TZX006 : edit_story.html is a NEW html added on 28 May 2024 -->
+
+{% extends "nav.html" %}
+
+{% block content %}
+
+    <h1 class="Text-shadow-1">Story Update</h1>
+
+    <div class="grid-container">
+        <div class="grid-item-1">
+            <form class="NewEntry" action="/update_story" method="post">
+                <label class="Bold-1" for="title">Title: {{ story.title }} </label>
+                <br><br>
+                <label class="Bold-1" for="content">Content:</label>
+                <label class="Grey-1" for="info">(up to 1000 characters)</label><br>
+                <textarea class="NewEntry" id="content" name="content" rows="16" cols="80">{{ story.content }}</textarea><br>
+    
+                <button type="button" class="MarkdownButton" onclick="convertMarkdownToHtml()">Preview</button>
+                <input type="submit" class="Input-submit-1" value="Update the Story">
+            </form>
+        </div>
+
+        <div class="grid-item-2">
+            <h2 class="Preview-1" >Preview Area:</h2>
+            <div class="Preview" id="html-output">
+            </div>
+        </div>
+    </div>
+
+    <img class="Img-bottom-1" src="{{ url_for('static', filename='images/writing.gif') }}" width=100>
+
+
+    <!-- Some how the system failed to load the converter.js externally. -->
+    <!-- For a quick solution, place the converter.js script internally (HERE). -->
+    <script>
+
+        function convertMarkdownToHtml() {
+            // Get the Markdown input value
+            const markdownInput = document.getElementById('content').value;
+            
+            // Function to replace Markdown syntax with HTML
+            function markdownToHtml(markdown) {
+                let html = markdown;
+                
+                // Replace headers (e.g., # Heading) with <h1>, <h2>, etc.
+                html = html.replace(/^#\s+(.*)$/gm, '<h1>$1</h1>');
+                html = html.replace(/^##\s+(.*)$/gm, '<h2>$1</h2>');
+                html = html.replace(/^###\s+(.*)$/gm, '<h3>$1</h3>');
+                html = html.replace(/^####\s+(.*)$/gm, '<h4>$1</h4>');
+                html = html.replace(/^#####\s+(.*)$/gm, '<h5>$1</h5>');
+                html = html.replace(/^######\s+(.*)$/gm, '<h6>$1</h6>');
+                
+                // Replace bold and italic
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                // Replace links
+                html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+                
+                // Replace unordered lists - tested NOT working # TZX006
+                html = html.replace(/^\s*\*\s+(.*)$/gm, '<ul><li>$1</li></ul>');
+
+                // Replace ordered lists - tested NOT working # TZX006
+                html = html.replace(/^\s*1\.?\s+(.*)$/gm, '<ol><li>$1</li></ol>');
+
+                // Replace line breaks - tested NOT working # TZX006
+                html = html.replace(/  \n/g, '<br>');
+                
+                // Replace paragraphs
+                html = `<p>${html.replace(/\n\n/g, '</p><p>')}</p>`;
+
+                // Add rule for images (e.g., !Alt Text) - Not sure working or not !!!
+                html = html.replace(/!\[([^\]]+)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+
+                // Replace newline characters ('\n') with <br> tags.       TZX006
+                html = html.replace(/\\n/g, '<br>');                     // TZX006
+
+                // Replace the Markdown horizontal rule '---' with an HTML <hr> tag.       TZX006
+                html = html.replace(/^---$/gm, '<hr>');                                 // TZX006
+            
+                return html;
+            }
+            
+            // Convert Markdown to HTML
+            const html = markdownToHtml(markdownInput);
+            
+            // Display the HTML output in the HTML output area
+            const htmlOutput = document.getElementById('html-output');
+            htmlOutput.innerHTML = html;
+        }
+
+    </script>
+
+{%endblock%}

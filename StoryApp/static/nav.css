@@ -8,7 +8,7 @@
 }
 
 head{
-    font-family:"poppins",sans-serif;
+    font-family: "poppins",sans-serif;
 }
 
 nav{
@@ -20,7 +20,7 @@ nav{
 
 label.logo{
     color: white;
-    font-size:30px;
+    font-size: 40px;         /* 30px; - TZX007: Too small, set to 40px */
     line-height:70px;
     padding:0 50px;
     font-weight:bold;
@@ -45,7 +45,22 @@ nav ul li a{
     font-size: 18px;
 }
 
-/* TZX001 added the following lines */
+/* TZX006 (begin) --------------------------- */
+
+.nav-list.active {
+    background-color: grey; /* Adjust this color as desired */
+    color: black; /* Adjust this color as desired for text contrast */
+    font-weight: bold;
+}
+  
+/* Optional styles for a subtle hover effect (not required for highlighting) */
+.nav-list:hover {
+    background-color: grey; /* Adjust this color as desired */
+    color: black;
+}
+
+/* TZX006 (end) ------------------------------*/
+
 .nav-list {
     display: inline-block;
     line-height: 70px;
@@ -58,82 +73,14 @@ body {
     background-color: #c5e1f8;
 }
 
-/* Commented by TZX004
-h1, h2 {
-    padding-top: 20px;
-    padding-left: 20px;
-    padding-bottom: 20px;
-    color: Blue;
-    text-shadow: 2px 2px 5px red;
-}
-*/
-
-/* Commented by TZX004
-label {
-    padding-left: 20px;
-    font-weight: bold;
-}
-
-p {
-    padding-left: 30px;
-    margin-right: 100px;
-    margin-bottom: 10px; 
-}
-*/
-
-/* Commented by TZX004
-ol {
-    list-style: decimal;
-}
-
-ol li {
-    padding-left: 50px;
-    padding-bottom: 10px;
-}
-
-table, th, td {
-    background-color: white;
-    border: 1px solid grey;
-}
-
-th {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-td {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 2px;
-    padding-bottom: 2px;
-}
-
-img {
-    padding-left: 0;
-}
-*/
-
 .archive-item {
     margin-left: 20px;
 }
 
-/* Commented by TZX004
-.btn-dustbin {
-    margin-left: 10px;
-    margin-bottom: 10px;
-}
-
-.btn-speech {
-    margin-left: 10px;
-    margin-bottom: 10px;
-}
-*/
-
-/* TZX001 added the above lines */
-
 /*-- TZX004 (start) -----------------------------------------------------------------------------*/
+
+/*-- TZX006 (start) ----------------------------------------------*/
+/* TZX006 - commented the following lines
 .hgroup-1 {
     padding-left: 30px;
     margin-right: 100px;
@@ -198,19 +145,22 @@ img {
     margin-left: 40px;
     margin-top: 5px;
     cursor: pointer;
-    border-radius: 5px;     /* Set rounded corners */
-    border-style: ridge;    /* Specifies a 3D ridged border */
-    width: 150px;           /* Specifies the width of input button */
+    border-radius: 5px;     
+    border-style: ridge;    
+    width: 150px;           
 }
 
 .Input-submit-1:hover {
     background-color: #45a049;
     transform: scale(1.1,1.1);
 }
+*/
+/*-- TZX006 (end) ----------------------------------------------*/
 
 .hyperlink-1 {
     padding-left: 2px;   
-    text-decoration: underline;
+  /*  text-decoration: underline; */ /* TZX007*/
+    font-size: 22px;    /* TZX007 */
 }
 
 .hyperlink-1:link {
@@ -278,11 +228,13 @@ img {
     padding-right: 20px;
     padding-top: 2px;
     padding-bottom: 0;
+    font-size: 22px;    /* TZX007 */
 }
 
 .Table-td-2 {
     font-family:'Times New Roman', Times, serif;
-    font-size: small;
+  /*  font-size: small;  */
+    font-size: 20px;    /* TZX007 */
     font-style: italic;
     background-color: White;
     padding-left: 20px;
@@ -296,7 +248,8 @@ img {
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 5px;             
-    padding-bottom: 5px;          
+    padding-bottom: 5px;   
+    font-size: 22px;    /* TZX007 */       
 }
 
 .Btn-speech {
@@ -331,7 +284,7 @@ img {
 
 /*-- TZX005 (start) ------------------------------------------------------------------------------------- */
 
- .Fixed-container-1 {
+.Fixed-container-1 {
     position: fixed;
     top: 16%;
     left: 60%;
@@ -348,7 +301,7 @@ img {
     margin-left: 10px;
     margin-right: 10px;
     padding: 10px;
-    font-size: 16px;
+    font-size: 16px; 
 }
 
 .Btn-submit-1 {
@@ -357,7 +310,7 @@ img {
     margin-bottom: 2px;
     margin-left: 0;
     padding: 10px;
-    font-size: 16px;
+    font-size: 18px;   /* TZX007 */
 }
 
 .Form-1 {
@@ -370,11 +323,191 @@ img {
     list-style: decimal;   /* Not Working !! Why? */
 }
 
-/*
-ol li {
-    padding-left: 50px;
-    padding-bottom: 10px;
-}
-*/
-
  /*-- TZX005 (end) ------------------------ */
+
+ /*-- TZX006 (begin) ----------------------------------------------------- */
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    padding: 0px;
+}
+
+.grid-item-1 {
+    width: fit-content;
+    float: left;
+}
+
+.grid-item-2 {
+    width: 100%;        /* Takes up remaining width in the container */
+    float: left;
+    background-color: lightblue;  /* TZX006 */
+    border-style: none;         /* TZX006 */
+    border-color: blue;  
+}
+
+
+form.NewEntry {
+    background: lightblue;     /* TZX006 */
+    margin-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 5px;
+    border: 3px solid #c1c1c1;
+}
+
+label.Bold-1 {
+    padding-left: 20px;
+    font-weight: bold;
+    font-size: 22px;    /* TZX007 */
+}
+
+label.Grey-1 {
+    padding-left: 3px;
+    font-weight: lighter;
+  /*  font-size: small; */
+    font-size: 20px;    /* TZX007 */
+    color: grey;
+}
+
+label.Grey-2 {
+    padding-left: 25px;
+    font-weight: lighter;
+    /*  font-size: small; */
+    font-size: 20px;    /* TZX007 */
+    color: grey;
+}
+
+
+input.NewEntry-1 {
+    background-color: white;  /* TZX006 */
+    margin-left: 20px;
+    padding: 8px;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 22px;    /* TZX007 */
+}
+
+textarea.NewEntry {
+    background-color: white;  /* TZX006 */    
+    margin-top: 0;
+    margin-left: 20px;
+    padding: 8px;
+    padding-top: 0;
+    border: 2px solid #cccccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    resize: both;    /* TZX006 */
+    font-size: 22px;    /* TZX007 */
+}
+
+.Input-submit-1 {
+    background-color: #5c72cb;
+    color: white;
+    padding: 8px;
+    margin-left: 10px;      /* TZX006 */ 
+    margin-top: 8px;        /* TZX006*/
+    cursor: pointer;
+    border-style: none;         /* TZX006 */
+    width: 150px;           /* Specifies the width of input button */
+}
+
+.Input-submit-1:hover {
+    background-color: #45a049;
+    transform: scale(1.1,1.1);
+}
+
+div.StoryBook {
+    min-height: 60%;
+    background-color: lightblue;  /* TZX006 */
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    width: 60%;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 5px;
+    border: 3px solid #c1c1c1;
+}
+
+h1.StoryTitle {
+    padding-left: 10px;
+    padding-bottom: 10px;
+    -webkit-text-fill-color: #5c72cb;
+}
+
+hgroup.Content-1 {
+    padding-left: 15px;
+}
+
+
+p.Author-TimeStamp {
+    padding-left: 30px;
+    margin-right: 100px;
+    margin-bottom: 10px;
+}
+
+p.OriginalData {
+    padding-left: 30px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+button.Speech {
+    margin-left: 30px;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+button.Speech:hover {
+    transform: scale(1.2,1.2);
+}
+
+button.Dustbin-1 {
+    margin: 2px;
+}
+
+button.Dustbin-1:hover {
+    transform: scale(1.2,1.2);
+}
+
+button.MarkdownButton {
+    background-color: #5c72cb;
+    color: white;
+    padding: 8px;
+    margin-left: 40px;
+    margin-top: 8px;            /* TZX006*/
+    cursor: pointer;
+    border-style: none;         /* TZX006 */
+    width: 150px;           /* Specifies the width of input button */
+}
+
+button.MarkdownButton:hover {
+    background-color: #45a049;
+    transform: scale(1.1,1.1);
+}
+
+h2.Preview-1 {
+    color: white;
+    text-shadow: 1px 1px 2px black, 0 0 25px blue, 0 0 5px darkblue;
+    padding-left: 10px; 
+    padding-top: 10px;
+}
+
+div.Preview {
+    color: black;
+    padding-left: 10;
+    font-size: 22px;    /* TZX007 */
+}
+
+div.Preview::before {
+    content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; 
+}
+
+div.Edit-Content {
+    opacity: 0.6;       /* 40% transparent */
+}
+
+ /*-- TZX006 (end) ----------------------------------------------------- */

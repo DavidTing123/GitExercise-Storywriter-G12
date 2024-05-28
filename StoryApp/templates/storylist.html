@@ -3,20 +3,31 @@
 {% extends "nav.html" %}
 
 {% block title %}
-    Story Listing
+    {%if editmode%}
+        Story Editor
+    {%else%}
+        Story Browser
+    {%endif%}
 {% endblock %}
 
 {% block content %}
 
-    <h1 class="Text-shadow-1">Story Listing</h1>
+    {%if editmode%}
+        <h1 class="Text-shadow-1">Story Editor</h1>
+    {%else%}
+        <h1 class="Text-shadow-1">Story Browser</h1>
+    {%endif%}
+
 
     <!-- TZX005 (Option: Start) --------------------------------->
     <div class="Fixed-container-1">
         <form class="Form-1" action="{{ url_for('sort_record') }}" method="post">
             <h4>Sort by:</h4>
             <select class="Select-1" name="sort_field" id="sort_field" required>
+                {%if not editmode%}
+                    <option value="author">Author</option>
+                {%endif%}
                 <option value="title">Title</option>
-                <option value="author">Author</option>
                 <option value="timestamp">Creation Timestamp</option>
             </select>
             <button class="Btn-submit-1" type="submit">Sort it now</button>
@@ -27,12 +38,17 @@
     <ol class="ol-class-1">
         {% for story in stories %}
             <li class="OrderList-1">
-                
-                <a class="hyperlink-1" href="{{ url_for('read_story', timestamp=story.timestamp) }}">
-                    <span><strong>{{ story.title }}</strong></span> &mdash; 
-                    &laquo; <small>by {{ story.author }} on {{ story.timestamp }}</small> &raquo;
-                </a>
-
+                {%if editmode%}
+                    <a class="hyperlink-1" href="{{ url_for('edit_story', timestamp=story.timestamp) }}">
+                        <span><strong>{{ story.title }}</strong></span> &mdash; 
+                        &laquo; <small>by {{ story.author }} on {{ story.timestamp }}</small> &raquo;
+                    </a>
+                {%else%}
+                    <a class="hyperlink-1" href="{{ url_for('read_story', timestamp=story.timestamp) }}">
+                        <span><strong>{{ story.title }}</strong></span> &mdash; 
+                        &laquo; <small>by {{ story.author }} on {{ story.timestamp }}</small> &raquo;
+                    </a>
+                {%endif%}
             </li>
         {% endfor %}
     </ol>

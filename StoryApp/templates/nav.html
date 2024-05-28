@@ -4,14 +4,17 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <nav>
-        <label class="logo">StoryWriter</label>
+
+    <!-- <nav> --> <!-- TZX006 commented this line -->
+    <nav class="navbar" id="navbar">                <!-- TZX006 -->    
+        <label class="logo">MyStory</label>         <!-- TZX006 -->
         <ul class="navbar">
             {%if current_user.is_authenticated%}
 
                 <li class="nav-list"><a class="nav-item" href="/">Home</a></li>               <!--TZX004-->
                 <li class="nav-list"><a class="nav-item" href="/success">Writer</a></li>      <!--TZX004-->
-                <li class="nav-list"><a class="nav-item" href="/storylist">Story</a></li>     <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/storylist">Browser</a></li>     <!--TZX006-->
+                <li class="nav-list"><a class="nav-item" href="/editrecord">Editor</a></li>     <!-- TZX006 -->
                 <li class="nav-list"><a class="nav-item" href="/archive">Admin</a></li>       <!--TZX004-->
                 <li class="nav-list"><a class="nav-item" href="/profile">Profile</a></li>     <!--TZX004-->
                 <li class="nav-list"><a class="nav-item" href="/logout">Logout</a></li>        <!--TZX004-->

@@ -2,6 +2,29 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nav.css') }}">
     <title>{% block title %}{% endblock %}</title>
+    <style>
+        /* Hide the navbar and print button when printing */
+        @media print {
+            .Text-shadow-1{
+                display: none;
+            }
+            .navbar {
+                display: none;
+            }
+            #print-btn {
+                display: none;
+            }
+            .Img-margin-0{
+                display: none;
+            }
+            .containerr{
+                display: none;
+            }
+            .Author-TimeStamp{
+                display:none;
+            }
+        }
+    </style>
 </head>
 <body>
 

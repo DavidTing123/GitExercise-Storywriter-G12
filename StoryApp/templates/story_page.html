@@ -1,6 +1,6 @@
 <!-- templates/story_page.html -->
 <!-- TZX004 : Revise the whole html codes on 20 May 2024 -->
-
+<link rel="stylesheet" href="{{ url_for('static', filename='printbutton.css') }}">
 {% extends "nav.html" %}
 
 <!-- Roel01 - Changes (start) --------------------------------------------->
@@ -25,7 +25,20 @@
         </button>
     </form>
     
-    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p><hr>
+    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>
+
+    <!-- Print button -->
+    <button id="print-btn">Print Story</button>
+
+    <script>
+         // Function to handle printing
+        function printStory() {
+             window.print();
+           }
+   
+         // Attach event listener to print button
+        document.getElementById('print-btn').addEventListener('click', printStory);
+    </script>
 
     <!-- Comment Section -->
 

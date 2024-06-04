@@ -171,26 +171,4 @@ img {
     margin-bottom: 10px;
 }
 
-.count {
-    background-color: #000000;
-    top: 110%;
-    width: 20%;
-    padding: 10px;
-    left: 85%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: space-around;
-    border-radius: 5px;
-    box-shadow: 0 20px 40px rgba(30, 21, 49, 0.4);
-
-  }
-  .count p {
-    color: #a0a0c0;
-  }
-  .count h5 {
-    color: #ffffff;
-    font-size: 32px;
-  }
-
 /* TZX001 added the above lines */

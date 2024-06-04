@@ -1,0 +1,14 @@
+.nav-list {
+    list-style-type: none;
+}
+
+.nav-item {
+    text-decoration: none;
+    padding: 10px;
+    display: inline-block;
+}
+
+
+.hidden {
+    display: none;
+}

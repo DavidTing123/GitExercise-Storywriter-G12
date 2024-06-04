@@ -3,9 +3,10 @@ import smtplib
 import secrets 
 from PIL import Image
 from flask import render_template,url_for, request, flash, redirect, session
+from flask_sqlalchemy import SQLAlchemy
 from StoryApp import app,db, bcrypt
 from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
-from StoryApp.models import User
+from StoryApp.models import User, initialize_database
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
 import bleach
@@ -20,6 +21,8 @@ import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
+from StoryApp.models import Comment
+from flask import Flask, jsonify
 
 
 # CSV file - to store the stories data.
@@ -530,5 +533,64 @@ def sort_record():
 
     #return render_template('storylist.html', stories=sorted_records)
     return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+
+def initialize_database():
+    db.create_all()
+
+''' Commented the following lines for Roel02 changes.
+@app.route('/add_comment', methods=['POST'])
+def add_comment():
+    email = request.form['email']
+    comment_text = request.form['comment']
+    author = request.form['author']
+    
+    new_comment = Comment(email=email, comment=comment_text, author=author)
+    db.session.add(new_comment)
+    db.session.commit()
+    
+    return jsonify({'status': 'Comment added successfully!'})
+'''
+# Roel02 (start) -------------------------------------------------------------------
+@app.route('/add_comment', methods=['POST'])
+def add_comment():
+
+    # Get data from request.json
+    data = request.get_json()
+    username = data.get("username")
+    comment = data.get("comment")
+    email = story.author
+    timestamp = story.timestamp
+
+    try:
+        new_comment = Comment(email=email, comment=comment, author=username, timestamp=timestamp)
+        #new_comment = Comment(email=email, comment=commentText, author=author)
+        db.session.add(new_comment)
+        db.session.commit()
+        # Simulate processing the data (replace with your actual logic)
+        processed_data = f"Username: {username}, Comment: {comment}"
+    except exc.IntegrityError as err:                          
+        winsound.Beep(1000, 500)                            
+        processed_data = f"Error: {email} {err}"
+
+    # Return processed data as JSON
+    return jsonify({"processed_data": processed_data})    
+# Roel02 (end) -------------------------------------------------------------------
+
+@app.route('/get_comments', methods=['GET'])
+def get_comments():
+    comments = Comment.query.order_by(Comment.timestamp.desc()).all()
+    return jsonify([{
+        'id': comment.id,
+        'email': comment.email,
+        'comment': comment.comment,
+        'author': comment.author,
+        'timestamp': comment.timestamp
+    } for comment in comments])
+
+if __name__ == '__main__':
+    with app.app_context():
+        initialize_database()
+    app.run(debug=True)
+
 
 #--- TZX005 -------------------------------------------------------------------

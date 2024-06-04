@@ -5,10 +5,6 @@
     font-family: "Poppins", sans-serif;
 }
 
-body {
-    background-color : #8b5ceb;
-}
-
 .wrapper{
     position: absolute;
     width: 90vmin;

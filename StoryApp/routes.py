@@ -755,11 +755,18 @@ def add_rating():
         new_rating = Rating(story_id=story_id, rating=rating, username=user_name)
         db.session.add(new_rating)
         db.session.commit()
-        
+   
         #TZX011# story = Story.query.get_or_404(story_id)
 
         # Retrieve ALL the rating for the specific story id.
         ratings = Rating.query.filter_by(story_id=story_id).all()
+
+        #------------------------------------------------------- # TZX012
+        # To delete specific record based on id                  # TZX012
+        # delrec = Rating.query.filter(Rating.id == 1).first()   # TZX012
+        # db.session.delete(delrec)                              # TZX012 
+        # db.session.commit()                                    # TZX012
+        #------------------------------------------------------- # TZX012
         
         # Compute the average rating based on the unique story id (then round-to-nearest)
         average_rating = round(sum(r.rating for r in ratings) / len(ratings) if ratings else 0, 1)

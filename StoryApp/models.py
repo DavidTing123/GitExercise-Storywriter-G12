@@ -2,6 +2,7 @@ from flask import current_app
 from itsdangerous import URLSafeTimedSerializer 
 from StoryApp import db, login_manager, app
 from flask_login import UserMixin
+from datetime import datetime 
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -51,3 +52,25 @@ def __init__(self, id, title, content, author, timestamp):      # TZX002
     self.content = content                                      # TZX002
     self.author = author                                        # TZX002
     self.timestamp = timestamp                                  # TZX002
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(50))
+    comment = db.Column(db.String(1000))
+    author = db.Column(db.String(50), nullable=False)
+    timestamp = db.Column(db.String(19))
+
+    def __init__(self, id, email, comment, author, timestamp):  # Roel02
+        self.id = id                                            # Roel02
+        self.email = email
+        self.comment = comment
+        self.author = author
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def initialize_database():
+    db.create_all()
+
+if __name__ == '__main__':
+    with app.app_context():
+        initialize_database()                                                       

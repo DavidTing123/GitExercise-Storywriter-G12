@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Website</title>
+    <style>
+        /* Basic styling for the navigation */
+        .nav-list {
+            list-style-type: none;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        /* Hidden class to hide the content initially */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li class="nav-list"><a class="nav-item" href="#" id="badgestButton">Badges</a></li>
+            <!-- Add other navigation items here -->
+        </ul>
+    </nav>
+    <div id="badgestContent" class="hidden">
+        <h2>Badges Section</h2>
+        <p>Here you can view your badges and rewards.</p>
+        <!-- Add more content related to badges and rewards here -->
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const badgestButton = document.getElementById("badgestButton");
+            const badgestContent = document.getElementById("badgestContent");
+
+            badgestButton.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent default link behavior
+                badgestContent.classList.toggle("hidden"); // Toggle the hidden class
+            });
+        });
+    </script>
+</body>
+</html>

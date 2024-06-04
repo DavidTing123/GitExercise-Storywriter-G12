@@ -6,6 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Story Writer</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="count.css" />
 </head>
 <body>
     <h1>Story Writer</h1>
@@ -13,8 +19,22 @@
         <label for="title">Title:</label><br>
         <input type="text" id="title" name="title" required><br><br>
         <label for="content">Content:</label><br>
-        <textarea id="content" name="content" rows="4" cols="50" required placeholder="Write your story here..."></textarea><br><br>
+        <textarea id="content" name="content" rows="4" cols="50" required placeholder="Write your story here..." oninput="updateWordCount()"></textarea><br><br>
         <input type="submit" value="Submit">
+
+        <div class="count">
+        <div>
+          <h5 id="word-count">0</h5>
+          <p>Words</p>
+        </div>
+        <div>
+          <h5 id="charac-count">0</h5>
+          <p>Characters</p>
+        </div>
+      </div>
+
+      <script src="script.js"></script>
+      
     </form>
     <h2>Stories:</h2>
     <ul>

@@ -1,28 +1,97 @@
 <!-- templates/story_page.html -->
 <!-- TZX004 : Revise the whole html codes on 20 May 2024 -->
-
+<link rel="stylesheet" href="{{ url_for('static', filename='printbutton.css') }}">
 {% extends "nav.html" %}
+
+<!-- Roel01 - Changes (start) --------------------------------------------->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/review.css') }}">
+<!-- Roel01 - Changes (end) --------------------------------------------->
 
 {% block content %}
 
-    <!-- 7 lines chg below # TZX006 -->
-    <h1 class="Text-shadow-1">Story</h1>
-    <div class="StoryBook">
-        <h1 class="StoryTitle">{{ data.page_title }}</h1>
-        <hgroup class="Content-1">    
-            {{ data.html|safe }}
-        </hgroup>
-    </div>
-
+   <!-- 7 lines chg below # TZX006 -->
+   <h1 class="Text-shadow-1">Story</h1>
+   <div class="StoryBook">
+       <h1 class="StoryTitle">{{ data.page_title }}</h1>
+       <hgroup class="Content-1">    
+           {{ data.html|safe }}
+       </hgroup>
+   </div>
     
-	<!-- Text-To-Speech (TTS) button: pass the timestamp parameter. # TZX004 - 5 lines below -->
+    <!-- Text-To-Speech (TTS) button: pass the timestamp parameter. # TZX004 - 5 lines below -->
     <form method="post" action="{{ url_for('speech_text', timestamp=data.timestamp) }}">
-        <button class="Speech" type="submit">
+        <button class="Btn-speech" type="submit">
             <img class="Img-margin-0" src="{{ url_for('static', filename='images/text-to-speech.jpg') }}" width="50" height="40">
         </button>
     </form>
-
-    <!-- TZX006 : Chg 1 lines below  -->
-    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p><hr><br>
     
-{%endblock%}
+    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>
+
+    <!-- Print button -->
+    <button id="print-btn">Print Story</button>
+
+    <script>
+         // Function to handle printing
+        function printStory() {
+             window.print();
+           }
+   
+         // Attach event listener to print button
+        document.getElementById('print-btn').addEventListener('click', printStory);
+    </script>
+
+    <!-- Comment Section -->
+
+    <!-- Roel02 - Changes (start) --------------------------------------------->
+    <div class="bodyy"></div>
+    <div class="containerr">
+        <form id="comment-form">
+            <div class="headd"><h2>Post a Comment</h2></div>
+            <div><span id="commentCount">0</span> Comments</div>
+            <div class="textt"><p>We are happy to hear from you</p></div><br>
+            <label for="username">Your name:</label><br>
+            <input type="text" id="username" name="username" required>
+            <br>
+            <label for="comment">Your comment:</label><br>
+            <textarea id="comment" name="comment" rows="4" cols="50" required placeholder="Write your comment here"></textarea>
+            <br>
+            <button type="button" onclick="submitData()">Publish</button>
+            <br>
+            <p class="policy">This site is protected by reCAPTCHA and the Google <a href="">privacy policy</a> and <a href="">Terms of Service</a> apply.</p>
+            <br>
+            <p id="processedData"></p>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery for AJAX -->
+
+    <script>
+
+        function submitData() {
+            const username = document.getElementById("username").value;
+            const comment = document.getElementById("comment").value;
+
+            const data = {
+                username: username,
+                comment: comment
+            };
+
+            fetch('/add_comment', {
+                method: 'POST', // Set method to POST
+                headers: { 'Content-Type': 'application/json' }, // Set Content-Type header
+                body: JSON.stringify(data) // Convert data to JSON string for body
+            })
+            .then(response => response.json()) // Parse JSON response from server
+            .then(data => {
+                console.log('Roel02 - For debugging #1');   // Log to console for debugging
+                console.log('response data:', data);        // Log response data for debugging
+                document.getElementById("processedData").textContent = data.processed_data;
+            })
+            .catch(error => console.error(error));
+        }
+        
+    </script>
+    <!-- Roel02 - Changes (start) --------------------------------------------->
+
+
+{% endblock %}

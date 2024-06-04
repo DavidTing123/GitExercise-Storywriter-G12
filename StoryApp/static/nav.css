@@ -20,11 +20,17 @@ nav{
 
 label.logo{
     color: white;
-    font-size: 40px;         /* 30px; - TZX007: Too small, set to 40px */
+    font-size: 40px;
+    /* Create text with a neon glow effect: */  /* TZX010 */
+    text-shadow:                      /* TZX010 */
+        0 0 5px lightskyblue,       /* TZX010 */
+        0 0 10px lightskyblue,      /* TZX010 */
+        0 0 20px lightskyblue,      /* TZX010 */
+        0 0 40px lightskyblue,      /* TZX010 */
+        0 0 80px lightskyblue;      /* TZX010 */
     line-height:70px;
     padding:0 50px;
     font-weight:bold;
-
 }
 
 nav ul{
@@ -329,13 +335,16 @@ body {
  /*-- TZX006 (begin) ----------------------------------------------------- */
 .grid-container {
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: 55% 45%;     /* TZX010 */    
     padding: 0px;
 }
 
 .grid-item-1 {
     width: fit-content;
     float: left;
+    padding-left: 30px;   /* TZX010 */
+    padding-right: 30px;   /* TZX010 */
+    padding-bottom: 10px;   /* TZX010 */
 }
 
 .grid-item-2 {
@@ -346,6 +355,12 @@ body {
     border-color: blue;  
 }
 
+div.Content-1 {             /* TZX010 */
+    min-height: 400px;      /* TZX010 */
+    min-width: 800px;       /* TZX010 */
+    border: 1px dotted;     /* TZX010 */
+    padding: 10px 10px;     /* TZX010 */        
+}                           /* TZX010 */
 
 form.NewEntry {
     background: lightblue;     /* TZX006 */
@@ -497,15 +512,26 @@ h2.Preview-1 {
     padding-top: 10px;
 }
 
+div.Preview-1 {
+    color: black;
+    min-height: 550px;      /* TZX010 */
+    padding-top: 30;        /* TZX010 */
+    padding-bottom: 30;     /* TZX010 */
+    padding-left: 30;       /* TZX010 */
+    padding-right: 30;      /* TZX010 */
+}
+  
 div.Preview {
     color: black;
     padding-left: 10;
     font-size: 22px;    /* TZX007 */
 }
 
+/* TZX010 - commented. */
+/*
 div.Preview::before {
     content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; 
-}
+} */
 
 div.Edit-Content {
     opacity: 0.6;       /* 40% transparent */
@@ -692,4 +718,30 @@ div.Edit-Content {
     color: #808080;
     font-size: 0.8em;
  }
- /*-- TZX006 (end) ----------------------------------------------------- */
+ 
+
+ /*-- TZX011 (begin) ----------------------------------------------------- */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse; /* This line was causing the reverse direction */
+    justify-content: left;  
+    direction: row;         
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    font-size: 2em;
+    color: lightgray;
+    cursor: pointer;
+}
+
+.star-rating input:checked ~ label,
+.star-rating input:hover ~ label,      
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: gold;
+}
+ /*-- TZX011 (end) ----------------------------------------------------- */

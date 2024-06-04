@@ -11,10 +11,9 @@ from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
 import bleach
 from bleach import clean
-import csv
-import pyttsx3   # a simple text-to-speech converter library in Python
-#from pygame import mixer    # Sound effect
-## from flask_sqlalchemy import SQLAlchemy     # TZX002
+#TZX010# import csv
+#TZX010# import pyttsx3   # a simple text-to-speech converter library in Python
+from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_           # TZX002
 from datetime import datetime               # TZX002
 import winsound                             # TZX002
@@ -22,11 +21,48 @@ import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
 from StoryApp.models import Comment
+from StoryApp.models import Rating          # TZX011a
 from flask import Flask, jsonify
+# Install the googletrans library using "pip install googletrans==4.0.0-rc1"    # TZX010
+from googletrans import Translator              # TZX010
+# Install the langdetect libarry: "pip install langdetect"  # TZX010
+from langdetect import detect, detect_langs, DetectorFactory        # TZX010
+from langdetect.lang_detect_exception import LangDetectException    # TZX010
 
 
 # CSV file - to store the stories data.
-CSV_FILE = 'StoryApp/stories.csv'
+#TZX010# CSV_FILE = 'StoryApp/stories.csv'
+
+# Adjust the maximum content length for Flask Application Configurations.   # TZX010
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit          # TZX010
+
+EditMode = False        # TZX010
+
+# List of supported languages               # TZX010
+languages = {                               # TZX010
+   # 'zh': 'Chinese',                       # TZX010
+    'zh-CN': 'Chinese (Simplified)',        # TZX010
+    'zh-TW': 'Chinese (Traditional)',       # TZX010
+    'en': 'English',                        # TZX010
+    'tl': 'Filipino',                       # TZX010
+    'fr': 'French',                         # TZX010
+    'de': 'German',                         # TZX010
+    'el': 'Greek',                          # TZX010
+    'iw': 'Hebrew',                         # TZX010
+    'hi': 'Hindi',                          # TZX010
+    'id': 'Indonesian',                     # TZX010
+    'it': 'Italian',                        # TZX010
+    'ja': 'Japanese',                       # TZX010
+    'ko': 'Korean',                         # TZX010
+    'la': 'Latin',                          # TZX010
+    'ms': 'Malay',                          # TZX010
+    'pt': 'Portuguese',                     # TZX010
+    'ru': 'Russian',                        # TZX010
+    'es': 'Spanish',                        # TZX010
+    'ta': 'Tamil',                          # TZX010
+    'th': 'Thai'                            # TZX010
+    # Add more languages if needed          # TZX010
+}                                           # TZX010
 
 # Create tables if they don't exist.    # TZX002
 with app.app_context():                 # TZX002
@@ -119,6 +155,71 @@ def sort_stories(field):
 
 # TZX005 program changes (end) ----------------------------------------------------------------
 
+# TZX010 (begin) ------------------------------------------------------------------------------
+# Note: The 'translate' library relies on external services for translation. It may use
+# different providers like Google Translate, which might have limitations or require an
+# API key. If you need more advanced features or support for multiple languages, you might
+# consider using the googletrans library, which is a free and unlimited Python library 
+# that uses the Google Translate API.
+# Limitation: Google Translate API typically enforces a limit on the number of characters 
+# per request. This limit can be around 5000 characters. If you try to translate text 
+# that exceeds this limit, you may encounter an error.
+# Work around Solution: By handling the text in chunks, you can effectively work around 
+# the size limitations of the googletrans library and the Google Translate API.
+# Accuracy: Splitting the text at arbitrary points can sometimes lead to less accurate 
+# translations, especially if it splits sentences or phrases in awkward places. To mitigate 
+# this, you can try to split the text at natural boundaries such as spaces or punctuation marks.
+
+def detect_language(text):
+    # The DetectorFactory.seed setting ensures that results are consistent across multiple runs.
+    DetectorFactory.seed = 0
+    try:
+        # Detect the language
+        language = detect(text)
+        print('After detect(text)')
+        return language
+    except LangDetectException as e:
+        # Handle cases where detection fails
+        print("Language detection failed: {str(e)}")
+        language = 'en'     # Default to English
+        return language
+    
+def split_text(text, max_length=5000):
+    # Split the text into chunks of max_length characters
+    chunks = []
+    while len(text) > max_length:
+        # Find the last space within the first `max_length` characters
+        split_point = text[:max_length].rfind(' ')
+
+        # If no space is found, split at `max_length`
+        if split_point == -1:
+            split_point = max_length
+
+        # Add the chunk to the list    
+        chunks.append(text[:split_point])
+
+        # Remove the processed chunk from the text
+        text = text[split_point:]
+
+    # Add the remaining text as the last chunk    
+    chunks.append(text)
+
+    return chunks
+
+def text_to_mp3(text, mp3_filename, language_code):
+
+    # Create the gTTS object
+    tts = gTTS(text=text, lang=language_code)
+
+    # Save the audio to a file named "output.mp3"
+    tts.save(mp3_filename)
+
+    return 0
+
+# TZX010 (end) ------------------------------------------------------------------------------
+
+# TZX010 - commented the CSV obsolete codes below (begin) -------------------------------------
+'''
 # Function to write story to CSV file
 def write_to_csv(title, content):
     with open(CSV_FILE, mode='a', newline='') as file:
@@ -161,11 +262,12 @@ def delete_csv_record(index):
         writer.writerows(data)
 
     return None
+'''
+# TZX010 - commented the CSV obsolete codes above (end) -----------------------------------
+
 
 @app.route('/')
 def home():
-    #global username     # TZX001
-    
     return render_template("home.html",title="Home")
 
 
@@ -177,13 +279,11 @@ def login():
        return redirect(url_for("index"))
     form =LogInForm()
 
-    #user = form.username.data       # TZX001
-    #password = form.password.data       # TZX001
-    #print('User:', user)
-
     # We need to keep the username !!!  # TZX004
     username = form.email.data          # TZX004
-    print('Username:', username)        # TZX004
+
+    # Store username in Session             # TZX011
+    session['username'] = username          # TZX011
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -342,6 +442,10 @@ def storylist():
 # If "Edit" Navigation Menu pressed, route to this "editrecord" function.   # TZX006
 @app.route('/editrecord')                                                   # TZX006
 def editrecord():                                                           # TZX006
+
+    # Retrieve username from session                                        # TZX010a
+    username = session.get('username', "")  # Default to "" if not set      # TZX010a
+
     try:                                                                    # TZX006
         # This will raise a NameError because 'username' is not defined.    # TZX006
         print(username)                                                     # TZX006
@@ -414,13 +518,10 @@ def archive():
     '''
 
 
-#@app.route('/read_story/<title>')
 @app.route('/read_story/<timestamp>')           # TZX002
-#def read_story(title):
 def read_story(timestamp):                      # TZX002
     global story
 
-    #story = get_story(title)
     story = get_story_by_timestamp(timestamp)   # TZX002
 
     #------------------------------------------------------ # TZX003
@@ -437,7 +538,6 @@ def read_story(timestamp):                      # TZX002
     # By default, the markdown module doesn't convert single        # TZX006
     # newlines to <br> tags. We need double newlines.               # TZX006
 
-    #data["html"] = markdown.markdown(story.content)         # TZX003
     # NOTE: markdown library not supported "\n"             # TZX006
     # Replace newline characters, "\n" with <br> tags       # TZX006
     text1 = story.content                                   # TZX006
@@ -445,11 +545,48 @@ def read_story(timestamp):                      # TZX002
     data["html"] = markdown.markdown(text2)                 # TZX006
 
     data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
-    return render_template('story_page.html', story=story, data=data)    # TZX005
+
+    # TZX010 - New changes (begin) ----------------------------------------
+    txt1 = story.title     # Retrieve title of story        # TZX010
+    txt2 = story.content   # Retrieve the content of story  # TZX010
+
+    # Convert Markdown to readable plain text.              # TZX010
+    plain_text = markdown_to_plain_text(txt2)               # TZX010
+
+    # Combine title & content into one variable.            # TZX010
+    txt = txt1 + ". " + plain_text                          # TZX010
+
+    # Detect the language                                   # TZX010
+    language_code = detect_language(txt)                    # TZX010
+    print('Language_code detected:', language_code)         # TZX010
+
+    # Define MP3 filename for TTS audio output.             # TZX010   
+    #mp3_filename = ".\static\Audio1.mp3"                    # TZX010
+    #mp3_filename = "Audio1.mp3"                            # TZX010a
+    mp3_filename = "StoryApp/Audio1.mp3"                   # TZX010a
+
+    # Convert text to speech and save it to mp3 audio file. # TZX010
+    text_to_mp3(txt, mp3_filename, language_code)           # TZX010
+
+    # Delete Audio2.MP3 file if exist.              # TZX010
+    #file_path = '.\static\Audio2.mp3'               # TZX010
+    #file_path = "Audio2.mp3"                             # TZX010a
+    file_path = "StoryApp/Audio2.mp3"                   # TZX010a
+    if os.path.exists(file_path):                   # TZX010
+        os.remove(file_path)                        # TZX010
+        print(f'{file_path} has been removed.')     # TZX010
+    else:                                           # TZX010
+        print(f'{file_path} does not exist.')       # TZX010
+
+    # TZX010 - New changes (end) ---------------------------------------
 
 
-#@app.route('/speech_text', methods=['POST'])
-#def speech_text():
+    #TZX010# return render_template('story_page.html', story=story, data=data)    # TZX005
+    return render_template('story_page.html', story=story, data=data, languages=languages)    # TZX010
+
+
+# TZX010 - Commented the following lines (begin) ---------------------
+'''
 @app.route('/speech_text/<timestamp>', methods=['POST'])    # TZX004
 def speech_text(timestamp):                                 # TZX004
 
@@ -480,6 +617,76 @@ def speech_text(timestamp):                                 # TZX004
     engine.runAndWait()             # Wait for the speech to finish
 
     return redirect(url_for('read_story', timestamp=timestamp))     # TZX004
+'''
+# TZX010 (end) ---------------------------------------------------------------------------
+
+# TZX010 (begin) ---------------------------------------------------------------------------
+@app.route('/translate', methods=['POST'])
+def translate():
+    # NOTE: 'translate' library has 500 characters limitation in a single function call.
+    # Work around solution: Break down large texts into smaller chunks and translate them individually. 
+    # For translate non-English text, ensuring that the text is encoded in UTF-8 encoding can prevent
+    # issues with character recognition and translation.
+    # Here's a code to translate non-English text Using the googletrans library. 
+    #
+
+    # Delete Audio2.MP3 file if exist.              # TZX010
+    #file_path = '.\static\Audio2.mp3'               # TZX010
+    #file_path = "Audio2.mp3"                        # TZX010a
+    file_path = "StoryApp/Audio2.mp3"               # TZX010a
+    if os.path.exists(file_path):                   # TZX010
+        os.remove(file_path)                        # TZX010
+        print(f'{file_path} has been removed.')     # TZX010
+    else:                                           # TZX010
+        print(f'{file_path} does not exist.')       # TZX010
+
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        target_language = data.get('language')
+
+        print('text:', text)
+
+        if not text or not target_language:
+            return jsonify({'error': 'Invalid input or target language'}), 400
+
+        # Detect the language
+        language = detect_language(text)
+
+        # Auto-detect language and translate
+        try:
+            # Create a Translator object
+            translator = Translator()
+
+            # Split the text into manageable chunks
+            text_chunks = split_text(text)
+
+            # Translate each chunk and combine the results
+            translated_chunks = []
+            for chunk in text_chunks:
+                translated1 = translator.translate(chunk, src=language, dest=target_language).text
+                translated_chunks.append(translated1)
+
+            # Combine translated chunks into a single string
+            translated_text = ' '.join(translated_chunks)
+
+            # Define MP3 filename for TTS audio output.             # TZX010   
+            #mp3_filename = ".\static\Audio2.mp3"                    # TZX010
+            #mp3_filename = "Audio2.mp3"                             # TZX010a
+            mp3_filename = "StoryApp/Audio2.mp3"                     # TZX010a
+
+            # Convert text to speech and save it to mp3 audio file.         # TZX010
+            text_to_mp3(translated_text, mp3_filename, target_language)     # TZX010
+            
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
+
+        return jsonify({'translation': ''.join(translated_text)})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+# TZX010 (end) ---------------------------------------------------------------------------
 
 
 @app.route('/delete_story', methods=['GET', 'POST'])
@@ -514,10 +721,6 @@ def sort_record():
     # Retrieve EditMode from session                                                # TZX006
     EditMode = session.get('EditMode', False)  # Default to False if not set        # TZX006
 
-    '''
-    # Available sort fields
-    sort_fields = ['title', 'author', 'timestamp']  # Assuming you want to allow sorting by these fields
-    '''
     # Available sort fields
     sort_fields = [field.name for field in Story.__table__.columns if field.name != 'id']
 
@@ -531,11 +734,49 @@ def sort_record():
     else:
         sorted_records = get_all_stories()  # Call a new function to retrieve all stories
 
-    #return render_template('storylist.html', stories=sorted_records)
     return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+
+
+# TZX011 (begin) -------------------------------------------------------------------
+@app.route('/add_rating', methods=['POST'])
+def add_rating():
+
+    # Get data from request.json
+    data = request.get_json()
+    story_id = data.get("story_id")
+    rating1 = data.get("rating")
+    rating = int(rating1)
+    
+    # Retrieve username from session                # TZX011
+    user_name = session.get('username', " ")        # TZX011a
+
+    try:
+        # Add new rating to the database
+        new_rating = Rating(story_id=story_id, rating=rating, username=user_name)
+        db.session.add(new_rating)
+        db.session.commit()
+        
+        #TZX011# story = Story.query.get_or_404(story_id)
+
+        # Retrieve ALL the rating for the specific story id.
+        ratings = Rating.query.filter_by(story_id=story_id).all()
+        
+        # Compute the average rating based on the unique story id (then round-to-nearest)
+        average_rating = round(sum(r.rating for r in ratings) / len(ratings) if ratings else 0, 1)
+
+    except exc.IntegrityError as err:                          
+        winsound.Beep(500, 500)
+        average_rating = f"Error: {user_name} not found or {err} "
+
+    # Return processed data as JSON
+    return jsonify({"average_rating": average_rating})    
+
+# TZX011 (end) ------------------------------------------------------------------------
+
 
 def initialize_database():
     db.create_all()
+
 
 ''' Commented the following lines for Roel02 changes.
 @app.route('/add_comment', methods=['POST'])

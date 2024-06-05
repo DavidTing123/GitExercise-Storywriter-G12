@@ -134,6 +134,23 @@ def delete_story_by_timestamp(timestamp):               # TZX002
             # Delete the story and commit the change        # TZX002
             db.session.delete(story)                        # TZX002
             db.session.commit()                             # TZX002
+
+            # TZX013 : Chg below (start) ----------------------------------
+            '''
+            story_id = Story.id                                                   # TZX013
+            print("story_id", story_id)
+            delrec = Rating.query.filter(Rating.story_id == story_id).first()     # TZX013
+            if delrec:
+                # Ratings found for deletion
+                db.session.delete(delrec)
+                db.session.commit()
+                print("Ratings associated with story ID", story_id, "deleted successfully.")
+            else:
+                # No ratings found for deletion
+                print("No ratings found associated with story ID", story_id)            
+            '''
+            # TZX013 : Chg below (end) ----------------------------------------    
+
             return True                                     # TZX002
         else:                                               # TZX002
             winsound.Beep(1000, 500)                        # TZX002
@@ -561,17 +578,13 @@ def read_story(timestamp):                      # TZX002
     print('Language_code detected:', language_code)         # TZX010
 
     # Define MP3 filename for TTS audio output.             # TZX010   
-    #mp3_filename = ".\static\Audio1.mp3"                    # TZX010
-    #mp3_filename = "Audio1.mp3"                            # TZX010a
-    mp3_filename = "StoryApp/Audio1.mp3"                   # TZX010a
+    mp3_filename = "StoryApp/static/Audio1.mp3"             # TZX013
 
     # Convert text to speech and save it to mp3 audio file. # TZX010
     text_to_mp3(txt, mp3_filename, language_code)           # TZX010
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    #file_path = '.\static\Audio2.mp3'               # TZX010
-    #file_path = "Audio2.mp3"                             # TZX010a
-    file_path = "StoryApp/Audio2.mp3"                   # TZX010a
+    file_path = "StoryApp/static/Audio2.mp3"                   # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
@@ -631,9 +644,7 @@ def translate():
     #
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    #file_path = '.\static\Audio2.mp3'               # TZX010
-    #file_path = "Audio2.mp3"                        # TZX010a
-    file_path = "StoryApp/Audio2.mp3"               # TZX010a
+    file_path = "StoryApp/static/Audio2.mp3"               # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
@@ -671,9 +682,7 @@ def translate():
             translated_text = ' '.join(translated_chunks)
 
             # Define MP3 filename for TTS audio output.             # TZX010   
-            #mp3_filename = ".\static\Audio2.mp3"                    # TZX010
-            #mp3_filename = "Audio2.mp3"                             # TZX010a
-            mp3_filename = "StoryApp/Audio2.mp3"                     # TZX010a
+            mp3_filename = "StoryApp/static/Audio2.mp3"                     # TZX013
 
             # Convert text to speech and save it to mp3 audio file.         # TZX010
             text_to_mp3(translated_text, mp3_filename, target_language)     # TZX010

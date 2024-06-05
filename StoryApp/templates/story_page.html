@@ -21,28 +21,35 @@
     <!-- TZX010 - Changes (begin) --------------------------------------------->
     <div class="grid-container">
         <div class="grid-item-1">
-            <form id="translate-form"> 
-                <h1 for="text" class="StoryTitle">{{ data.page_title }}</h1>
-                <div id="text" name="text" class="Content-1">    
-                    {{ data.html|safe }}
-                </div><br>
-
-                <label for="language">Translate text to:</label><br>
-                <select id="language" name="language">
-                    {% for code, name in languages.items() %}
-                        <option value="{{ code }}">{{ name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit">Translate</button>
-                <label><small>Note: The translation might take a few seconds to complete.</small></label>
-            </form><br>
-
-            <label>Read aloud:</label><br>
-            <audio controls>
-             <!--   <source src="{{ url_for('static', filename='Audio1.mp3') }}" type="audio/mpeg">  -->
-                <source src="StoryApp/Audio1.mp3" type="audio/mpeg">
-                Your browser does not support the audio element.
-            </audio>    
+            <!-- TZX013 : Define a print & no-print area (start) ----------------------------->
+            <form id="translate-form">
+                <div class="print-content"> 
+                    <h1 for="text" class="StoryTitle">{{ data.page_title }}</h1>
+                    <div id="text" name="text" class="Content-1">    
+                        {{ data.html|safe }}
+                    </div><br>
+                </div>
+                
+                <div class="no-print" >
+                    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>
+                    <button id="print-btn">Print Story</button>
+                    <br>
+                    <audio controls>
+                        <source src="{{ url_for('static', filename='Audio1.mp3') }}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <br><br>
+                    <label for="language">Translate text to:</label><br>
+                    <select id="language" name="language">
+                        {% for code, name in languages.items() %}
+                            <option value="{{ code }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Translate</button>
+                    <label><small>Note: The translation might take a few seconds to complete.</small></label>
+                </div>
+            </form>
+            <!-- TZX013 : Chg lines above (end) ---------------------------------------------->
         </div>
         
         <div class="grid-item-2">
@@ -50,39 +57,43 @@
             <div class="Preview-1" id="translation">
             </div>
             <audio controls id="audio2Player" class="Audio2Player" >
-             <!--   <source src="{{ url_for('static', filename='Audio2.mp3') }}" type="audio/mpeg">  -->
-                <source src="StoryApp/Audio2.mp3" type="audio/mpeg">
+                <source src="{{ url_for('static', filename='Audio2.mp3') }}" type="audio/mpeg">
+             <!--   <source src="StoryApp/Audio2.mp3" type="audio/mpeg">  -->
+             <!--   <source src="Audio2.mp3" type="audio/mpeg">  -->
                 Your browser does not support the audio element.
             </audio>    
         </div>
     </div>
     <!-- TZX010 - Changes (end) --------------------------------------------->
 
-    <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>
-
-    <!-- TZX011a - Changes (begin) --------------------------------------------->
-    <hr>
-    <h2>User Rating (average):  <p id="average_rating"></p></h2>
-    <form id="Rating-form">
-        <div class="star-rating" id="star-rating">
-            <input type="radio" id="5-stars" name="rating" value=5>
-            <label for="5-stars" class="star">&#9733;</label>
-            <input type="radio" id="4-stars" name="rating" value=4>
-            <label for="4-stars" class="star">&#9733;</label>
-            <input type="radio" id="3-stars" name="rating" value=3>
-            <label for="3-stars" class="star">&#9733;</label>
-            <input type="radio" id="2-stars" name="rating" value=2>
-            <label for="2-stars" class="star">&#9733;</label>
-            <input type="radio" id="1-star" name="rating" value=1>
-            <label for="1-star" class="star">&#9733;</label>
-        </div>
-        <button id="submitRating">Submit Rating</button>
-    </form>
-    <br>
-    <!-- TZX011 - Changes (end) --------------------------------------------->
+  <!-- TZX013 : Comment 1 line below -->
+  <!--  <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>  -->
 
     <!-- Print button -->
-    <button id="print-btn">Print Story</button>
+ <!--   <button id="print-btn">Print Story</button>  --><!-- Commented by TZX013 -->
+
+    <!-- TZX013 - Changes (begin) --------------------------------------------->
+    <div class="no-print" >
+        <hr>
+        <h2>User Rating (average):  <p id="average_rating"></p></h2>
+        <form id="Rating-form">
+            <div class="star-rating" id="star-rating">
+                <input type="radio" id="5-stars" name="rating" value=5>
+                <label for="5-stars" class="star">&#9733;</label>
+                <input type="radio" id="4-stars" name="rating" value=4>
+                <label for="4-stars" class="star">&#9733;</label>
+                <input type="radio" id="3-stars" name="rating" value=3>
+                <label for="3-stars" class="star">&#9733;</label>
+                <input type="radio" id="2-stars" name="rating" value=2>
+                <label for="2-stars" class="star">&#9733;</label>
+                <input type="radio" id="1-star" name="rating" value=1>
+                <label for="1-star" class="star">&#9733;</label>
+            </div>
+            <button id="submitRating">Submit Rating</button>
+        </form>
+        <br>
+    </div>
+    <!-- TZX013 - Changes (end) --------------------------------------------->
 
     <script>
          // Function to handle printing
@@ -139,15 +150,15 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('TZX010 - For debugging #2');  // Log to console for debugging
                 console.log('response data:', data);  // Log response data for debugging
                 if (data.translation) {
                     document.getElementById('translation').innerText = data.translation;
                     // To refresh the audio element (id=audio2Player) in the HTML.
-        //TZX012 - Somehow not working. Commented for temporary.            
-        //TZX012            var audioElement = document.getElementById('audio2Player');
-        //TZX012                audioElement.src = "Audio2.mp3" + '?' + new Date().getTime(); // Cache buster
-        //TZX012                audioElement.load();                    
+                    // Force reload of the audio source by appending a query parameter with the current timestamp.
+                    // This ensures the browser fetches the new source instead of using a cached version.
+                    var audioElement = document.getElementById('audio2Player');
+                    audioElement.src = "{{ url_for('static', filename='Audio2.mp3') }}" + "?t=" + new Date().getTime();
+                    audioElement.load();                    
                 } else {
                     console.error('Translation not found in response');
                 }

@@ -356,9 +356,9 @@ body {
 }
 
 div.Content-1 {             /* TZX010 */
-    min-height: 400px;      /* TZX010 */
+    min-height: 380px; /*400px;*//*TZX013*/  /* TZX010 */
     min-width: 800px;       /* TZX010 */
-    border: 1px dotted;     /* TZX010 */
+  /*  border: 1px dotted; *//*TZX013*    /* TZX010 */ 
     padding: 10px 10px;     /* TZX010 */        
 }                           /* TZX010 */
 
@@ -514,7 +514,7 @@ h2.Preview-1 {
 
 div.Preview-1 {
     color: black;
-    min-height: 550px;      /* TZX010 */
+    min-height: 500px; /* 550px; *//*TZX013*/  /* TZX010 */
     padding-top: 30;        /* TZX010 */
     padding-bottom: 30;     /* TZX010 */
     padding-left: 30;       /* TZX010 */

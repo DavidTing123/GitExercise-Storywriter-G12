@@ -137,17 +137,11 @@ def delete_story_by_timestamp(timestamp):               # TZX002
 
             # TZX013 : Chg below (start) ----------------------------------
             '''
-            story_id = Story.id                                                   # TZX013
+            story_id = Story.id                                                   
             print("story_id", story_id)
-            delrec = Rating.query.filter(Rating.story_id == story_id).first()     # TZX013
-            if delrec:
-                # Ratings found for deletion
-                db.session.delete(delrec)
-                db.session.commit()
-                print("Ratings associated with story ID", story_id, "deleted successfully.")
-            else:
-                # No ratings found for deletion
-                print("No ratings found associated with story ID", story_id)            
+            Rec_deleted = db.session.query(Rating).filter(Rating.story_id == story_id).delete()
+            db.session.commit()
+            print("Number of record deleted:", Rec_deleted, "successfully.")
             '''
             # TZX013 : Chg below (end) ----------------------------------------    
 
@@ -772,9 +766,9 @@ def add_rating():
 
         #------------------------------------------------------- # TZX012
         # To delete specific record based on id                  # TZX012
-        # delrec = Rating.query.filter(Rating.id == 1).first()   # TZX012
-        # db.session.delete(delrec)                              # TZX012 
-        # db.session.commit()                                    # TZX012
+        ## Numdeleted = db.session.query(Rating).filter(Rating.story_id == 1).delete()  # TZX012
+        ## print("Number of record deleted:", Numdeleted)                               # TZX012
+        ## db.session.commit()                                    # TZX012
         #------------------------------------------------------- # TZX012
         
         # Compute the average rating based on the unique story id (then round-to-nearest)
@@ -849,5 +843,8 @@ if __name__ == '__main__':
         initialize_database()
     app.run(debug=True)
 
+@app.route('/badges')
+def badges():
+    return render_template('badges.html')
 
 #--- TZX005 -------------------------------------------------------------------

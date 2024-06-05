@@ -1,7 +1,12 @@
 <!-- templates/index.html -->
 
 {% extends "nav.html" %}
-{% block title %}Home Page{% endblock %}
+
+<!-- TZX010 : Add 3 lines below -->
+{% block title %}
+    My Story
+{% endblock %}
+
 {% block content %}
     <div class="flash-messages">
         {% with messages = get_flashed_messages() %}
@@ -17,7 +22,8 @@
         {% endwith %}
     </div>
 
-    <h1 class="Text-shadow-1">Story Writer</h1>
+    <!-- TZX010 - 1 line chg below -->
+    <h1 class="Text-shadow-1">My Story</h1>
 
     <script src="{{ url_for('static', filename='converter.js') }}"></script>
 

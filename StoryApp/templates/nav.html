@@ -29,15 +29,15 @@
 <body>
 
     <!-- <nav> --> <!-- TZX006 commented this line -->
-    <nav class="navbar" id="navbar">                <!-- TZX006 -->    
-        <label class="logo">MyStory</label>         <!-- TZX006 -->
+    <nav class="navbar" id="navbar">                <!-- TZX006 -->
+        <!-- TZX010 chg 1 line below --->
+        <label class="logo">StoryWriter</label>
         <ul class="navbar">
             {%if current_user.is_authenticated%}
-
-                <li class="nav-list"><a class="nav-item" href="/">Home</a></li>               <!--TZX004-->
-                <li class="nav-list"><a class="nav-item" href="/success">Writer</a></li>      <!--TZX004-->
-                <li class="nav-list"><a class="nav-item" href="/storylist">Browser</a></li>     <!--TZX006-->
-                <li class="nav-list"><a class="nav-item" href="/editrecord">Editor</a></li>     <!-- TZX006 -->
+                <!-- Remove "Home" from the top navigation menu by TZX010 -->
+                <li class="nav-list"><a class="nav-item" href="/success">My Story</a></li>      <!--TZX010-->
+                <li class="nav-list"><a class="nav-item" href="/storylist">Story</a></li>       <!--TZX010-->
+                <li class="nav-list"><a class="nav-item" href="/editrecord">Edit</a></li>       <!--TZX010-->
                 <li class="nav-list"><a class="nav-item" href="/archive">Admin</a></li>       <!--TZX004-->
                 <li class="nav-list"><a class="nav-item" href="/profile">Profile</a></li>     <!--TZX004-->
                 <li class="nav-list"><a class="nav-item" href="/badges">Badges<span class="word-count-indicator"></span></a></li>

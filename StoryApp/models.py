@@ -53,6 +53,13 @@ def __init__(self, id, title, content, author, timestamp):      # TZX002
     self.author = author                                        # TZX002
     self.timestamp = timestamp                                  # TZX002
 
+# TZX011 (start) ----------------------------------------------------------------
+class Rating(db.Model): 
+    id = db.Column(db.Integer, primary_key=True)
+    story_id = db.Column(db.Integer, db.ForeignKey('story.id'), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+    username = db.Column(db.String(50), nullable=False)                  
+# TZX011 (end) ----------------------------------------------------------------
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

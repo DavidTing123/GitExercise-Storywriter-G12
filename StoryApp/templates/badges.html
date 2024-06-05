@@ -1,49 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Website</title>
-    <style>
-        /* Basic styling for the navigation */
-        .nav-list {
-            list-style-type: none;
-        }
-
-        .nav-item {
-            text-decoration: none;
-            padding: 10px;
-            display: inline-block;
-        }
-
-        /* Hidden class to hide the content initially */
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <ul>
-            <li class="nav-list"><a class="nav-item" href="#" id="badgestButton">Badges</a></li>
-            <!-- Add other navigation items here -->
-        </ul>
-    </nav>
-    <div id="badgestContent" class="hidden">
-        <h2>Badges Section</h2>
-        <p>Here you can view your badges and rewards.</p>
-        <!-- Add more content related to badges and rewards here -->
+{% extends "nav.html" %}
+{% block title %}badges{% endblock %}
+{% block content %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
     </div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const badgestButton = document.getElementById("badgestButton");
-            const badgestContent = document.getElementById("badgestContent");
 
-            badgestButton.addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent default link behavior
-                badgestContent.classList.toggle("hidden"); // Toggle the hidden class
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to remove red dot when navigation link is clicked
+            function removeRedDot() {
+                document.querySelector('.word-count-indicator').classList.remove('active');
+            }
+
+            // Add event listener for navigation bar links
+            var navLinks = document.querySelectorAll('.nav-item');
+            navLinks.forEach(function(link) {
+                link.addEventListener('click', removeRedDot);
             });
         });
     </script>
-</body>
-</html>
+{% endblock content %}

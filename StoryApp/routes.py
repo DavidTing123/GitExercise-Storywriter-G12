@@ -840,5 +840,8 @@ if __name__ == '__main__':
         initialize_database()
     app.run(debug=True)
 
+@app.route('/badges')
+def badges():
+    return render_template('badges.html')
 
 #--- TZX005 -------------------------------------------------------------------

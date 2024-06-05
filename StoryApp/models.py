@@ -73,4 +73,26 @@ def initialize_database():
 
 if __name__ == '__main__':
     with app.app_context():
+        initialize_database()
+
+
+class Badges(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(50))
+    Badges = db.Column(db.String(1000))
+    author = db.Column(db.String(50), nullable=False)
+    timestamp = db.Column(db.String(19))
+
+    def __init__(self, id, email, Badges, author, timestamp):  # Roel02
+        self.id = id                                            # Roel02
+        self.email = email
+        self.comment = Badges 
+        self.author = author
+        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+def initialize_database():
+    db.create_all()
+
+if __name__ == '__main__':
+    with app.app_context():
         initialize_database()                                                       

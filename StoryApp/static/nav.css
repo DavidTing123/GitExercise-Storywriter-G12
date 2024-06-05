@@ -692,4 +692,27 @@ div.Edit-Content {
     color: #808080;
     font-size: 0.8em;
  }
+
+
+.word-count-indicator {
+    position: relative;
+}
+
+.word-count-indicator::after {
+    content: "";
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: 70px;
+    transform: translate(50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+}
+
+.word-count-indicator.active::after {
+    display: block;
+}
+
  /*-- TZX006 (end) ----------------------------------------------------- */

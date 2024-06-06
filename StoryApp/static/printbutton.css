@@ -20,3 +20,27 @@
     opacity: 0.6;
     
 }
+
+/* TZX013 - Define a print & no-print area (block begin) */
+/* Print styles */
+@media print {
+    /* Show only the print-content */
+    .print-content {
+        display: block;
+    }
+
+    /* Ensure child elements within print-content are displayed */
+    .print-content * {
+        display: block;
+    }
+
+    /* Hide elements we don't want to print */
+    .no-print,
+  /*  #translation, */
+  /*  #audio2Player, */
+    .grid-item-2 {
+        display: none;
+    }
+
+}
+/* TZX013 - Define a print & no-print area (block end) */

@@ -11,7 +11,6 @@
 {% block content %}
 
     <h1 class="Text-shadow-1">Story Update</h1>
-
     <div class="grid-container">
         <div class="grid-item-1">
             <form class="NewEntry" action="/update_story" method="post">
@@ -19,7 +18,8 @@
                 <br><br>
                 <label class="Bold-1" for="content">Content:</label>
                 <label class="Grey-1" for="info">(up to 1000 characters)</label><br>
-                <textarea class="NewEntry" id="content" name="content" rows="16" cols="80">{{ story.content }}</textarea><br>
+                <!-- TZX013 : 1 line chg below, i.e. cols ="72" -->
+                <textarea class="NewEntry" id="content" name="content" rows="16" cols="72">{{ story.content }}</textarea><br>
     
                 <button type="button" class="MarkdownButton" onclick="convertMarkdownToHtml()">Preview</button>
                 <input type="submit" class="Input-submit-1" value="Update the Story">

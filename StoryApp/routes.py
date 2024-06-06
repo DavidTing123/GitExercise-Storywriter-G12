@@ -134,6 +134,17 @@ def delete_story_by_timestamp(timestamp):               # TZX002
             # Delete the story and commit the change        # TZX002
             db.session.delete(story)                        # TZX002
             db.session.commit()                             # TZX002
+
+            # TZX013 : Chg below (start) ----------------------------------
+            '''
+            story_id = Story.id                                                   
+            print("story_id", story_id)
+            Rec_deleted = db.session.query(Rating).filter(Rating.story_id == story_id).delete()
+            db.session.commit()
+            print("Number of record deleted:", Rec_deleted, "successfully.")
+            '''
+            # TZX013 : Chg below (end) ----------------------------------------    
+
             return True                                     # TZX002
         else:                                               # TZX002
             winsound.Beep(1000, 500)                        # TZX002
@@ -561,17 +572,13 @@ def read_story(timestamp):                      # TZX002
     print('Language_code detected:', language_code)         # TZX010
 
     # Define MP3 filename for TTS audio output.             # TZX010   
-    #mp3_filename = ".\static\Audio1.mp3"                    # TZX010
-    #mp3_filename = "Audio1.mp3"                            # TZX010a
-    mp3_filename = "StoryApp/Audio1.mp3"                   # TZX010a
+    mp3_filename = "StoryApp/static/Audio1.mp3"             # TZX013
 
     # Convert text to speech and save it to mp3 audio file. # TZX010
     text_to_mp3(txt, mp3_filename, language_code)           # TZX010
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    #file_path = '.\static\Audio2.mp3'               # TZX010
-    #file_path = "Audio2.mp3"                             # TZX010a
-    file_path = "StoryApp/Audio2.mp3"                   # TZX010a
+    file_path = "StoryApp/static/Audio2.mp3"                   # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
@@ -631,9 +638,7 @@ def translate():
     #
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    #file_path = '.\static\Audio2.mp3'               # TZX010
-    #file_path = "Audio2.mp3"                        # TZX010a
-    file_path = "StoryApp/Audio2.mp3"               # TZX010a
+    file_path = "StoryApp/static/Audio2.mp3"               # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
@@ -671,9 +676,7 @@ def translate():
             translated_text = ' '.join(translated_chunks)
 
             # Define MP3 filename for TTS audio output.             # TZX010   
-            #mp3_filename = ".\static\Audio2.mp3"                    # TZX010
-            #mp3_filename = "Audio2.mp3"                             # TZX010a
-            mp3_filename = "StoryApp/Audio2.mp3"                     # TZX010a
+            mp3_filename = "StoryApp/static/Audio2.mp3"                     # TZX013
 
             # Convert text to speech and save it to mp3 audio file.         # TZX010
             text_to_mp3(translated_text, mp3_filename, target_language)     # TZX010
@@ -763,9 +766,9 @@ def add_rating():
 
         #------------------------------------------------------- # TZX012
         # To delete specific record based on id                  # TZX012
-        # delrec = Rating.query.filter(Rating.id == 1).first()   # TZX012
-        # db.session.delete(delrec)                              # TZX012 
-        # db.session.commit()                                    # TZX012
+        ## Numdeleted = db.session.query(Rating).filter(Rating.story_id == 1).delete()  # TZX012
+        ## print("Number of record deleted:", Numdeleted)                               # TZX012
+        ## db.session.commit()                                    # TZX012
         #------------------------------------------------------- # TZX012
         
         # Compute the average rating based on the unique story id (then round-to-nearest)

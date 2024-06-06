@@ -20,18 +20,23 @@
     opacity: 0.6;
     
 }
+.print-content{
+    width:750px;
 
+}
 /* TZX013 - Define a print & no-print area (block begin) */
 /* Print styles */
 @media print {
     /* Show only the print-content */
     .print-content {
-        display: block;
+        display: inline-block; /* YC print change to inline block so that it can print the text with max width*/
+        
     }
 
     /* Ensure child elements within print-content are displayed */
     .print-content * {
-        display: block;
+        display: inline-block; /* YC*/
+        
     }
 
     /* Hide elements we don't want to print */

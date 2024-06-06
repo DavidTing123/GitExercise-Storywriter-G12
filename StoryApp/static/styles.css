@@ -39,7 +39,7 @@ label {
 input[type="text"],
 textarea {
   /*  background-color: lightgray; */
-    width: 40%;
+    width: 100%;
     padding: 10px;
     border: 2px solid #cccccc;
     border-radius: 5px;

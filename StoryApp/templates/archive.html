@@ -2,14 +2,12 @@
 
 {% extends "nav.html" %}
 
-<!-- TZX010 : Add 3 lines below -->
 {% block title %}
     Admin
 {% endblock %}
 
 {% block content %}
 
-    <!-- TZX004 -->
     <h1 class="Text-shadow-1">Stories Archive</h1>
     
     <div class="archive-item">
@@ -29,7 +27,6 @@
                         <td class="Table-td-2">{{ story.author }}</td>
                         <td class="Table-td-2">{{ story.timestamp }}</td>
                         <td class="Table-td-2">
-                            <!-- Chg 1 line below: TZX006 -->
                             <button class="Dustbin-1" type="submit" name="button_value" value="{{ story.timestamp }}">
                                 <img class="Img-margin-0" src="{{ url_for('static', filename='images/dustbin.jpg') }}" width="28" height="28">
                             </button>        
@@ -41,7 +38,7 @@
 
     </div><br>
 
-  <!-- <a href="/success">Home</a><br><br> -->
+    <!-- <a href="/success">Home</a><br><br> -->
   
     <img class="Img-bottom-1" src="{{ url_for('static', filename='images/trash-can.gif') }}" width=80>
 

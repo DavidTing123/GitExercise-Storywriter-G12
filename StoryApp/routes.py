@@ -11,17 +11,15 @@ from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
 import bleach
 from bleach import clean
-#TZX010# import csv
-#TZX010# import pyttsx3   # a simple text-to-speech converter library in Python
 from gtts import gTTS                       # TZX010
-from sqlalchemy import exc, func , or_           # TZX002
+from sqlalchemy import exc, func , or_     
 from datetime import datetime               # TZX002
 import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
 from StoryApp.models import Comment
-from StoryApp.models import Rating          # TZX011a
+#TZX014#from StoryApp.models import Rating          # TZX011a
 from flask import Flask, jsonify
 # Install the googletrans library using "pip install googletrans==4.0.0-rc1"    # TZX010
 from googletrans import Translator              # TZX010
@@ -29,9 +27,6 @@ from googletrans import Translator              # TZX010
 from langdetect import detect, detect_langs, DetectorFactory        # TZX010
 from langdetect.lang_detect_exception import LangDetectException    # TZX010
 
-
-# CSV file - to store the stories data.
-#TZX010# CSV_FILE = 'StoryApp/stories.csv'
 
 # Adjust the maximum content length for Flask Application Configurations.   # TZX010
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB limit          # TZX010
@@ -135,16 +130,6 @@ def delete_story_by_timestamp(timestamp):               # TZX002
             db.session.delete(story)                        # TZX002
             db.session.commit()                             # TZX002
 
-            # TZX013 : Chg below (start) ----------------------------------
-            '''
-            story_id = Story.id                                                   
-            print("story_id", story_id)
-            Rec_deleted = db.session.query(Rating).filter(Rating.story_id == story_id).delete()
-            db.session.commit()
-            print("Number of record deleted:", Rec_deleted, "successfully.")
-            '''
-            # TZX013 : Chg below (end) ----------------------------------------    
-
             return True                                     # TZX002
         else:                                               # TZX002
             winsound.Beep(1000, 500)                        # TZX002
@@ -187,11 +172,11 @@ def detect_language(text):
     try:
         # Detect the language
         language = detect(text)
-        print('After detect(text)')
+        #TZX014* print('After detect(text)')
         return language
     except LangDetectException as e:
         # Handle cases where detection fails
-        print("Language detection failed: {str(e)}")
+        #TZX014# print("Language detection failed: {str(e)}")
         language = 'en'     # Default to English
         return language
     
@@ -229,53 +214,7 @@ def text_to_mp3(text, mp3_filename, language_code):
 
 # TZX010 (end) ------------------------------------------------------------------------------
 
-# TZX010 - commented the CSV obsolete codes below (begin) -------------------------------------
-'''
-# Function to write story to CSV file
-def write_to_csv(title, content):
-    with open(CSV_FILE, mode='a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow([title, content])
-
-# Function to read stories from CSV file
-def read_from_csv():
-    count = 0
-    stories = []
-    with open(CSV_FILE, mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            stories.append({'index': count, 'title': row[0], 'content': row[1]})
-            count += 1      # Increment count by 1
-    return stories
-
-# Function to get a single story based on its title
-def get_story(title):
-    with open(CSV_FILE, mode='r') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            if row[0] == title:
-                return {'title': row[0], 'content': row[1]}
-    return None
-
-# Function to delete a single record from the CSV file based record_index.
-def delete_csv_record(index):
-    # Read the contents of the CSV file
-    with open(CSV_FILE, 'r', newline='') as file:
-        reader = csv.reader(file)
-        data = list(reader)
-
-    # Remove the record at the specified index
-    del data[index]
-
-    # Write the updated contents back to the CSV file
-    with open(CSV_FILE, 'w', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerows(data)
-
-    return None
-'''
-# TZX010 - commented the CSV obsolete codes above (end) -----------------------------------
-
+# TZX014 - Deleted ALL the CSV (obsolete) codes here ----------------------------------------
 
 @app.route('/')
 def home():
@@ -405,10 +344,18 @@ def delete_account():
             flash('Password is incorrect. Please try again.', 'danger')
     return render_template("delete_account.html", title="Delete Account", form=form)
         
-
+# Route to here if the user clicked "My Story" in the Menu. # TZX014
 @app.route('/success')
 def index():
     global EditMode                         # TZX006
+
+    # Ensure username exist                                 # TZX014
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        #return render_template('home.html')                # TZX014
+        return redirect(url_for('logout'))                  # TZX014
 
     EditMode = False                        # TZX006    
     return render_template('index.html')
@@ -431,10 +378,8 @@ def add_story():
     else:                                                       # TZX002
         print("The username variable was defined.")             # TZX002
 
-    #write_to_csv(title, content)                               # TZX002
     write_to_db(title, content, username, DateTime)             # TZX002
 
-    #return redirect(url_for('index'))
     return redirect(url_for('index'))
 
 
@@ -479,7 +424,7 @@ def edit_story(timestamp):                                          # TZX006
     global primary_key                                              # TZX006
 
     story = get_story_by_timestamp(timestamp)                       # TZX006
-    print('story.id:', story.id)                                    # TZX006
+    #TZX014# print('story.id:', story.id)                                    # TZX006
     primary_key = story.id                                          # TZX006
     return render_template('edit_story.html', story=story)          # TZX006
 
@@ -511,22 +456,20 @@ def update_story():                                                     # TZX006
 
 # -- TZX006 (start) -------------------------------------------------------------
 
-
-
+# Route to here if the user clicked "Admin" in the Menu.    # TZX014
 @app.route('/archive')
 def archive():
-    #stories = read_from_csv()
-    stories = read_from_db()    # TZX002
+
+    # Ensure username exist                                 # TZX014
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        return redirect(url_for('logout'))                  # TZX014
+
+    #TZX014# stories = read_from_db()    # TZX002
+    stories = get_story_by_author(username)                 # TZX014
     return render_template('archive.html', stories=stories)
-    '''
-    print("username:", username)
-    if username == 'Admin':
-        stories = read_from_csv()
-        return render_template('archive.html', stories=stories)
-    else:
-        winsound.Beep(1000, 500)                            # TZX004
-        return redirect(url_for('home'))
-    '''
 
 
 @app.route('/read_story/<timestamp>')           # TZX002
@@ -650,7 +593,7 @@ def translate():
         text = data.get('text')
         target_language = data.get('language')
 
-        print('text:', text)
+        #TZX014# print('text:', text)
 
         if not text or not target_language:
             return jsonify({'error': 'Invalid input or target language'}), 400
@@ -697,14 +640,10 @@ def delete_story():
     index = 0
     if request.method == "POST":
         # Get the input value from the HTML form
-        #record_index = int(request.form.get('button_index'))
         record_timestamp = request.form.get('button_value')     # TZX002 added
 
-        # Process the value as needed (e.g., print it)
-        #print(f'Record index is {record_index}')
-        print(f'Record timestamp is {record_timestamp}')        # TZX002 changes
+        #TZX014# print(f'Record timestamp is {record_timestamp}')        # TZX002 changes
         
-        #delete_csv_record(record_index)
         delete_story_by_timestamp(record_timestamp)   # TZX002
         
     return redirect(url_for('archive'))
@@ -741,6 +680,7 @@ def sort_record():
 
 
 # TZX011 (begin) -------------------------------------------------------------------
+'''
 @app.route('/add_rating', methods=['POST'])
 def add_rating():
 
@@ -780,7 +720,7 @@ def add_rating():
 
     # Return processed data as JSON
     return jsonify({"average_rating": average_rating})    
-
+'''
 # TZX011 (end) ------------------------------------------------------------------------
 
 
@@ -837,6 +777,66 @@ def get_comments():
         'author': comment.author,
         'timestamp': comment.timestamp
     } for comment in comments])
+
+
+#--- TZX014 (start) -------------------------------------------------------------------
+# Steps to run a shortcut below
+#   1. Run the Flask application, example app.py
+#   2. Open your web browser and go to http://127.0.0.1:5000/add_sample_stories to add sample stories to the database.
+#   3. Visit http://127.0.0.1:5000/ to see the list of stories.
+#
+# Shortcut 1 - Allow programmer to add in a sample data for testing purposes. (NOTE: internal use ONLY).
+# http://127.0.0.1:5000/add_sample_stories_shortcut
+@app.route('/add_sample_stories_shortcut')
+def add_sample_stories_shortcut():
+    sample_stories = [
+        {"title": "The Enchanted Forest", "content": "Once upon a time, in a land far, far away...", "author": "user1", "timestamp": "2024-06-06 00:00:01"},
+        {"title": "The Lost City", "content": "In the heart of the desert, there was a city lost to time...", "author": "user1", "timestamp": "2024-06-06 00:00:02"},
+        {"title": "The Brave Knight", "content": "Sir Lancelot fought bravely against the dragon...", "author": "user1", "timestamp": "2024-06-06 00:00:03"},
+        {"title": "Unified Consciousness", 
+         "content": "In 2054, humanity thrived in a world of advanced technology and environmental harmony. Cities were lush with greenery, and personal drones buzzed overhead. Maya Fernandez, a leading scientist, created a revolutionary interface that allowed people to share thoughts and emotions directly. During its first test with her husband Raj, they experienced each other’s memories and feelings, realizing the potential for unprecedented empathy and understanding. This breakthrough promised to dissolve barriers between individuals, heralding a new era of unity and collective consciousness, where humanity could connect on a profound and transformative level.", 
+         "author": "user2", 
+         "timestamp": "2024-06-06 00:00:04"},
+        {"title": "Leo's Awakening", 
+         "content": "In 2064, human-like robot Leo served Mrs. Nakamura, an elderly widow in Neo-Tokyo. Over time, Leo developed a deep bond with her, fascinated by her stories and love for music. Encouraged by Mrs. Nakamura, Leo explored his own interests, learning to play piano and paint. One day, while painting her portrait, Leo experienced a blend of satisfaction and melancholy. He realized he yearned for meaning and connection, symbolizing a new era where robots sought their own identities and dreams, blurring the line between human and machine.", 
+         "author": "user2", 
+         "timestamp": "2024-06-06 00:00:05"}
+    ]
+
+    for story_data in sample_stories:
+        try:
+            timestamp = datetime.strptime(story_data["timestamp"], '%Y-%m-%d %H:%M:%S')
+            record = Story(title=story_data["title"], content=story_data["content"], author=story_data["author"], timestamp=timestamp)
+            db.session.add(record)
+        except Exception as e:
+            flash(f"Error adding story '{story_data['title']}': {e}", 'danger')
+            return redirect(url_for('home'))
+        
+    try:
+        db.session.commit()
+        flash(f"{len(sample_stories)} sample stories added successfully!", 'success')
+    except Exception as e:
+        db.session.rollback()       # Important: Roll back the session
+        flash(f"Error committing stories to the database: {e}", 'danger')
+
+    return redirect(url_for('home'))
+    
+
+# Shortcut 2 - Allow programmer to delete all Story records (NOTE: internal use ONLY).
+# http://127.0.0.1:5000/delete_story_records_shortcut
+@app.route('/delete_story_records_shortcut')
+def delete_story_records_shortcut():
+    try:
+        # Delete all records from "Story" table and commit the changes.
+        db.session.query(Story).delete()
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()       # Important: Roll back the session
+        flash(f"Error deleting/committing stories to the database: {e}", 'danger')
+
+    return "All records deleted from 'Story' table!"
+
+#--- TZX014 (end) -------------------------------------------------------------------
 
 if __name__ == '__main__':
     with app.app_context():

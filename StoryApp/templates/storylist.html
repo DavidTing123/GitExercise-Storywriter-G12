@@ -19,7 +19,6 @@
     {%endif%}
 
 
-    <!-- TZX005 (Option: Start) --------------------------------->
     <div class="Fixed-container-1">
         <form class="Form-1" action="{{ url_for('sort_record') }}" method="post">
             <h4>Sort by:</h4>
@@ -33,7 +32,6 @@
             <button class="Btn-submit-1" type="submit">Sort it now</button>
         </form>
     </div>
-    <!-- TZX005 (Option: End) --------------------------------->
 
     <ol class="ol-class-1">
         {% for story in stories %}

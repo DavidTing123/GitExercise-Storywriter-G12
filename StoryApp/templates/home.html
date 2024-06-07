@@ -21,6 +21,16 @@
             {%endif%}
         {% endwith%}
     </div>
+
+    <section class="top">
+        <img src="{{ url_for('static', filename='homepic.png') }}" alt="Write story" class="homepic">
+        <div class="top-content">
+            <h1>Welcome to StoryWriter</h1>
+            <p>Looking for the perfect place to write and share your stories?<br> You've found it with StoryWriter!</p>
+            <a href="/signup" class="gsbutton">Get Started</a>
+        </div>
+    </section>
+
 {%endblock%}
 </body>
 </html>

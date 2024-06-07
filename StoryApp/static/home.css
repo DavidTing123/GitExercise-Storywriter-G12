@@ -19,5 +19,42 @@
     font-size: 18px;
 }
 
+.top {
+    display: flex;
+    align-items: center;
+    padding: 50px 20px;
+    background-color: #e0f7fa; /* Light blue background */
+}
 
+.homepic img {
+    max-width: 100%;
+    height: auto;
+}
 
+.top-content {
+    margin-left: 20px;
+    max-width: 50%;
+}
+
+.top-content h1 {
+    color:#5c72cb;
+    font-size: 40px;
+    padding-bottom:30px;
+}
+
+.top-content p {
+    font-size: 14px;
+    font-weight: bold;
+    padding-bottom: 20px;
+    color: #555;
+}
+
+.gsbutton {
+    display: inline-block;
+    background-color: #f90;
+    color:white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+}

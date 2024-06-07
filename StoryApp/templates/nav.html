@@ -28,9 +28,7 @@
 </head>
 <body>
 
-    <!-- <nav> --> <!-- TZX006 commented this line -->
-    <nav class="navbar" id="navbar">                <!-- TZX006 -->
-        <!-- TZX010 chg 1 line below --->
+    <nav class="navbar" id="navbar">
         <label class="logo">StoryWriter</label>
         <ul class="navbar">
             {%if current_user.is_authenticated%}
@@ -55,5 +53,24 @@
     </nav>
     {% block content %}{% endblock content%}
 </body>
+
+<!-- TZX015 (start) :  -->
+<!-- TZX015: Dynamically adds an 'active' class to a navigation item based on the current html page title. -->
+<script>
+
+    const menuItems = document.querySelectorAll('nav li');
+    const pageTitle = document.title.toLowerCase().substring(0, 5); // Get the first five characters of the page title
+    
+    for (const menuItem of menuItems) {
+        const itemText = menuItem.textContent.toLowerCase().substring(0, 5); // Get the first five characters of the menu item text
+        if (itemText === pageTitle) {
+            menuItem.classList.add('active');
+            break; // Only highlight the first match
+        }
+    }
+
+</script>
+<!-- TZX015 (start) -->
+
 </html>
 

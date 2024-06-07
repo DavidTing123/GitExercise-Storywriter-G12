@@ -51,8 +51,6 @@ nav ul li a{
     font-size: 18px;
 }
 
-/* TZX006 (begin) --------------------------- */
-
 .nav-list.active {
     background-color: grey; /* Adjust this color as desired */
     color: black; /* Adjust this color as desired for text contrast */
@@ -64,8 +62,6 @@ nav ul li a{
     background-color: grey; /* Adjust this color as desired */
     color: black;
 }
-
-/* TZX006 (end) ------------------------------*/
 
 .nav-list {
     display: inline-block;
@@ -83,90 +79,10 @@ body {
     margin-left: 20px;
 }
 
-/*-- TZX004 (start) -----------------------------------------------------------------------------*/
-
-/*-- TZX006 (start) ----------------------------------------------*/
-/* TZX006 - commented the following lines
-.hgroup-1 {
-    padding-left: 30px;
-    margin-right: 100px;
-    margin-bottom: 10px; 
-}
-
-.Text-p {
-    padding-left: 30px;
-    margin-right: 100px;
-    margin-bottom: 10px;
-}
-
-
-.p-Text-1 {
-    padding-left: 30px;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.Label-1 {
-    padding-left: 20px;
-    font-weight: bold;
-}
-
-.Label-grey-1 {
-    padding-left: 3px;
-    font-weight: lighter;
-    font-size: small;
-    color: grey;
-}
-
-.Label-grey-2 {
-    padding-left: 25px;
-    font-weight: lighter;
-    font-size: small;
-    color: grey;
-}
-
-.Input-text-1 {
-    margin-left: 20px;
-    padding: 8px;
-    border: 2px solid #cccccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-
-}
-
-.Textarea-1 {
-    margin-top: 0;
-    margin-left: 20px;
-    padding: 8px;
-    padding-top: 0;
-    border: 2px solid #cccccc;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
-.Input-submit-1 {
-    background-color: #5c72cb;
-    color: white;
-    padding: 8px;
-    margin-left: 40px;
-    margin-top: 5px;
-    cursor: pointer;
-    border-radius: 5px;     
-    border-style: ridge;    
-    width: 150px;           
-}
-
-.Input-submit-1:hover {
-    background-color: #45a049;
-    transform: scale(1.1,1.1);
-}
-*/
-/*-- TZX006 (end) ----------------------------------------------*/
 
 .hyperlink-1 {
     padding-left: 2px;   
-  /*  text-decoration: underline; / / TZX007*/
-  font-size: 22px;    /* TZX007 */
+    font-size: 22px;
 }
 
 
@@ -193,9 +109,7 @@ body {
     color: #f15a51;
 }
 
-/*-- TZX004 (end) -----------------------------------------------------------------------------/
 
-/*-- TZX004 (start) ------------------------------------------------------------------------------------- */
 .Text-shadow-1 {
     padding-top: 20px;
     padding-left: 20px;
@@ -235,13 +149,12 @@ body {
     padding-right: 20px;
     padding-top: 2px;
     padding-bottom: 0;
-    font-size: 22px;    /* TZX007 */
+    font-size: 22px; 
 }
 
 .Table-td-2 {
     font-family:'Times New Roman', Times, serif;
-  /*  font-size: small;  */
-    font-size: 20px;    /* TZX007 */
+    font-size: 20px; 
     font-style: italic;
     background-color: White;
     padding-left: 20px;
@@ -256,7 +169,7 @@ body {
     padding-right: 20px;
     padding-top: 5px;             
     padding-bottom: 5px;   
-    font-size: 22px;    /* TZX007 */       
+    font-size: 22px;
 }
 
 .Btn-speech {
@@ -287,9 +200,6 @@ body {
     height: 40px;
 }
 
-/*-- TZX004 (end) ------------------------------------------------------------------------------------- */
-
-/*-- TZX005 (start) ------------------------------------------------------------------------------------- */
 
 .Fixed-container-1 {
     position: fixed;
@@ -330,9 +240,6 @@ body {
     list-style: decimal;   /* Not Working !! Why? */
 }
 
- /*-- TZX005 (end) ------------------------ */
-
- /*-- TZX006 (begin) ----------------------------------------------------- */
 .grid-container {
     display: grid;
     grid-template-columns: 55% 45%;     /* TZX010 */    
@@ -342,90 +249,87 @@ body {
 .grid-item-1 {
     width: fit-content;
     float: left;
-    padding-left: 5px;  /* 30px; *//*TZX013*/  /* TZX010 */
-    padding-right: 30px;   /* TZX010 */
-    padding-bottom: 10px;   /* TZX010 */
+    padding-left: 5px;
+    padding-right: 30px;
+    padding-bottom: 10px;
 }
 
 .grid-item-2 {
     width: 100%;        /* Takes up remaining width in the container */
     float: left;
-    background-color: lightblue;  /* TZX006 */
-    border-style: none;         /* TZX006 */
+    background-color: lightblue;
+    border-style: none;
     border-color: blue;  
 }
 
-div.Content-1 {             /* TZX010 */
-    min-height: 380px; /*400px;*//*TZX013*/  /* TZX010 */
-    min-width: 800px;       /* TZX010 */
-  /*  border: 1px dotted; *//*TZX013*    /* TZX010 */ 
-    padding: 10px 10px;     /* TZX010 */        
-}                           /* TZX010 */
+div.Content-1 {
+    min-height: 380px;
+    min-width: 300px;
+    padding: 10px 10px;
+}
 
 form.NewEntry {
-    background: lightblue;     /* TZX006 */
-    margin-left: 5px;  /* 20px; *//*TZX013*/
+    background: lightblue;
+    margin-left: 5px;
     padding-top: 20px;
     padding-bottom: 20px;
     padding-left: 5px;
-    padding-right: 5px;     /* TZX013 */
+    padding-right: 5px;
     border: 3px solid #c1c1c1;
 }
 
 label.Bold-1 {
-    padding-left: 10px;  /* 20px; *//* TZX013*/
+    padding-left: 10px;
     font-weight: bold;
-    font-size: 22px;    /* TZX007 */
+    font-size: 22px;
 }
 
 label.Grey-1 {
     padding-left: 3px;
     font-weight: lighter;
-  /*  font-size: small; */
-    font-size: 20px;    /* TZX007 */
+    font-size: 20px;
     color: grey;
 }
 
 label.Grey-2 {
     padding-left: 25px;
     font-weight: lighter;
-    /*  font-size: small; */
-    font-size: 20px;    /* TZX007 */
+    font-size: 20px;
     color: grey;
 }
 
 
 input.NewEntry-1 {
-    background-color: white;  /* TZX006 */
-    margin-left: 10px;  /* 20px; *//* TZX013 */
+    background-color: white;
+    margin-left: 10px;
     padding: 8px;
     border: 2px solid #cccccc;
     border-radius: 5px;
     box-sizing: border-box;
-    font-size: 22px;    /* TZX007 */
+    font-size: 22px;
 }
 
 textarea.NewEntry {
-    background-color: white;  /* TZX006 */    
+    background-color: white;    
     margin-top: 0;
-    margin-left: 10px;  /* 20px; *//* TZX013 */
+    margin-left: 10px;
     padding: 8px;
     padding-top: 0;
     border: 2px solid #cccccc;
     border-radius: 5px;
     box-sizing: border-box;
-  /*  resize: both; *//* TZX013 */   /* TZX006 */
-    font-size: 20px;  /* 22px; *//* TZX013 */    /* TZX007 */
+  /*  resize: both; *//* TZX013 */
+    font-size: 20px;
 }
 
 .Input-submit-1 {
     background-color: #5c72cb;
     color: white;
     padding: 8px;
-    margin-left: 10px;      /* TZX006 */ 
-    margin-top: 8px;        /* TZX006*/
+    margin-left: 10px;
+    margin-top: 8px;
     cursor: pointer;
-    border-style: none;         /* TZX006 */
+    border-style: none;
     width: 150px;           /* Specifies the width of input button */
 }
 
@@ -436,7 +340,7 @@ textarea.NewEntry {
 
 div.StoryBook {
     min-height: 60%;
-    background-color: lightblue;  /* TZX006 */
+    background-color: lightblue;
     margin-top: 10px;
     margin-bottom: 10px;
     margin-left: 20px;
@@ -495,9 +399,9 @@ button.MarkdownButton {
     color: white;
     padding: 8px;
     margin-left: 40px;
-    margin-top: 8px;            /* TZX006*/
+    margin-top: 8px;
     cursor: pointer;
-    border-style: none;         /* TZX006 */
+    border-style: none;
     width: 150px;           /* Specifies the width of input button */
 }
 
@@ -515,27 +419,22 @@ h2.Preview-1 {
 
 div.Preview-1 {
     color: black;
-    min-height: 500px; /* 550px; *//*TZX013*/  /* TZX010 */
-    padding-top: 30;        /* TZX010 */
-    padding-bottom: 30;     /* TZX010 */
-    padding-left: 30;       /* TZX010 */
-    padding-right: 30;      /* TZX010 */
+    min-height: 500px;
+    padding-top: 30;
+    padding-bottom: 30;
+    padding-left: 30;
+    padding-right: 30;
 }
   
 div.Preview {
     color: black;
-    padding-top: 15px;              /* TZX013 */
-    padding-bottom: 15px;              /* TZX013 */    
-    padding-left: 15px;   /* 10; */ /* TZX013 */
-    padding-right: 15px;             /* TZX013 */
-    font-size: 22px;    /* TZX007 */
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;    
+    padding-right: 15px;
+    font-size: 22px;    
 }
 
-/* TZX010 - commented. */
-/*
-div.Preview::before {
-    content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'; 
-} */
 
 div.Edit-Content {
     opacity: 0.6;       /* 40% transparent */
@@ -724,9 +623,10 @@ div.Edit-Content {
  }
 
  /*-- TZX011 (begin) ----------------------------------------------------- */
+/*
 .star-rating {
     display: flex;
-    flex-direction: row-reverse; /* This line was causing the reverse direction */
+    flex-direction: row-reverse; 
     justify-content: left;  
     direction: row;         
 }
@@ -747,5 +647,5 @@ div.Edit-Content {
 .star-rating label:hover ~ label {
     color: gold;
 }
- /*-- TZX011
- /*-- TZX006 (end) ----------------------------------------------------- */
+*/
+/*-- TZX011 (end) ----------------------------------------------------- */

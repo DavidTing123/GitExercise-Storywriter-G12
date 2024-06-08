@@ -1,6 +1,6 @@
 <!-- templates/edit_story.html -->
 <!-- TZX006 : edit_story.html is a NEW html added on 28 May 2024 -->
-
+<link rel="stylesheet" href="{{ url_for('static', filename='edit_story.css') }}">
 {% extends "nav.html" %}
 
 {% block title %}
@@ -8,6 +8,20 @@
 {% endblock %}
 
 {% block content %}
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
     <h1 class="Text-shadow-1">Story Update</h1>
     <div class="grid-container">

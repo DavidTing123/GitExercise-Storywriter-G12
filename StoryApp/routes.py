@@ -448,11 +448,11 @@ def update_story():                                                     # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
             flash('Story has been updated successfully!', 'success')    # TZX006
-            return redirect(url_for('home'))                            # TZX006
+            return render_template('edit_story.html', story=story)                       # TZX006
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
         flash('Story not found!', 'danger')                             # TZX006
-        return redirect(url_for('home'))                                # TZX006
+        return render_template('edit_story.html', story=story)                              # TZX006
 
 # -- TZX006 (start) -------------------------------------------------------------
 

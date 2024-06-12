@@ -204,13 +204,14 @@ def split_text(text, max_length=5000):
 
 def text_to_mp3(text, mp3_filename, language_code):
 
+   
     # Create the gTTS object
     tts = gTTS(text=text, lang=language_code)
 
     # Save the audio to a file named "output.mp3"
     tts.save(mp3_filename)
 
-    return 0
+    return 0 
 
 # TZX010 (end) ------------------------------------------------------------------------------
 
@@ -448,11 +449,11 @@ def update_story():                                                     # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
             flash('Story has been updated successfully!', 'success')    # TZX006
-            return redirect(url_for('home'))                            # TZX006
+            return render_template('edit_story.html', story=story)                       # TZX006
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
         flash('Story not found!', 'danger')                             # TZX006
-        return redirect(url_for('home'))                                # TZX006
+        return render_template('edit_story.html', story=story)                              # TZX006
 
 # -- TZX006 (start) -------------------------------------------------------------
 

@@ -1,6 +1,5 @@
 <!-- templates/story_page.html -->
-<!-- TZX004 : Revise the whole html codes on 20 May 2024 -->
-<!-- TZX010 : Add in a new function: Text translation on 4 Jun 2024 -->
+
 <link rel="stylesheet" href="{{ url_for('static', filename='printbutton.css') }}">
 {% extends "nav.html" %}
 
@@ -8,20 +7,16 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/review.css') }}">
 <!-- Roel01 - Changes (end) --------------------------------------------->
 
-<!-- TZX010 : Add 3 lines below -->
 {% block title %}
     Story | Reading
 {% endblock %}
 
 {% block content %}
 
-    <!-- TZX010 : 1 line chg below -->
     <h1 class="Text-shadow-1">Story Reading</h1>
 
-    <!-- TZX010 - Changes (begin) --------------------------------------------->
     <div class="grid-container">
         <div class="grid-item-1">
-            <!-- TZX013 : Define a print & no-print area (start) ----------------------------->
             <form id="translate-form">
                 <div class="print-content"> 
                     <h1 for="text" class="StoryTitle">{{ data.page_title }}</h1>
@@ -49,7 +44,6 @@
                     <label><small>Note: The translation might take a few seconds to complete.</small></label>
                 </div>
             </form>
-            <!-- TZX013 : Chg lines above (end) ---------------------------------------------->
         </div>
         
         <div class="grid-item-2">
@@ -58,42 +52,10 @@
             </div>
             <audio controls id="audio2Player" class="Audio2Player" >
                 <source src="{{ url_for('static', filename='Audio2.mp3') }}" type="audio/mpeg">
-             <!--   <source src="StoryApp/Audio2.mp3" type="audio/mpeg">  -->
-             <!--   <source src="Audio2.mp3" type="audio/mpeg">  -->
                 Your browser does not support the audio element.
             </audio>    
         </div>
     </div>
-    <!-- TZX010 - Changes (end) --------------------------------------------->
-
-  <!-- TZX013 : Comment 1 line below -->
-  <!--  <p class="Author-TimeStamp"><i><small>&bull; Written by {{ data.author }} on {{ data.timestamp }}</small></i></p>  -->
-
-    <!-- Print button -->
- <!--   <button id="print-btn">Print Story</button>  --><!-- Commented by TZX013 -->
-
-    <!-- TZX013 - Changes (begin) --------------------------------------------->
-    <div class="no-print" >
-        <hr>
-        <h2>User Rating (average):  <p id="average_rating"></p></h2>
-        <form id="Rating-form">
-            <div class="star-rating" id="star-rating">
-                <input type="radio" id="5-stars" name="rating" value=5>
-                <label for="5-stars" class="star">&#9733;</label>
-                <input type="radio" id="4-stars" name="rating" value=4>
-                <label for="4-stars" class="star">&#9733;</label>
-                <input type="radio" id="3-stars" name="rating" value=3>
-                <label for="3-stars" class="star">&#9733;</label>
-                <input type="radio" id="2-stars" name="rating" value=2>
-                <label for="2-stars" class="star">&#9733;</label>
-                <input type="radio" id="1-star" name="rating" value=1>
-                <label for="1-star" class="star">&#9733;</label>
-            </div>
-            <button id="submitRating">Submit Rating</button>
-        </form>
-        <br>
-    </div>
-    <!-- TZX013 - Changes (end) --------------------------------------------->
 
     <script>
          // Function to handle printing
@@ -122,8 +84,6 @@
             <br>
             <button type="button" onclick="submitData()">Publish</button>
             <br>
-            <p class="policy">This site is protected by reCAPTCHA and the Google <a href="">privacy policy</a> and <a href="">Terms of Service</a> apply.</p>
-            <br>
             <p id="processedData"></p>
         </form>
     </div>
@@ -131,7 +91,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery for AJAX -->
 
     <script>
-        // TZX010 - Changes (begin) ---------------------------------------------
         // Handling form submission via JavaScript and accessing the text content directly from the DOM element.
         document.getElementById('translate-form').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -165,43 +124,7 @@
             })
             .catch(error => console.error('Error:', error));
         });
-        // TZX010 - Changes (end) ---------------------------------------------
 
-        // TZX011 - Changes (start) ---------------------------------------------
-        function submitRating(storyId) {
-            const rating = document.querySelector('input[name="rating"]:checked').value;
-            const data = {
-                story_id: storyId,
-                rating: parseInt(rating)  // Ensure rating is sent as an integer
-            };
-
-            fetch('/add_rating', {
-                method: 'POST',     // Set method to POST
-                headers: {
-                    'Content-Type': 'application/json'  // Set Content-Type header
-                },
-                body: JSON.stringify(data)  // Convert data to JSON string for body
-            })
-            .then(response => response.json()) // Parse JSON response from server
-            .then(data => {
-                console.log('Success:', data);
-                console.log('response data:', data);        // Log response data for debugging
-                document.getElementById("average_rating").textContent = data.average_rating;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        }
-
-        document.getElementById('submitRating').addEventListener('click', (event) => {
-            // Prevent default form submission behavior (if applicable)
-            event.preventDefault();
-
-            // Call your submitRating function with story.id
-            submitRating({{ story.id }});
-        });
-
-        // TZX011 - Changes (end) ---------------------------------------------
 
         function submitData() {
             const username = document.getElementById("username").value;
@@ -227,7 +150,6 @@
         }
         
     </script>
-    <!-- Roel02 - Changes (start) --------------------------------------------->
 
 
-{% endblock %}
+{% endblock content %}

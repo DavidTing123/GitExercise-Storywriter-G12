@@ -1,14 +1,27 @@
 <!-- templates/edit_story.html -->
 <!-- TZX006 : edit_story.html is a NEW html added on 28 May 2024 -->
-
+<link rel="stylesheet" href="{{ url_for('static', filename='edit_story.css') }}">
 {% extends "nav.html" %}
 
-<!-- TZX010 : Add 3 lines below -->
 {% block title %}
     Edit | Story Update
 {% endblock %}
 
 {% block content %}
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "success" in message %}
+                        <li class="flash-s">{{ message }}</li>
+                    {% else %}
+                        <li class="flash-e">{{ message }}</li>
+                    {%endif%}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
     <h1 class="Text-shadow-1">Story Update</h1>
     <div class="grid-container">
@@ -18,8 +31,8 @@
                 <br><br>
                 <label class="Bold-1" for="content">Content:</label>
                 <label class="Grey-1" for="info">(up to 1000 characters)</label><br>
-                <!-- TZX013 : 1 line chg below, i.e. cols ="72" -->
-                <textarea class="NewEntry" id="content" name="content" rows="16" cols="72">{{ story.content }}</textarea><br>
+                <!-- TZX013 : 1 line chg below, i.e. cols ="65" -->
+                <textarea class="NewEntry" id="content" name="content" rows="16" cols="65">{{ story.content }}</textarea><br>
     
                 <button type="button" class="MarkdownButton" onclick="convertMarkdownToHtml()">Preview</button>
                 <input type="submit" class="Input-submit-1" value="Update the Story">

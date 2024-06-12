@@ -73,3 +73,7 @@ class SearchForm(FlaskForm):
 class DeleteAccountForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     submit = SubmitField('Delete Account')
+
+class CommentForm(FlaskForm):
+    comment= TextAreaField("Comment", validators=[DataRequired()])
+    submit = SubmitField("Publish")

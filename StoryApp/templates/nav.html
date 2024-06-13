@@ -1,5 +1,17 @@
+<!DOCTYPE html>     <!-- TZX015 -->
+<!------------------------------------------------------------------------>
+<!-- Program name: base.html                                            -->
+<!-- Reference:                                                         -->
+<!--  1. How TO - Add Active Class to Current Element                   -->
+<!--      https://www.w3schools.com/howto/howto_js_active_element.asp   -->
+<!--                                                                    -->
+<!-- TZX015 : Dynamically adds an 'active' class to a navigation item   -->
+<!--          based on the current html page title.                     -->
+<!------------------------------------------------------------------------>
+
 <html lang="en">
 <head>
+    <meta charset="UTF-8">  <!-- TZX015 -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='nav.css') }}">
     <title>{% block title %}{% endblock %}</title>
     <style>
@@ -37,8 +49,9 @@
                 <li class="nav-list"><a class="nav-item" href="/storylist">Story</a></li>       <!--TZX010-->
                 <li class="nav-list"><a class="nav-item" href="/editrecord">Edit</a></li>       <!--TZX010-->
                 <li class="nav-list"><a class="nav-item" href="/archive">Admin</a></li>       <!--TZX004-->
+                <li class="nav-list"><a class="nav-item" href="/leaderboard">Leaderboard</a></li>    <!-- TZX015 -->
                 <li class="nav-list"><a class="nav-item" href="/profile">Profile</a></li>     <!--TZX004-->
-                <li class="nav-list"><a class="nav-item" href="/badges">Badges<span class="word-count-indicator"></span></a></li>
+             <!--  <li class="nav-list"><a class="nav-item" href="/badges">Badges<span class="word-count-indicator"></span></a></li> -->
                 <li class="nav-list"><a class="nav-item" href="/logout">Logout</a></li>        <!--TZX004-->
                 <li class="nav-list"><a href="/search"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAACXBIWXMAAAsTAAALEwEAmpwYAAABaUlEQVR4nO2Wz0pCQRjFf2i6ydop9ArZO1T7FhrlK0TSH+spxNcw61GCaJMFJZn71rqolfHBufBtwjtzLxLkgYELM+ecud98cxhY4Q+hDLSAW+ANmGnY90BztiZXHAIfwHzBGAPNPAwLQM8JPwEXwDawrlEHLoGhW9cVNxo9CX0BJwvEbO5UaxPz6PLOJbQbwNtz5o1Q07I7U/vTULTFfQdKIcSWO9OYsyoCz9I4CiHeiXROPDrSuAkhjUSy7o1FXRp2z1NjKlIlg/GGNKbLNt6MMR7lUOod19mpMRDJEikW19Lox1ynYYbr9CKN49AAGYtoMRiKM3EnwFooueki02IwLfaBb3EPiETXmbdVwt9Q1J8mpp9ANda44MznisGOwqGiYd175c40MU3W18iAhq7FoofAROWtuqzObF5S4Fv2vioYZtpQX93rG6mWp3koqu5lYpvd4r+Y11zZH5ZpnJg/AvfLNl4Bww/dcoIlpDH7/gAAAABJRU5ErkJggg=="></a></li>
                     
@@ -51,18 +64,23 @@
             {% endif %}
         </ul>
     </nav>
+
     {% block content %}{% endblock content%}
+    
 </body>
 
 <!-- TZX015 (start) :  -->
 <!-- TZX015: Dynamically adds an 'active' class to a navigation item based on the current html page title. -->
 <script>
 
-    const menuItems = document.querySelectorAll('nav li');
+    // This JavaScript highlights the menu item that matches the first 5 characters of the current page title (in lowercase). TZX015
+    // const menuItems = document.querySelectorAll('nav li');
+    const menuItems = document.querySelectorAll('nav ul li');       // Get all the menu items in the navigation list.
     const pageTitle = document.title.toLowerCase().substring(0, 5); // Get the first five characters of the page title
     
     for (const menuItem of menuItems) {
         const itemText = menuItem.textContent.toLowerCase().substring(0, 5); // Get the first five characters of the menu item text
+        // if the first 5 characters of the menu item text (itemText) match the first 5 characters of the page title (pageTitle).
         if (itemText === pageTitle) {
             menuItem.classList.add('active');
             break; // Only highlight the first match
@@ -73,4 +91,3 @@
 <!-- TZX015 (start) -->
 
 </html>
-

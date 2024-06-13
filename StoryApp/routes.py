@@ -13,7 +13,8 @@ import bleach
 from bleach import clean
 from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_     
-from datetime import datetime               # TZX002
+#TZX016# from datetime import datetime               # TZX002
+from datetime import datetime, timedelta    # TZX016
 import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
@@ -26,6 +27,9 @@ from googletrans import Translator              # TZX010
 # Install the langdetect libarry: "pip install langdetect"  # TZX010
 from langdetect import detect, detect_langs, DetectorFactory        # TZX010
 from langdetect.lang_detect_exception import LangDetectException    # TZX010
+#from sqlalchemy import func                 # TZX015
+from sqlalchemy import desc                 # TZX015
+from sqlalchemy.orm import aliased          # TZX015
 
 
 # Adjust the maximum content length for Flask Application Configurations.   # TZX010
@@ -64,9 +68,11 @@ with app.app_context():                 # TZX002
     db.create_all()                     # TZX002
 
 # Adds a new story to the database.                             # TZX002
-def write_to_db(title, content, author, timestamp):             # TZX002
+#def write_to_db(title, content, author, timestamp):             # TZX002
+def write_to_db(data):                                          # TZX014
     try:                                                        # TZX002
-        record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        #record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        record = Story(**data)                                  # TZX014
         db.session.add(record)                                  # TZX002
         db.session.commit()                                     # TZX002
     except exc.IntegrityError as err:                           # TZX002
@@ -78,7 +84,7 @@ def write_to_db(title, content, author, timestamp):             # TZX002
 # Retrieves all stories from database.      # TZX002
 def read_from_db():                         # TZX002
     all_stories = Story.query.all()         # TZX002
-    print('all_stories', all_stories)       # TZX002
+    #TZX016# print('all_stories', all_stories)       # TZX002
     return all_stories                      # TZX002
 
 # Retrieves a story from database based on timestamp.           # TZX006
@@ -172,11 +178,9 @@ def detect_language(text):
     try:
         # Detect the language
         language = detect(text)
-        #TZX014* print('After detect(text)')
         return language
     except LangDetectException as e:
         # Handle cases where detection fails
-        #TZX014# print("Language detection failed: {str(e)}")
         language = 'en'     # Default to English
         return language
     
@@ -345,10 +349,15 @@ def delete_account():
             flash('Password is incorrect. Please try again.', 'danger')
     return render_template("delete_account.html", title="Delete Account", form=form)
         
-# Route to here if the user clicked "My Story" in the Menu. # TZX014
+
+#-------------------------------------------------------------------# TZX016
+# (1) When the user clicked "My Story" in the Menu, route to here.  # TZX016
+#     If username exist, return to 'index.html',                    # TZX016
+#     else ask the user to login.                                   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/success')
 def index():
-    global EditMode                         # TZX006
+    global EditMode                                         # TZX006
 
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
@@ -362,6 +371,10 @@ def index():
     return render_template('index.html')
 
 
+#-------------------------------------------------------------------# TZX016
+# (1.1) If username exist, save the new story into sqlalchemy.      # TZX016
+#       Then, return to 'index.html'.                               # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/add_story', methods=['POST'])
 def add_story():
     title = request.form['title']
@@ -379,36 +392,73 @@ def add_story():
     else:                                                       # TZX002
         print("The username variable was defined.")             # TZX002
 
-    write_to_db(title, content, username, DateTime)             # TZX002
+    # TZX014: (Start) --------------------------------------------------
+    # Construct the data dictionary
+    story_data = {
+        "title": title,
+        "content": content,
+        "author": username,
+        "timestamp": DateTime
+    }
+    # TZX014: (end) --------------------------------------------------
 
-    return redirect(url_for('index'))
+    #write_to_db(title, content, username, DateTime)             # TZX002
+    write_to_db(story_data)                                     # TZX014
+
+    #return redirect(url_for('index'))
+    return render_template('index.html')            # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (2) When the user clicked "Story" in the Menu, route to here.     # TZX016
+#     If username exist, read and get ALL story records,            # TZX016
+#     then pass the records to 'storylist.html'.                    # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/storylist')
 def storylist():
 
+    # Ensure username exist                                 # TZX014
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        #return render_template('home.html')                 # TZX014
+        return redirect(url_for('logout'))                  # TZX014
+
     stories = read_from_db()                                    # TZX002
+
     # Store EditMode in Session                                 # TZX006
     session['EditMode'] = EditMode                              # TZX006
 
-    #return render_template('storylist.html', stories=stories)
-    return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+    # TZX016 : (start) Add selected field. ------------------------------------
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+    # TZX016 : (end) Add selected field. ------------------------------------
+
+    #return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
-# -- TZX006 (start) -------------------------------------------------------------
-# If "Edit" Navigation Menu pressed, route to this "editrecord" function.   # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3) When the user clicked "Edit" in the Menu, route to here.      # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'storylist.html' for display.      # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/editrecord')                                                   # TZX006
 def editrecord():                                                           # TZX006
 
     # Retrieve username from session                                        # TZX010a
     username = session.get('username', "")  # Default to "" if not set      # TZX010a
 
-    try:                                                                    # TZX006
-        # This will raise a NameError because 'username' is not defined.    # TZX006
-        print(username)                                                     # TZX006
-    except NameError:                                                       # TZX006
-        flash("An error occurred: 'username' is not defined. Please log in to your account.", "error")     # TZX006
-        return render_template('home.html')                                     # TZX006
+    # Ensure username exist                                 # TZX014    
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        #return render_template('home.html')                 # TZX014
+        return redirect(url_for('logout'))                  # TZX014
                 
     # Proceed if not NameError...                                               # TZX006
     EditMode = True                                                             # TZX006            
@@ -417,47 +467,66 @@ def editrecord():                                                           # TZ
     # Store EditMode in Session                                     # TZX006
     session['EditMode'] = EditMode                                  # TZX006
 
-    return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+    # TZX016 : (start) Add selected field. ------------------------------------
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+    # TZX016 : (end) Add selected field. ------------------------------------
+
+    #return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (3.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Then, return the story record to 'edit_story.html'.         # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/edit_story/<timestamp>')                               # TZX006
 def edit_story(timestamp):                                          # TZX006
-    global primary_key                                              # TZX006
+    #TZX016# global primary_key                                              # TZX006
+    global story_id                                                 # TZX016
 
     story = get_story_by_timestamp(timestamp)                       # TZX006
     #TZX014# print('story.id:', story.id)                                    # TZX006
-    primary_key = story.id                                          # TZX006
+    #TZX016# primary_key = story.id                                          # TZX006
+    story_id = story.id                                             # TZX016
     return render_template('edit_story.html', story=story)          # TZX006
 
 
-# All the following lines are NEW added, not verify yet !!!!            # TZX006 !!!
-#@app.route('/update_story/<timestamp>', methods=['GET', 'POST'])       # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3.2) When user clicked 'Update' button from 'edit_story.html'.   # TZX016
+#       Update the new content to the existing record.              # TZX016
+#       Return to 'edit_story.html'.                                # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/update_story', methods=['POST'])                           # TZX006
 def update_story():                                                     # TZX006
     
-    # Testing...                                                # TZX006
-    #msg = 'Debug msg: primary_key = ' + str(primary_key)        # TZX006 
-    #flash(msg, 'success')                                       # TZX006
-    #return redirect(url_for('home'))                            # TZX006
-
     #story = get_story_by_timestamp(timestamp)                           # TZX006
-    story = Story.query.get(primary_key)                                # TZX006
+    #TZX016# story = Story.query.get(primary_key)                                # TZX006
+    story = Story.query.get(story_id)                                   # TZX016
     
     if story:                                                           # TZX006
         if request.method == 'POST':                                    # TZX006
             new_content = request.form['content']                       # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
-            flash('Story has been updated successfully!', 'success')    # TZX006
-            return render_template('edit_story.html', story=story)                       # TZX006
+            #TZX016# flash('Story has been updated successfully!', 'success')    # TZX006
+            #TZX016# return render_template('edit_story.html', story=story)                       # TZX006
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
+        winsound.Beep(1000, 500)                                        # TZX016
         flash('Story not found!', 'danger')                             # TZX006
         return render_template('edit_story.html', story=story)                              # TZX006
 
 # -- TZX006 (start) -------------------------------------------------------------
 
-# Route to here if the user clicked "Admin" in the Menu.    # TZX014
+#-------------------------------------------------------------------# TZX016
+# (4) When the user clicked "Admin" in the Menu, route to here.     # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'archive.html' for display.        # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/archive')
 def archive():
 
@@ -473,6 +542,14 @@ def archive():
     return render_template('archive.html', stories=stories)
 
 
+#-------------------------------------------------------------------# TZX016
+# (2.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Markdown conversion; detect language of original text,      # TZX016
+#       Text-To-Speech (TTS) it, and save to 'Audio1.mp3' file.     # TZX016
+#       Then, pass story record to 'story_page.html' for display.   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/read_story/<timestamp>')           # TZX002
 def read_story(timestamp):                      # TZX002
     global story
@@ -572,6 +649,13 @@ def speech_text(timestamp):                                 # TZX004
 # TZX010 (end) ---------------------------------------------------------------------------
 
 # TZX010 (begin) ---------------------------------------------------------------------------
+#---------------------------------------------------------------------------# TZX016
+# (2.1a) When the user clicked 'Translate' button from 'story_page.html',   # TZX016
+#        route to here by JavaScript (JSON)                                 # TZX016
+#        Translate the original text to the required language.              # TZX016
+#        Text-To-Speech (TTS) translated text and save it to 'Audio2.mp3'.  # TZX016
+#        Then, return translated text to 'story_page.html' by JSON.         # TZX016
+#---------------------------------------------------------------------------# TZX016
 @app.route('/translate', methods=['POST'])
 def translate():
     # NOTE: 'translate' library has 500 characters limitation in a single function call.
@@ -636,6 +720,12 @@ def translate():
 # TZX010 (end) ---------------------------------------------------------------------------
 
 
+#-------------------------------------------------------------------# TZX016
+# (4.1) When user pressed "Delete" button from 'archive.html',      # TZX016
+#       route to here to get 'button_value' (i.e. record timestamp) # TZX016 
+#       and delete the record from database based on timestamp.     # TZX016
+#       Then, return back to 'archive'.                             # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/delete_story', methods=['GET', 'POST'])
 def delete_story():
     index = 0
@@ -649,8 +739,13 @@ def delete_story():
         
     return redirect(url_for('archive'))
 
-#--- TZX005 -------------------------------------------------------------------
-#
+
+#-------------------------------------------------------------------# TZX016
+# (2a) When the user needs record sorting, route to here.           # TZX016
+# (3a) When the user needs record sorting, route to here.           # TZX016
+#      Perform a record sorting based on user request,              # TZX016
+#      then pass the sorted records to 'storylist.html'.            # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/sort_record', methods=['GET', 'POST'])
 def sort_record():
 
@@ -670,14 +765,66 @@ def sort_record():
     # Default sort field
     selected_field = sort_fields[0]
 
+    '''
     # Handle POST request (sort based on selected field)
     if request.method == 'POST':
         selected_field = request.form.get('sort_field')
         sorted_records = sort_stories(selected_field)  # Call a new function for sorting
     else:
         sorted_records = get_all_stories()  # Call a new function to retrieve all stories
+    '''
 
-    return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+    # TZX016 : Fix a bugs (start) -------------------------------
+    # Handle POST request (sort based on selected field)
+    if request.method == 'POST':
+        selected_field = request.form.get('sort_field')
+        if selected_field not in sort_fields:
+            selected_field = sort_fields[0]     # Default to first field if invalid
+
+    # Sort records based "EditMode" (For 'View' or 'Edit' page)
+    if EditMode:
+        # Dynamically get the field from the Story model
+        field = getattr(Story, selected_field)
+        # The sorting is in ascending order by default.  # author=session.get('username')
+        sorted_records = db.session.query(Story).filter_by(author=username).order_by(field).all()
+    else:
+        sorted_records = sort_stories(selected_field)  
+
+    # TZX016 : Fix a bugs (start) -------------------------------
+
+    #return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+    return render_template('storylist.html', stories=sorted_records, editmode=EditMode, selected_field=selected_field)     # TZX016
+
+# TZX015 (start) -------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------# TZX016
+# (5) When user clicked "Leaderboard" in the Menu, route to here.   # TZX016
+#     Count the total stories written by each user, and             # TZX016
+#     get the top ten most productive authors records.              # TZX016
+#     then pass info to 'topwriter.html' for display.               # TZX016
+#-------------------------------------------------------------------# TZX016
+# Top Ten Most Productive Authors / Writers
+@app.route('/leaderboard')
+def Leaderboard():
+
+    # Create the subquery - get the number of story written by each author
+    subquery = db.session.query(Story.author, db.func.count(Story.id).label('story_count'))\
+                        .group_by(Story.author).subquery()
+
+    # Alias the subquery for ease of use
+    alias = aliased(subquery)
+
+    # Query to get authors and their story counts, sorted by story_count in descending order and limit to top ten authors
+    top_authors = db.session.query(alias.c.author, alias.c.story_count)\
+                                .order_by(desc(alias.c.story_count))\
+                                .limit(10).all()
+
+    for author, story_count in top_authors:
+        print(f"Author: {author}, Story Count: {story_count}")
+
+    return render_template('topwriter.html', authors=top_authors)
+# TZX015 (end) -------------------------------------------------------------------
 
 
 # TZX011 (begin) -------------------------------------------------------------------
@@ -780,64 +927,200 @@ def get_comments():
     } for comment in comments])
 
 
-#--- TZX014 (start) -------------------------------------------------------------------
+# TZX016 (start) -------------------------------------------------------------------------
 # Steps to run a shortcut below
 #   1. Run the Flask application, example app.py
 #   2. Open your web browser and go to http://127.0.0.1:5000/add_sample_stories to add sample stories to the database.
 #   3. Visit http://127.0.0.1:5000/ to see the list of stories.
 #
 # Shortcut 1 - Allow programmer to add in a sample data for testing purposes. (NOTE: internal use ONLY).
-# http://127.0.0.1:5000/add_sample_stories_shortcut
-@app.route('/add_sample_stories_shortcut')
-def add_sample_stories_shortcut():
+# http://127.0.0.1:5000/add_story_shortcut
+@app.route('/add_story_shortcut')
+def add_story_shortcut():
     sample_stories = [
-        {"title": "The Enchanted Forest", "content": "Once upon a time, in a land far, far away...", "author": "user1", "timestamp": "2024-06-06 00:00:01"},
-        {"title": "The Lost City", "content": "In the heart of the desert, there was a city lost to time...", "author": "user1", "timestamp": "2024-06-06 00:00:02"},
-        {"title": "The Brave Knight", "content": "Sir Lancelot fought bravely against the dragon...", "author": "user1", "timestamp": "2024-06-06 00:00:03"},
-        {"title": "Unified Consciousness", 
-         "content": "In 2054, humanity thrived in a world of advanced technology and environmental harmony. Cities were lush with greenery, and personal drones buzzed overhead. Maya Fernandez, a leading scientist, created a revolutionary interface that allowed people to share thoughts and emotions directly. During its first test with her husband Raj, they experienced each other’s memories and feelings, realizing the potential for unprecedented empathy and understanding. This breakthrough promised to dissolve barriers between individuals, heralding a new era of unity and collective consciousness, where humanity could connect on a profound and transformative level.", 
+        # 1st record
+        {"title": "The Enchanted Forest",
+         "content": "In the Enchanted Forest, trees whispered secrets to those who listened. Moonlight revealed hidden \
+                        paths, guiding lost souls to safety. Animals spoke in riddles, and every dawn brought new magic. \
+                        Visitors left with hearts lightened, forever changed by the forest's gentle, mystical embrace.", 
+         "author": "david@gmail.com", 
+         "timestamp": "2024-06-01 00:00:01"},
+        # 2nd record
+        {"title": "Harmony in 2036",
+         "content": "In 2036, humans coexisted with AI, embracing technology's wonders. Cities floated above green oceans, \
+                        diseases were memories, and minds explored digital realms. Peace flourished, uniting diverse cultures \
+                        under shared dreams. Humanity thrived, ever-evolving, crafting a future where harmony and innovation \
+                        danced hand in hand.", 
+         "author": "billgate@hotmail.com", 
+         "timestamp": "2024-06-01 00:00:02"},
+        # 3rd record 
+        {"title": "The Brave Knight",
+         "content": "The Brave Knight ventured into the dragon's lair, heart steady, sword gleaming. Facing the fearsome beast, \
+                        he saw not a monster, but a creature in pain. With courage, he offered peace instead of battle. The \
+                        dragon, touched by kindness, became an ally. Together, they restored harmony to the land, their bond \
+                        unbreakable.", 
+         "author": "moorthy@gmail.com", 
+         "timestamp": "2024-06-01 00:00:03"},
+        # 4th record  
+        {"title": "Unified Consciousness",
+         "content": "In 2054, humanity thrived in a world of advanced technology and environmental harmony. Cities were lush \
+                        with greenery, and personal drones buzzed overhead. Maya Fernandez, a leading scientist, created a \
+                        revolutionary interface that allowed people to share thoughts and emotions directly. During its first \
+                        test with her husband Raj, they experienced each other’s memories and feelings, realizing the potential \
+                        for unprecedented empathy and understanding. This breakthrough promised to dissolve barriers between \
+                        individuals, heralding a new era of unity and collective consciousness, where humanity could connect \
+                        on a profound and transformative level.", 
+         "author": "chatgpt@openai.com", 
+         "timestamp": "2024-06-01 00:00:04"},
+        # 5th record
+        {"title": "Leo's Awakening",
+         "content": "In 2064, human-like robot Leo served Mrs. Nakamura, an elderly widow in Neo-Tokyo. Over time, Leo developed \
+                        a deep bond with her, fascinated by her stories and love for music. Encouraged by Mrs. Nakamura, Leo \
+                        explored his own interests, learning to play piano and paint. One day, while painting her portrait, Leo \
+                        experienced a blend of satisfaction and melancholy. He realized he yearned for meaning and connection, \
+                        symbolizing a new era where robots sought their own identities and dreams, blurring the line between human \
+                        and machine.", 
+         "author": "chatgpt@openai.com", 
+         "timestamp": "2024-06-01 00:00:05"},
+        # 6th record
+        {"title": "The Forgotten Kingdom",
+         "content": "Once upon a time, in a land far, far away, a hidden kingdom thrived in eternal spring. A kind queen ruled, \
+                        her laughter bringing joy. One day, a lost traveler found the kingdom and shared its magic with the world, \
+                        ensuring its beauty was never forgotten again.", 
+         "author": "billgate@hotmail.com", 
+         "timestamp": "2024-06-01 00:00:06"},
+        # 7th record
+        {"title": "The Lost City",
+         "content": "Beneath the dense jungle, explorers discovered the Lost City. Ancient ruins whispered tales of a grand \
+                        civilization, forgotten by time. As they unearthed treasures and secrets, they felt a deep connection \
+                        to the past, realizing the city's legacy was not lost, but waiting to be remembered.", 
+         "author": "ahmad@gamil.com", 
+         "timestamp": "2024-06-01 00:00:07"},
+        # 8th record 
+        {"title": "Ali Baba",
+         "content": "Ali Baba menemui pintu gua tersembunyi dengan kata kunci 'Sesame, buka!'. Dalam gua, harta karun berkilauan \
+                        menanti. Dengan bijak, Ali Baba membagikan kekayaan kepada orang miskin di kampungnya, membawa kebahagiaan \
+                        dan kemakmuran. Kisahnya menjadi legenda, menginspirasi generasi akan pentingnya kebaikan dan keadilan.", 
+         "author": "ahmad@gamil.com", 
+         "timestamp": "2024-06-01 00:00:08"},
+        # 9th record
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
+         "author": "chatgpt@openai.com", 
+         "timestamp": "2024-06-01 00:00:09"},
+        # 10th record 
+        {"title": "狮子和狐狸",
+         "content": "森林里有一头上了年纪的老狮子，他想到处去捕猎，却又没有足够的力气。狮子暗自思考着，用什么办法才能获得食物，该怎么办呢？\
+                        狮子想出了一个好办法，那就是装病抓住他们。他钻进一个山洞，躺在地上，假装生病了，只要其它小动物一走过来，询问他的健康状况，\
+                        他就会上前抓住它们，然后把它们吃掉。可就算是这样，狮子依旧吃不饱。于是这头狡猾的狮子故意跑到树下叹着气说，“哎呦！\
+                        我马上就要病死了。”树上的麻雀听到了，就飞过去告诉了兔子，兔子听了就去告诉了小松鼠，小松鼠听了又跑去告诉了小猪，\
+                        大家很快就知道了这个消息，心地善良的小动物们带着礼物去探望狮子。日子一天一天过去了，森林里的动物变得越来越少。\
+                        过了一段时间，狐狸也带着礼物去探望狮子，到了洞口，狐狸发现地上只有动物们进去的脚印，却没有出来的脚印。\
+                        狐狸远远的站在洞外问狮子，“狮子先生，你现在感觉怎么样啊？”狮子回答说，“我现在感觉很不好啊！你为什么站在外面问呢？\
+                        快进洞里来吧！”狐狸说，“狮子先生，我发现地上只有动物们进去的脚印，却没一个出来的脚印，你一定是把它们都给吃了，\
+                        要不是我看到这些脚印，说不定我已经被你吞进肚子里，成为你的美食了。”话一说完，狐狸转身就走了，这个消息立刻传遍了整个森林，\
+                        狮子的谎言被识破了。从此以后，再也没有小动物敢到狮子的洞里来了。", 
+         "author": "david@gmail.com", 
+         "timestamp": "2024-06-01 00:00:10"},
+        # 11th record 
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
+         "author": "moorthy@gmail.com", 
+         "timestamp": "2024-06-01 00:00:11"},
+        # 12th record 
+        {"title": "The Brave Knight",
+         "content": "Sir Lancelot fought bravely against the dragon...", 
+         "author": "user1", 
+         "timestamp": "2024-06-01 00:00:12"},
+        # 13th record 
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
          "author": "user2", 
-         "timestamp": "2024-06-06 00:00:04"},
-        {"title": "Leo's Awakening", 
-         "content": "In 2064, human-like robot Leo served Mrs. Nakamura, an elderly widow in Neo-Tokyo. Over time, Leo developed a deep bond with her, fascinated by her stories and love for music. Encouraged by Mrs. Nakamura, Leo explored his own interests, learning to play piano and paint. One day, while painting her portrait, Leo experienced a blend of satisfaction and melancholy. He realized he yearned for meaning and connection, symbolizing a new era where robots sought their own identities and dreams, blurring the line between human and machine.", 
+         "timestamp": "2024-06-01 00:00:13"},
+        # 14th record 
+        {"title": "The Brave Knight",
+         "content": "Sir Lancelot fought bravely against the dragon...", 
          "author": "user2", 
-         "timestamp": "2024-06-06 00:00:05"}
+         "timestamp": "2024-06-01 00:00:14"},
+        # 15th record 
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
+         "author": "user1", 
+         "timestamp": "2024-06-01 00:00:15"},
+        # 16th record 
+        {"title": "The Brave Knight",
+         "content": "Sir Lancelot fought bravely against the dragon...", 
+         "author": "user1", 
+         "timestamp": "2024-06-01 00:00:16"},
+        # 17th record 
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
+         "author": "david@gmail.com", 
+         "timestamp": "2024-06-01 00:00:17"},
+        # 18th record 
+        {"title": "The Brave Knight",
+         "content": "Sir Lancelot fought bravely against the dragon...", 
+         "author": "user1", 
+         "timestamp": "2024-06-01 00:00:18"},
+        # 19th record 
+        {"title": "The Lost City",
+         "content": "In the heart of the desert, there was a city lost to time...", 
+         "author": "user2", 
+         "timestamp": "2024-06-01 00:00:19"},
+        # 20th record 
+        {"title": "The Brave Knight",
+         "content": "Sir Lancelot fought bravely against the dragon...", 
+         "author": "user1", 
+         "timestamp": "2024-06-01 00:00:20"}
     ]
 
-    for story_data in sample_stories:
+    dt = datetime.now()  # Get current datetime
+
+    #for story_data in sample_stories:
+    for i, story_data in enumerate(sample_stories):
         try:
-            timestamp = datetime.strptime(story_data["timestamp"], '%Y-%m-%d %H:%M:%S')
-            record = Story(title=story_data["title"], content=story_data["content"], author=story_data["author"], timestamp=timestamp)
+            # Generate timestamp incremented by seconds
+            timestamp = (dt + timedelta(seconds=i)).strftime("%Y-%m-%d %H:%M:%S")
+            print(timestamp)
+            record = Story(
+                title=story_data["title"], 
+                content=story_data["content"], 
+                author=story_data["author"], 
+                timestamp=timestamp
+            )
+            # Add record to the database
             db.session.add(record)
         except Exception as e:
+            db.session.rollback()  # Roll back the session to avoid partial commits
             flash(f"Error adding story '{story_data['title']}': {e}", 'danger')
             return redirect(url_for('home'))
         
     try:
-        db.session.commit()
+        db.session.commit()     # Commit the database
         flash(f"{len(sample_stories)} sample stories added successfully!", 'success')
     except Exception as e:
-        db.session.rollback()       # Important: Roll back the session
+        db.session.rollback()   # Roll back the session to avoid partial commits
         flash(f"Error committing stories to the database: {e}", 'danger')
 
     return redirect(url_for('home'))
     
 
 # Shortcut 2 - Allow programmer to delete all Story records (NOTE: internal use ONLY).
-# http://127.0.0.1:5000/delete_story_records_shortcut
-@app.route('/delete_story_records_shortcut')
-def delete_story_records_shortcut():
+# http://127.0.0.1:5000/delete_story_shortcut
+@app.route('/delete_story_shortcut')
+def delete_story_shortcut():
     try:
         # Delete all records from "Story" table and commit the changes.
         db.session.query(Story).delete()
         db.session.commit()
+        flash(f"All stories deleted successfully!", 'success')
     except Exception as e:
         db.session.rollback()       # Important: Roll back the session
         flash(f"Error deleting/committing stories to the database: {e}", 'danger')
 
-    return "All records deleted from 'Story' table!"
+    return redirect(url_for('home'))
+# TZX016 (end) -------------------------------------------------------------------------
 
-#--- TZX014 (end) -------------------------------------------------------------------
 
 if __name__ == '__main__':
     with app.app_context():

@@ -19,34 +19,24 @@ nav{
 }
 
 label.logo{
-    color: #F5F5F5;
+    color: white;
     font-size: 40px;
     /* Create text with a neon glow effect: */  /* TZX010 */
     text-shadow:                      /* TZX010 */
-        0 0 5px #000000,       
-        0 0 10px #404040,
-        0 0 20px #808080,
-        0 0 40px #c0c0c0,
-        0 0 80px #f0f0f0;
+        0 0 5px lightskyblue,       /* TZX010 */
+        0 0 10px lightskyblue,      /* TZX010 */
+        0 0 20px lightskyblue,      /* TZX010 */
+        0 0 40px lightskyblue,      /* TZX010 */
+        0 0 80px lightskyblue;      /* TZX010 */
     line-height:70px;
-    padding:0 20px;     /* TZX016 */
+    padding:0 50px;
     font-weight:bold;
 }
-
-/* TZX016 (start) -------------------- */
-@keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-}
-
-.logo {
-    animation: fadeIn 2s ease-in-out forwards;
-}
-/* TZX016 (end) -------------------- */
 
 nav ul{
     float: right;
     margin-right: 30px;
+
 }
 
 nav ul li{
@@ -59,22 +49,13 @@ nav ul li{
 nav ul li a{
     color: white;
     font-size: 18px;
-    font-family: cursive, Georgia, monospace, Verdana, serif;   /* TZX016 */    
 }
 
 .nav-list.active {
     background-color: grey; /* Adjust this color as desired */
-  /*  color: black; */ /* TZX016 */
-  /*  font-weight: bold; */ /* TZX016 */
-}
-
-/* TZX016 (start) ---------- */
-/*  For ACTIVE menu item */
-.nav-list.active a {
-    color: greenyellow; 
+    color: black; /* Adjust this color as desired for text contrast */
     font-weight: bold;
 }
-/* TZX016 (end) ---------- */
   
 /* Optional styles for a subtle hover effect (not required for highlighting) */
 .nav-list:hover {
@@ -85,11 +66,9 @@ nav ul li a{
 .nav-list {
     display: inline-block;
     line-height: 70px;
-  /*  padding-left: 25px;       
+    padding-left: 25px;       
     padding-right: 25px;
-    border-right: 1px solid #bbb;  *//* TZX016 */
-    width: 130px; /* Fixed width for each item */               /* TZX016 */
-    text-align: center; /* Centers text within each item */     /* TZX016 */
+    border-right: 1px solid #bbb;
 }
 
 body {
@@ -122,7 +101,7 @@ body {
 .hyperlink-2 {
     padding-left: 2px;
     font-size: small;
-    text-decoration: none;  /* underline; *//* TZX016 */
+    text-decoration: underline;
     color: blue;
 }
 
@@ -166,7 +145,6 @@ body {
     font-family:'Times New Roman', Times, serif;
     background-color: White;
     color: blue;
-    text-align: center;     /* TZX016 */
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 2px;
@@ -177,12 +155,10 @@ body {
 .Table-td-2 {
     font-family:'Times New Roman', Times, serif;
     font-size: 20px; 
-  /*  font-style: italic;  *//* TZX016*/
+    font-style: italic;
     background-color: White;
-    color: blue;        /* TZX016 */
-    text-align: left;     /* TZX016 */
-    padding-left: 10px;     /* TZX016 */
-    padding-right: 10px;    /* TZX016 */
+    padding-left: 20px;
+    padding-right: 20px;
     padding-top: 2px;
     padding-bottom: 0;
 }
@@ -464,27 +440,6 @@ div.Edit-Content {
     opacity: 0.6;       /* 40% transparent */
 }
 
-.count {
-    background-color: #000000;
-    top: 14%;   /* 33%; *//* TZX016*/
-    width: 20%;
-    padding: 10px;
-    left: 58%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: space-around;
-    border-radius: 5px;
-    box-shadow: 0 20px 40px rgba(30, 21, 49, 0.4);
-
-  }
-  .count p {
-    color: #a0a0c0;
-  }
-  .count h5 {
-    color: #ffffff;
-    font-size: 32px;
-  }
 
 
   .bodyy{ 

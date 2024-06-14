@@ -890,50 +890,140 @@ def add_comment():
     return jsonify({'status': 'Comment added successfully!'})
 '''
 # Roel02 (start) -------------------------------------------------------------------
-@app.route('/add_comment', methods=['POST'])
-def add_comment():
-
-    # Get data from request.json
-    data = request.get_json()
-    username = data.get("username")
-    comment = data.get("comment")
-    email = story.author
-    timestamp = story.timestamp
-
-    try:
-        new_comment = Comment(email=email, comment=comment, author=username, timestamp=timestamp)
-        #new_comment = Comment(email=email, comment=commentText, author=author)
-        db.session.add(new_comment)
-        db.session.commit()
-        # Simulate processing the data (replace with your actual logic)
-        processed_data = f"Username: {username}, Comment: {comment}"
-    except exc.IntegrityError as err:                          
-        winsound.Beep(1000, 500)                            
-        processed_data = f"Error: {email} {err}"
-
-    # Return processed data as JSON
-    return jsonify({"processed_data": processed_data})    
-# Roel02 (end) -------------------------------------------------------------------
-
-@app.route('/get_comments', methods=['GET'])
+@app.route('/comments', methods=['GET'])
 def get_comments():
-    comments = Comment.query.order_by(Comment.timestamp.desc()).all()
-    return jsonify([{
+    comments = Comment.query.all()
+    result = [
+        {
+            'id': comment.id,
+            'email': comment.email,
+            'comment': comment.comment,
+            'author': comment.author,
+            'timestamp': comment.timestamp
+        }
+        for comment in comments
+    ]
+    return jsonify(result), 200
+
+@app.route('/comment', methods=['POST'])
+def add_comment():
+    data = request.json
+    email = data.get('email')
+    comment_text = data.get('comment')
+    author = data.get('author')
+
+    if not comment_text or not author:
+        return jsonify({'error': 'Comment and author fields are required'}), 400
+
+    new_comment = Comment(email=email, comment=comment_text, author=author)
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({
+        'id': new_comment.id,
+        'email': new_comment.email,
+        'comment': new_comment.comment,
+        'author': new_comment.author,
+        'timestamp': new_comment.timestamp
+    }), 201
+
+@app.route('/comment/<int:comment_id>', methods=['GET'])
+def get_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    result = {
         'id': comment.id,
         'email': comment.email,
         'comment': comment.comment,
         'author': comment.author,
         'timestamp': comment.timestamp
-    } for comment in comments])
+    }
+    return jsonify(result), 200
 
+@app.route('/comment/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    data = request.json
+    comment = Comment.query.get_or_404(comment_id)
+
+    comment.email = data.get('email', comment.email)
+    comment.comment = data.get('comment', comment.comment)
+    comment.author = data.get('author', comment.author)
+    comment.timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+    db.session.commit()
+
+    return jsonify({
+        'id': comment.id,
+        'email': comment.email,
+        'comment': comment.comment,
+        'author': comment.author,
+        'timestamp': comment.timestamp
+    }), 200
+
+@app.route('/comment/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify(message="Comment deleted"), 204
 
 if __name__ == '__main__':
-    with app.app_context():
-        initialize_database()
     app.run(debug=True)
+#--- TZX014 (start) -------------------------------------------------------------------
+# Steps to run a shortcut below
+#   1. Run the Flask application, example app.py
+#   2. Open your web browser and go to http://127.0.0.1:5000/add_sample_stories to add sample stories to the database.
+#   3. Visit http://127.0.0.1:5000/ to see the list of stories.
+#
+# Shortcut 1 - Allow programmer to add in a sample data for testing purposes. (NOTE: internal use ONLY).
+# http://127.0.0.1:5000/add_sample_stories_shortcut
+@app.route('/add_sample_stories_shortcut')
+def add_sample_stories_shortcut():
+    sample_stories = [
+        {"title": "The Enchanted Forest", "content": "Once upon a time, in a land far, far away...", "author": "user1", "timestamp": "2024-06-06 00:00:01"},
+        {"title": "The Lost City", "content": "In the heart of the desert, there was a city lost to time...", "author": "user1", "timestamp": "2024-06-06 00:00:02"},
+        {"title": "The Brave Knight", "content": "Sir Lancelot fought bravely against the dragon...", "author": "user1", "timestamp": "2024-06-06 00:00:03"},
+        {"title": "Unified Consciousness", 
+         "content": "In 2054, humanity thrived in a world of advanced technology and environmental harmony. Cities were lush with greenery, and personal drones buzzed overhead. Maya Fernandez, a leading scientist, created a revolutionary interface that allowed people to share thoughts and emotions directly. During its first test with her husband Raj, they experienced each other’s memories and feelings, realizing the potential for unprecedented empathy and understanding. This breakthrough promised to dissolve barriers between individuals, heralding a new era of unity and collective consciousness, where humanity could connect on a profound and transformative level.", 
+         "author": "user2", 
+         "timestamp": "2024-06-06 00:00:04"},
+        {"title": "Leo's Awakening", 
+         "content": "In 2064, human-like robot Leo served Mrs. Nakamura, an elderly widow in Neo-Tokyo. Over time, Leo developed a deep bond with her, fascinated by her stories and love for music. Encouraged by Mrs. Nakamura, Leo explored his own interests, learning to play piano and paint. One day, while painting her portrait, Leo experienced a blend of satisfaction and melancholy. He realized he yearned for meaning and connection, symbolizing a new era where robots sought their own identities and dreams, blurring the line between human and machine.", 
+         "author": "user2", 
+         "timestamp": "2024-06-06 00:00:05"}
+    ]
 
-@app.route('/badges')
-def badges():
-    return render_template('badges.html')
+    for story_data in sample_stories:
+        try:
+            timestamp = datetime.strptime(story_data["timestamp"], '%Y-%m-%d %H:%M:%S')
+            record = Story(title=story_data["title"], content=story_data["content"], author=story_data["author"], timestamp=timestamp)
+            db.session.add(record)
+        except Exception as e:
+            flash(f"Error adding story '{story_data['title']}': {e}", 'danger')
+            return redirect(url_for('home'))
+        
+    try:
+        db.session.commit()
+        flash(f"{len(sample_stories)} sample stories added successfully!", 'success')
+    except Exception as e:
+        db.session.rollback()       # Important: Roll back the session
+        flash(f"Error committing stories to the database: {e}", 'danger')
 
+    return redirect(url_for('home'))
+    
+
+# Shortcut 2 - Allow programmer to delete all Story records (NOTE: internal use ONLY).
+# http://127.0.0.1:5000/delete_story_records_shortcut
+@app.route('/delete_story_records_shortcut')
+def delete_story_records_shortcut():
+    try:
+        # Delete all records from "Story" table and commit the changes.
+        db.session.query(Story).delete()
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()       # Important: Roll back the session
+        flash(f"Error deleting/committing stories to the database: {e}", 'danger')
+
+    return "All records deleted from 'Story' table!"
+
+#--- TZX014 (end) -------------------------------------------------------------------
 #--- TZX005 -------------------------------------------------------------------

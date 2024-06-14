@@ -5,12 +5,10 @@ from PIL import Image
 from flask import render_template,url_for, request, flash, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, SearchForm, DeleteAccountForm
 from StoryApp.models import User, initialize_database
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
-import bleach
-from bleach import clean
 from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_     
 #TZX016# from datetime import datetime               # TZX002
@@ -219,13 +217,12 @@ def text_to_mp3(text, mp3_filename, language_code):
 
 # TZX010 (end) ------------------------------------------------------------------------------
 
-# TZX014 - Deleted ALL the CSV (obsolete) codes here ----------------------------------------
-
+#CYC all user function(login,signup,search,profile,logout,delete account)
 @app.route('/')
 def home():
     return render_template("home.html",title="Home")
 
-
+#login,and signup involves bcrypt so that it will help us to hash it and our actual password will not shown in the database
 @app.route("/login" , methods =["GET","POST"])
 def login():
     global username     # TZX002
@@ -264,12 +261,13 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
+# link back to our StoryWriter home page 
 @app.route("/logout")
 def logout():
     logout_user()
-    #return redirect(url_for("index"))
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))
 
+#Able to upload our picture and will resize our picture size to 256,256. This will help save some space and make sure that all pic are uniform in size.
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext =os.path.splitext(form_picture.filename)
@@ -283,6 +281,7 @@ def save_picture(form_picture):
 
     return picture_fn
 
+# It will shows our basic info in profile page and there are forms where we can update our info
 @app.route("/profile" , methods =["GET","POST"])
 #decorator
 @login_required
@@ -306,24 +305,20 @@ def profile():
     html_bio = markdown.markdown(current_user.bio or '')
     return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
+# Go through each words to find words we search for. Uppercase and lowercase does not matter as I have set them to all lowercase.
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    posts = []  # Initialize posts as an empty list
+    posts = [] 
     if form.validate_on_submit():
-        searched_query = form.searched.data.lower()  # Convert the search query to lowercase
-        # Split the search query into individual words
+        searched_query = form.searched.data.lower()  
         search_words = searched_query.split()
-        # Initialize the query to retrieve stories
         query = Story.query
-        # Iterate over each word in the search query
         for word in search_words:
-            # Filter stories that contain the word in either the title or the content
             query = query.filter(or_(
                 func.lower(Story.title).like(func.lower(f"%{word}%")),
                 func.lower(Story.content).like(func.lower(f"%{word}%"))
             ))
-        # Execute the query to retrieve the matching stories
         posts = query.order_by(Story.title).all()
         return render_template("search.html", form=form, searched=searched_query, posts=posts)
     return render_template("search.html", form=form, searched="", posts=posts)
@@ -333,6 +328,7 @@ def base():
     form = SearchForm()
     return dict(form=form)
 
+# Need to check if we enter the correct password only we can delete the account
 @app.route("/delete_account", methods=["GET", "POST"])
 @login_required
 def delete_account():

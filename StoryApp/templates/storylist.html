@@ -46,11 +46,13 @@
             <li class="OrderList-1">
                 {%if editmode%}
                     <a class="hyperlink-1" href="{{ url_for('edit_story', timestamp=story.timestamp) }}">
+                        {{ loop.index }}.   <!-- TZX017 added -->
                         <span><strong>{{ story.title }}</strong></span> &mdash; 
                         &laquo; <small>by {{ story.author }} on {{ story.timestamp }}</small> &raquo;
                     </a>
                 {%else%}
                     <a class="hyperlink-1" href="{{ url_for('read_story', timestamp=story.timestamp) }}">
+                        {{ loop.index }}.   <!-- TZX017 added -->
                         <span><strong>{{ story.title }}</strong></span> &mdash; 
                         &laquo; <small>by {{ story.author }} on {{ story.timestamp }}</small> &raquo;
                     </a>

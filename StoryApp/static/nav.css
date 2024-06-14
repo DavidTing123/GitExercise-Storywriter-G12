@@ -19,43 +19,67 @@ nav{
 }
 
 label.logo{
-    color: white;
+    color: #F5F5F5;     /* white; *//*TZX016*/
     font-size: 40px;
     /* Create text with a neon glow effect: */  /* TZX010 */
     text-shadow:                      /* TZX010 */
-        0 0 5px lightskyblue,       /* TZX010 */
-        0 0 10px lightskyblue,      /* TZX010 */
-        0 0 20px lightskyblue,      /* TZX010 */
-        0 0 40px lightskyblue,      /* TZX010 */
-        0 0 80px lightskyblue;      /* TZX010 */
+        /* TZX016 : Chg 5 lines below. */
+        0 0 5px #000000,       
+        0 0 10px #404040,
+        0 0 20px #808080,
+        0 0 40px #c0c0c0,
+        0 0 80px #f0f0f0;
     line-height:70px;
-    padding:0 50px;
-    font-weight:bold;
+    padding: 0 20px;    /* 0 50px; *//*TZX016*/
+    font-weight: bold;
 }
+
+/* TZX016 (end) -------------------- */
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.logo {
+    animation: fadeIn 2s ease-in-out forwards;
+}
+/* TZX016 (end) -------------------- */
 
 nav ul{
     float: right;
     margin-right: 30px;
-
 }
 
+/*
 nav ul li{
     display:inline-block;
     line-height:70px;
     margin: 0 5px;
     color:white;
 }
+*/ /*TZX016*/
 
+/* WORKING - TZX000 */
 nav ul li a{
     color: white;
     font-size: 18px;
+    font-family: cursive, Georgia, monospace, Verdana, serif;   /* TZX016 */
 }
 
+/* WORKING - TZX000 */
 .nav-list.active {
     background-color: grey; /* Adjust this color as desired */
-    color: black; /* Adjust this color as desired for text contrast */
+  /*  color: black;  *//*TZX016*/
+  /*  font-weight: bold;  *//*TZX016*/
+}
+
+/* TZX016 (start) ---------- */
+/*  For ACTIVE menu item */
+.nav-list.active a {
+    color: greenyellow; 
     font-weight: bold;
 }
+/* TZX016 (end) ---------- */
   
 /* Optional styles for a subtle hover effect (not required for highlighting) */
 .nav-list:hover {
@@ -66,9 +90,11 @@ nav ul li a{
 .nav-list {
     display: inline-block;
     line-height: 70px;
-    padding-left: 25px;       
+  /*  padding-left: 25px;       
     padding-right: 25px;
-    border-right: 1px solid #bbb;
+    border-right: 1px solid #bbb;  *//*TZX016*/
+    width: 130px; /* Fixed width for each item */               /* TZX016 */
+    text-align: center; /* Centers text within each item */     /* TZX016 */
 }
 
 body {
@@ -101,7 +127,7 @@ body {
 .hyperlink-2 {
     padding-left: 2px;
     font-size: small;
-    text-decoration: underline;
+    text-decoration: none;  /* underline; *//* TZX016 */
     color: blue;
 }
 
@@ -133,7 +159,7 @@ body {
 .OrderList-1 {
     padding-left: 30px;
     padding-bottom: 5px;
-    list-style: decimal;    /* Not Working !! Why? */
+  /*  list-style: decimal;  */  /* Don't know why NOT Working, commented !! *//*TZX017*/
 }
 
 .Table-1 {
@@ -145,6 +171,7 @@ body {
     font-family:'Times New Roman', Times, serif;
     background-color: White;
     color: blue;
+    text-align: center;     /* TZX016 */
     padding-left: 20px;
     padding-right: 20px;
     padding-top: 2px;
@@ -155,10 +182,12 @@ body {
 .Table-td-2 {
     font-family:'Times New Roman', Times, serif;
     font-size: 20px; 
-    font-style: italic;
+  /*  font-style: italic;  *//*TZX016*/
     background-color: White;
-    padding-left: 20px;
-    padding-right: 20px;
+    color: blue;        /* TZX016 */
+    text-align: left;     /* TZX016 */
+    padding-left: 10px;     /* TZX016 */
+    padding-right: 10px;    /* TZX016 */
     padding-top: 2px;
     padding-bottom: 0;
 }
@@ -172,6 +201,7 @@ body {
     font-size: 22px;
 }
 
+/*
 .Btn-speech {
     margin-left: 30px;
     margin-top: 30px;
@@ -192,6 +222,7 @@ body {
 .Btn-dustbin:hover {
     transform: scale(1.2,1.2);
 }
+*/ /*TZX016*/
 
 .Btn-onclick-1 {
     margin-left: 30px;
@@ -236,9 +267,12 @@ body {
     align-items: center;
 }
 
+/* Don't know why NOT Working, commented !! */ /*TZX017*/
+/*
 .ol-class-1 {
-    list-style: decimal;   /* Not Working !! Why? */
+    list-style: decimal;
 }
+*/
 
 .grid-container {
     display: grid;

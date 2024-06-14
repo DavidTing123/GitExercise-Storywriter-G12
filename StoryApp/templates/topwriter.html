@@ -1,0 +1,31 @@
+<!-- topwriter.html -->
+
+{% extends "nav.html" %}
+
+{% block title %}
+    Leaderboard
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="Text-shadow-1">Leaderboard - Top Ten Most Productive Writers</h1>
+    
+    <div class="archive-item">
+        <table class="deletion" style="min-width: 600px;">  
+            <tr>
+                <th class="Table-th-1">No.</th>
+                <th class="Table-th-1">Writer</th>
+                <th class="Table-th-1">Total Story Posted</th>
+            </tr>  
+            {% for author in authors %}
+                <tr>
+                    <td class="Table-td-1">{{ loop.index }}.</td>
+                    <td class="Table-td-1">{{ author.author }}</td>
+                    <td class="Table-td-1">{{ author.story_count }}</td>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+{%endblock%}

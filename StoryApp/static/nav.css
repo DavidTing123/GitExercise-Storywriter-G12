@@ -601,30 +601,4 @@ div.Edit-Content {
     font-size: 0.8em;
  }
 
- /*-- TZX011 (begin) ----------------------------------------------------- */
-/*
-.star-rating {
-    display: flex;
-    flex-direction: row-reverse; 
-    justify-content: left;  
-    direction: row;         
-}
-
-.star-rating input {
-    display: none;
-}
-
-.star-rating label {
-    font-size: 2em;
-    color: lightgray;
-    cursor: pointer;
-}
-
-.star-rating input:checked ~ label,
-.star-rating input:hover ~ label,      
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-    color: gold;
-}
-*/
-/*-- TZX011 (end) ----------------------------------------------------- */
+ 

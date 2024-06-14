@@ -473,7 +473,7 @@ def update_story():                                                     # TZX006
             new_content = request.form['content']                       # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
-
+            flash('Story successfully updated!', 'success')   
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
         #winsound.Beep(1000, 500)                                        # TZX016

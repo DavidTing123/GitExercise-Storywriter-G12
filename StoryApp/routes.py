@@ -490,6 +490,9 @@ def update_story():                                                     # TZX006
 @app.route('/archive')
 def archive():
 
+    # Retrieve username from session                                        # TZX010a
+    username = session.get('username', "")  # Default to "" if not set      # TZX010a
+
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
         print(username)                                     # TZX014

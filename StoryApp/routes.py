@@ -340,7 +340,7 @@ def delete_account():
             db.session.commit()
             logout_user
             flash('Your account has been successfully deleted.', 'success')
-            return redirect(url_for('signup'))
+            return redirect(url_for('home'))
         else:
             flash('Password is incorrect. Please try again.', 'danger')
     return render_template("delete_account.html", title="Delete Account", form=form)

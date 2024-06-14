@@ -75,28 +75,27 @@
         <form id="comment-form">
             <div class="headd"><h2>Post a Comment</h2></div>
             <div><span id="commentCount">0</span> Comments</div>
-            <div class="textt"><p>We are happy to hear from you</p></div><br>
             <label for="username">Your name:</label><br>
             <input type="text" id="username" name="username" required>
             <br>
             <label for="comment">Your comment:</label><br>
             <textarea id="comment" name="comment" rows="4" cols="50" required placeholder="Write your comment here"></textarea>
             <br>
-            <button type="button" onclick="submitData()">Publish</button>
+            <button type="submit">Publish</button>
             <br>
             <p id="processedData"></p>
         </form>
+        <div id="comments-list"></div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery for AJAX -->
 
     <script>
-        // Handling form submission via JavaScript and accessing the text content directly from the DOM element.
         document.getElementById('translate-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const text = document.getElementById('text').textContent;
             const language = document.getElementById('language').value;
-
+    
             fetch('/translate', {
                 method: 'POST',
                 headers: {
@@ -109,47 +108,97 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log('response data:', data);  // Log response data for debugging
                 if (data.translation) {
                     document.getElementById('translation').innerText = data.translation;
-                    // To refresh the audio element (id=audio2Player) in the HTML.
-                    // Force reload of the audio source by appending a query parameter with the current timestamp.
-                    // This ensures the browser fetches the new source instead of using a cached version.
                     var audioElement = document.getElementById('audio2Player');
                     audioElement.src = "{{ url_for('static', filename='Audio2.mp3') }}" + "?t=" + new Date().getTime();
-                    audioElement.load();                    
+                    audioElement.load();
                 } else {
                     console.error('Translation not found in response');
                 }
             })
             .catch(error => console.error('Error:', error));
         });
-
-
-        function submitData() {
+    
+        document.getElementById('comment-form').addEventListener('submit', function(event) {
+            event.preventDefault();
             const username = document.getElementById("username").value;
             const comment = document.getElementById("comment").value;
-
+    
             const data = {
-                username: username,
-                comment: comment
+                author: username,
+                comment: comment,
+                email: ''
             };
-
-            fetch('/add_comment', {
-                method: 'POST', // Set method to POST
-                headers: { 'Content-Type': 'application/json' }, // Set Content-Type header
-                body: JSON.stringify(data) // Convert data to JSON string for body
+    
+            fetch('/comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             })
-            .then(response => response.json()) // Parse JSON response from server
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Roel02 - For debugging #1');   // Log to console for debugging
-                console.log('response data:', data);        // Log response data for debugging
-                document.getElementById("processedData").textContent = data.processed_data;
+                alert('Comment published successfully');
+                document.getElementById("processedData").textContent = data.message;
+                document.getElementById("username").value = '';
+                document.getElementById("comment").value = '';
+                fetchComments();
             })
-            .catch(error => console.error(error));
+            .catch(error => console.error('Error:', error));
+        });
+    
+        function fetchComments() {
+            fetch('/comments')
+                .then(response => response.json())
+                .then(comments => {
+                    const commentsList = document.getElementById('comments-list');
+                    const commentCount = document.getElementById('commentCount');
+                    commentsList.innerHTML = '';
+                    commentCount.textContent = comments.length;
+                    comments.forEach(comment => {
+                        const commentItem = document.createElement('div');
+                        commentItem.classList.add('comment-item');
+                        commentItem.innerHTML = `
+                            <p><strong>${comment.author}</strong> (${comment.timestamp}):</p>
+                            <p>${comment.comment}</p>
+                            <button class="delete-btn" data-id="${comment.id}">Delete</button>
+                        `;
+                        commentsList.appendChild(commentItem);
+                    });
+    
+                    document.querySelectorAll('.delete-btn').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const commentId = this.getAttribute('data-id');
+                            deleteComment(commentId);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching comments:', error));
         }
-        
+    
+        function deleteComment(commentId) {
+            fetch(`/comment/${commentId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();  // Fetching response text instead of json
+            })
+            .then(data => {
+                alert('Comment deleted successfully');
+                fetchComments();
+            })
+            .catch(error => console.error('Error deleting comment:', error));
+        }
+    
+        document.addEventListener('DOMContentLoaded', fetchComments);
     </script>
-
 
 {% endblock content %}

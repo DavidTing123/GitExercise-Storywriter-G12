@@ -50,41 +50,10 @@
         </div>
     </div>
 
-    <div class="count">
-        <div>
-            <h5 id="word-count">0</h5>
-            <p>Words</p>
-        </div>
-        <div>
-            <h5 id="charac-count">0</h5>
-            <p>Characters</p>
-        </div>
-    </div>
 
     <img class="Img-bottom-1" src="{{ url_for('static', filename='images/writing.gif') }}" width="100">
 
     <script>
-        var shownNotifications = {}; // Object to track shown notifications
-
-        function updateWordCount() {
-            var content = document.getElementById('content').value;
-            var words = content.trim().split(/\s+/).filter(function(item) { return item.length > 0; }).length;
-            var characters = content.length;
-            document.getElementById('word-count').innerText = words;
-            document.getElementById('charac-count').innerText = characters;
-
-            // Check for each word count threshold and display notification if not already shown
-            var thresholds = [100, 250, 300, 450, 500, 700];
-            for (var i = 0; i < thresholds.length; i++) {
-                if (words >= thresholds[i] && !shownNotifications[thresholds[i]]) {
-                    // Show a notification popup
-                    alert("You have reached " + thresholds[i] + " words!");
-                    shownNotifications[thresholds[i]] = true; // Mark notification as shown
-                    // Add red dot to navigation bar
-                    document.querySelector('.word-count-indicator').classList.add('active');
-                }
-            }
-        }
 
         function markdownConverter(markdownText) {
             // Simple conversion: replace markdown headings with HTML headings

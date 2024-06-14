@@ -742,43 +742,84 @@ def add_comment():
     return jsonify({'status': 'Comment added successfully!'})
 '''
 # Roel02 (start) -------------------------------------------------------------------
-@app.route('/add_comment', methods=['POST'])
-def add_comment():
-
-    # Get data from request.json
-    data = request.get_json()
-    username = data.get("username")
-    comment = data.get("comment")
-    email = story.author
-    timestamp = story.timestamp
-
-    try:
-        new_comment = Comment(email=email, comment=comment, author=username, timestamp=timestamp)
-        #new_comment = Comment(email=email, comment=commentText, author=author)
-        db.session.add(new_comment)
-        db.session.commit()
-        # Simulate processing the data (replace with your actual logic)
-        processed_data = f"Username: {username}, Comment: {comment}"
-    except exc.IntegrityError as err:                          
-        winsound.Beep(1000, 500)                            
-        processed_data = f"Error: {email} {err}"
-
-    # Return processed data as JSON
-    return jsonify({"processed_data": processed_data})    
-# Roel02 (end) -------------------------------------------------------------------
-
-@app.route('/get_comments', methods=['GET'])
+@app.route('/comments', methods=['GET'])
 def get_comments():
-    comments = Comment.query.order_by(Comment.timestamp.desc()).all()
-    return jsonify([{
+    comments = Comment.query.all()
+    result = [
+        {
+            'id': comment.id,
+            'email': comment.email,
+            'comment': comment.comment,
+            'author': comment.author,
+            'timestamp': comment.timestamp
+        }
+        for comment in comments
+    ]
+    return jsonify(result), 200
+
+@app.route('/comment', methods=['POST'])
+def add_comment():
+    data = request.json
+    email = data.get('email')
+    comment_text = data.get('comment')
+    author = data.get('author')
+
+    if not comment_text or not author:
+        return jsonify({'error': 'Comment and author fields are required'}), 400
+
+    new_comment = Comment(email=email, comment=comment_text, author=author)
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({
+        'id': new_comment.id,
+        'email': new_comment.email,
+        'comment': new_comment.comment,
+        'author': new_comment.author,
+        'timestamp': new_comment.timestamp
+    }), 201
+
+@app.route('/comment/<int:comment_id>', methods=['GET'])
+def get_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    result = {
         'id': comment.id,
         'email': comment.email,
         'comment': comment.comment,
         'author': comment.author,
         'timestamp': comment.timestamp
-    } for comment in comments])
+    }
+    return jsonify(result), 200
 
+@app.route('/comment/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    data = request.json
+    comment = Comment.query.get_or_404(comment_id)
 
+    comment.email = data.get('email', comment.email)
+    comment.comment = data.get('comment', comment.comment)
+    comment.author = data.get('author', comment.author)
+    comment.timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+    db.session.commit()
+
+    return jsonify({
+        'id': comment.id,
+        'email': comment.email,
+        'comment': comment.comment,
+        'author': comment.author,
+        'timestamp': comment.timestamp
+    }), 200
+
+@app.route('/comment/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify(message="Comment deleted"), 204
+
+if __name__ == '__main__':
+    app.run(debug=True)
 #--- TZX014 (start) -------------------------------------------------------------------
 # Steps to run a shortcut below
 #   1. Run the Flask application, example app.py
@@ -837,14 +878,4 @@ def delete_story_records_shortcut():
     return "All records deleted from 'Story' table!"
 
 #--- TZX014 (end) -------------------------------------------------------------------
-
-if __name__ == '__main__':
-    with app.app_context():
-        initialize_database()
-    app.run(debug=True)
-
-@app.route('/badges')
-def badges():
-    return render_template('badges.html')
-
 #--- TZX005 -------------------------------------------------------------------

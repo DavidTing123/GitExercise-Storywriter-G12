@@ -187,7 +187,6 @@ def split_text(text, max_length=5000):
 
 
 def text_to_mp3(text, mp3_filename, language_code):
-
    
     # Create the gTTS object
     tts = gTTS(text=text, lang=language_code)
@@ -197,9 +196,11 @@ def text_to_mp3(text, mp3_filename, language_code):
 
     return 0 
 
+
 @app.route('/')
 def home():
     return render_template("home.html",title="Home")
+
 
 #login,and signup involves bcrypt so that it will help us to hash it and our actual password will not shown in the database
 @app.route("/login" , methods =["GET","POST"])

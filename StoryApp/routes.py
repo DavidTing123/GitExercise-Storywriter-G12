@@ -13,7 +13,8 @@ import bleach
 from bleach import clean
 from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_     
-from datetime import datetime               # TZX002
+#TZX016# from datetime import datetime               # TZX002
+from datetime import datetime, timedelta    # TZX016
 import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
@@ -26,6 +27,9 @@ from googletrans import Translator              # TZX010
 # Install the langdetect libarry: "pip install langdetect"  # TZX010
 from langdetect import detect, detect_langs, DetectorFactory        # TZX010
 from langdetect.lang_detect_exception import LangDetectException    # TZX010
+#from sqlalchemy import func                 # TZX015
+from sqlalchemy import desc                 # TZX015
+from sqlalchemy.orm import aliased          # TZX015
 
 
 # Adjust the maximum content length for Flask Application Configurations.   # TZX010
@@ -64,9 +68,11 @@ with app.app_context():                 # TZX002
     db.create_all()                     # TZX002
 
 # Adds a new story to the database.                             # TZX002
-def write_to_db(title, content, author, timestamp):             # TZX002
+#def write_to_db(title, content, author, timestamp):             # TZX002
+def write_to_db(data):                                          # TZX014
     try:                                                        # TZX002
-        record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        #record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        record = Story(**data)                                  # TZX014
         db.session.add(record)                                  # TZX002
         db.session.commit()                                     # TZX002
     except exc.IntegrityError as err:                           # TZX002
@@ -78,7 +84,7 @@ def write_to_db(title, content, author, timestamp):             # TZX002
 # Retrieves all stories from database.      # TZX002
 def read_from_db():                         # TZX002
     all_stories = Story.query.all()         # TZX002
-    print('all_stories', all_stories)       # TZX002
+    #TZX016# print('all_stories', all_stories)       # TZX002
     return all_stories                      # TZX002
 
 # Retrieves a story from database based on timestamp.           # TZX006
@@ -172,11 +178,9 @@ def detect_language(text):
     try:
         # Detect the language
         language = detect(text)
-        #TZX014* print('After detect(text)')
         return language
     except LangDetectException as e:
         # Handle cases where detection fails
-        #TZX014# print("Language detection failed: {str(e)}")
         language = 'en'     # Default to English
         return language
     
@@ -345,10 +349,15 @@ def delete_account():
             flash('Password is incorrect. Please try again.', 'danger')
     return render_template("delete_account.html", title="Delete Account", form=form)
         
-# Route to here if the user clicked "My Story" in the Menu. # TZX014
+
+#-------------------------------------------------------------------# TZX016
+# (1) When the user clicked "My Story" in the Menu, route to here.  # TZX016
+#     If username exist, return to 'index.html',                    # TZX016
+#     else ask the user to login.                                   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/success')
 def index():
-    global EditMode                         # TZX006
+    global EditMode                                         # TZX006
 
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
@@ -362,6 +371,10 @@ def index():
     return render_template('index.html')
 
 
+#-------------------------------------------------------------------# TZX016
+# (1.1) If username exist, save the new story into sqlalchemy.      # TZX016
+#       Then, return to 'index.html'.                               # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/add_story', methods=['POST'])
 def add_story():
     title = request.form['title']
@@ -379,36 +392,73 @@ def add_story():
     else:                                                       # TZX002
         print("The username variable was defined.")             # TZX002
 
-    write_to_db(title, content, username, DateTime)             # TZX002
+    # TZX014: (Start) --------------------------------------------------
+    # Construct the data dictionary
+    story_data = {
+        "title": title,
+        "content": content,
+        "author": username,
+        "timestamp": DateTime
+    }
+    # TZX014: (end) --------------------------------------------------
 
-    return redirect(url_for('index'))
+    #write_to_db(title, content, username, DateTime)             # TZX002
+    write_to_db(story_data)                                     # TZX014
+
+    #return redirect(url_for('index'))
+    return render_template('index.html')            # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (2) When the user clicked "Story" in the Menu, route to here.     # TZX016
+#     If username exist, read and get ALL story records,            # TZX016
+#     then pass the records to 'storylist.html'.                    # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/storylist')
 def storylist():
 
+    # Ensure username exist                                 # TZX014
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        #return render_template('home.html')                 # TZX014
+        return redirect(url_for('logout'))                  # TZX014
+
     stories = read_from_db()                                    # TZX002
+
     # Store EditMode in Session                                 # TZX006
     session['EditMode'] = EditMode                              # TZX006
 
-    #return render_template('storylist.html', stories=stories)
-    return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+    # TZX016 : (start) Add selected field. ------------------------------------
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+    # TZX016 : (end) Add selected field. ------------------------------------
+
+    #return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
-# -- TZX006 (start) -------------------------------------------------------------
-# If "Edit" Navigation Menu pressed, route to this "editrecord" function.   # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3) When the user clicked "Edit" in the Menu, route to here.      # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'storylist.html' for display.      # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/editrecord')                                                   # TZX006
 def editrecord():                                                           # TZX006
 
     # Retrieve username from session                                        # TZX010a
     username = session.get('username', "")  # Default to "" if not set      # TZX010a
 
-    try:                                                                    # TZX006
-        # This will raise a NameError because 'username' is not defined.    # TZX006
-        print(username)                                                     # TZX006
-    except NameError:                                                       # TZX006
-        flash("An error occurred: 'username' is not defined. Please log in to your account.", "error")     # TZX006
-        return render_template('home.html')                                     # TZX006
+    # Ensure username exist                                 # TZX014    
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        #return render_template('home.html')                 # TZX014
+        return redirect(url_for('logout'))                  # TZX014
                 
     # Proceed if not NameError...                                               # TZX006
     EditMode = True                                                             # TZX006            
@@ -417,47 +467,66 @@ def editrecord():                                                           # TZ
     # Store EditMode in Session                                     # TZX006
     session['EditMode'] = EditMode                                  # TZX006
 
-    return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+    # TZX016 : (start) Add selected field. ------------------------------------
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+    # TZX016 : (end) Add selected field. ------------------------------------
+
+    #return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (3.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Then, return the story record to 'edit_story.html'.         # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/edit_story/<timestamp>')                               # TZX006
 def edit_story(timestamp):                                          # TZX006
-    global primary_key                                              # TZX006
+    #TZX016# global primary_key                                              # TZX006
+    global story_id                                                 # TZX016
 
     story = get_story_by_timestamp(timestamp)                       # TZX006
     #TZX014# print('story.id:', story.id)                                    # TZX006
-    primary_key = story.id                                          # TZX006
+    #TZX016# primary_key = story.id                                          # TZX006
+    story_id = story.id                                             # TZX016
     return render_template('edit_story.html', story=story)          # TZX006
 
 
-# All the following lines are NEW added, not verify yet !!!!            # TZX006 !!!
-#@app.route('/update_story/<timestamp>', methods=['GET', 'POST'])       # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3.2) When user clicked 'Update' button from 'edit_story.html'.   # TZX016
+#       Update the new content to the existing record.              # TZX016
+#       Return to 'edit_story.html'.                                # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/update_story', methods=['POST'])                           # TZX006
 def update_story():                                                     # TZX006
     
-    # Testing...                                                # TZX006
-    #msg = 'Debug msg: primary_key = ' + str(primary_key)        # TZX006 
-    #flash(msg, 'success')                                       # TZX006
-    #return redirect(url_for('home'))                            # TZX006
-
     #story = get_story_by_timestamp(timestamp)                           # TZX006
-    story = Story.query.get(primary_key)                                # TZX006
+    #TZX016# story = Story.query.get(primary_key)                                # TZX006
+    story = Story.query.get(story_id)                                   # TZX016
     
     if story:                                                           # TZX006
         if request.method == 'POST':                                    # TZX006
             new_content = request.form['content']                       # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
-            flash('Story has been updated successfully!', 'success')    # TZX006
-            return render_template('edit_story.html', story=story)                       # TZX006
+            #TZX016# flash('Story has been updated successfully!', 'success')    # TZX006
+            #TZX016# return render_template('edit_story.html', story=story)                       # TZX006
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
+        winsound.Beep(1000, 500)                                        # TZX016
         flash('Story not found!', 'danger')                             # TZX006
         return render_template('edit_story.html', story=story)                              # TZX006
 
 # -- TZX006 (start) -------------------------------------------------------------
 
-# Route to here if the user clicked "Admin" in the Menu.    # TZX014
+#-------------------------------------------------------------------# TZX016
+# (4) When the user clicked "Admin" in the Menu, route to here.     # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'archive.html' for display.        # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/archive')
 def archive():
 
@@ -473,6 +542,14 @@ def archive():
     return render_template('archive.html', stories=stories)
 
 
+#-------------------------------------------------------------------# TZX016
+# (2.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Markdown conversion; detect language of original text,      # TZX016
+#       Text-To-Speech (TTS) it, and save to 'Audio1.mp3' file.     # TZX016
+#       Then, pass story record to 'story_page.html' for display.   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/read_story/<timestamp>')           # TZX002
 def read_story(timestamp):                      # TZX002
     global story
@@ -572,6 +649,13 @@ def speech_text(timestamp):                                 # TZX004
 # TZX010 (end) ---------------------------------------------------------------------------
 
 # TZX010 (begin) ---------------------------------------------------------------------------
+#---------------------------------------------------------------------------# TZX016
+# (2.1a) When the user clicked 'Translate' button from 'story_page.html',   # TZX016
+#        route to here by JavaScript (JSON)                                 # TZX016
+#        Translate the original text to the required language.              # TZX016
+#        Text-To-Speech (TTS) translated text and save it to 'Audio2.mp3'.  # TZX016
+#        Then, return translated text to 'story_page.html' by JSON.         # TZX016
+#---------------------------------------------------------------------------# TZX016
 @app.route('/translate', methods=['POST'])
 def translate():
     # NOTE: 'translate' library has 500 characters limitation in a single function call.
@@ -636,6 +720,12 @@ def translate():
 # TZX010 (end) ---------------------------------------------------------------------------
 
 
+#-------------------------------------------------------------------# TZX016
+# (4.1) When user pressed "Delete" button from 'archive.html',      # TZX016
+#       route to here to get 'button_value' (i.e. record timestamp) # TZX016 
+#       and delete the record from database based on timestamp.     # TZX016
+#       Then, return back to 'archive'.                             # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/delete_story', methods=['GET', 'POST'])
 def delete_story():
     index = 0
@@ -649,8 +739,13 @@ def delete_story():
         
     return redirect(url_for('archive'))
 
-#--- TZX005 -------------------------------------------------------------------
-#
+
+#-------------------------------------------------------------------# TZX016
+# (2a) When the user needs record sorting, route to here.           # TZX016
+# (3a) When the user needs record sorting, route to here.           # TZX016
+#      Perform a record sorting based on user request,              # TZX016
+#      then pass the sorted records to 'storylist.html'.            # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/sort_record', methods=['GET', 'POST'])
 def sort_record():
 
@@ -670,14 +765,66 @@ def sort_record():
     # Default sort field
     selected_field = sort_fields[0]
 
+    '''
     # Handle POST request (sort based on selected field)
     if request.method == 'POST':
         selected_field = request.form.get('sort_field')
         sorted_records = sort_stories(selected_field)  # Call a new function for sorting
     else:
         sorted_records = get_all_stories()  # Call a new function to retrieve all stories
+    '''
 
-    return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+    # TZX016 : Fix a bugs (start) -------------------------------
+    # Handle POST request (sort based on selected field)
+    if request.method == 'POST':
+        selected_field = request.form.get('sort_field')
+        if selected_field not in sort_fields:
+            selected_field = sort_fields[0]     # Default to first field if invalid
+
+    # Sort records based "EditMode" (For 'View' or 'Edit' page)
+    if EditMode:
+        # Dynamically get the field from the Story model
+        field = getattr(Story, selected_field)
+        # The sorting is in ascending order by default.  # author=session.get('username')
+        sorted_records = db.session.query(Story).filter_by(author=username).order_by(field).all()
+    else:
+        sorted_records = sort_stories(selected_field)  
+
+    # TZX016 : Fix a bugs (start) -------------------------------
+
+    #return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+    return render_template('storylist.html', stories=sorted_records, editmode=EditMode, selected_field=selected_field)     # TZX016
+
+# TZX015 (start) -------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------# TZX016
+# (5) When user clicked "Leaderboard" in the Menu, route to here.   # TZX016
+#     Count the total stories written by each user, and             # TZX016
+#     get the top ten most productive authors records.              # TZX016
+#     then pass info to 'topwriter.html' for display.               # TZX016
+#-------------------------------------------------------------------# TZX016
+# Top Ten Most Productive Authors / Writers
+@app.route('/leaderboard')
+def Leaderboard():
+
+    # Create the subquery - get the number of story written by each author
+    subquery = db.session.query(Story.author, db.func.count(Story.id).label('story_count'))\
+                        .group_by(Story.author).subquery()
+
+    # Alias the subquery for ease of use
+    alias = aliased(subquery)
+
+    # Query to get authors and their story counts, sorted by story_count in descending order and limit to top ten authors
+    top_authors = db.session.query(alias.c.author, alias.c.story_count)\
+                                .order_by(desc(alias.c.story_count))\
+                                .limit(10).all()
+
+    for author, story_count in top_authors:
+        print(f"Author: {author}, Story Count: {story_count}")
+
+    return render_template('topwriter.html', authors=top_authors)
+# TZX015 (end) -------------------------------------------------------------------
 
 
 # TZX011 (begin) -------------------------------------------------------------------
@@ -743,43 +890,84 @@ def add_comment():
     return jsonify({'status': 'Comment added successfully!'})
 '''
 # Roel02 (start) -------------------------------------------------------------------
-@app.route('/add_comment', methods=['POST'])
-def add_comment():
-
-    # Get data from request.json
-    data = request.get_json()
-    username = data.get("username")
-    comment = data.get("comment")
-    email = story.author
-    timestamp = story.timestamp
-
-    try:
-        new_comment = Comment(email=email, comment=comment, author=username, timestamp=timestamp)
-        #new_comment = Comment(email=email, comment=commentText, author=author)
-        db.session.add(new_comment)
-        db.session.commit()
-        # Simulate processing the data (replace with your actual logic)
-        processed_data = f"Username: {username}, Comment: {comment}"
-    except exc.IntegrityError as err:                          
-        winsound.Beep(1000, 500)                            
-        processed_data = f"Error: {email} {err}"
-
-    # Return processed data as JSON
-    return jsonify({"processed_data": processed_data})    
-# Roel02 (end) -------------------------------------------------------------------
-
-@app.route('/get_comments', methods=['GET'])
+@app.route('/comments', methods=['GET'])
 def get_comments():
-    comments = Comment.query.order_by(Comment.timestamp.desc()).all()
-    return jsonify([{
+    comments = Comment.query.all()
+    result = [
+        {
+            'id': comment.id,
+            'email': comment.email,
+            'comment': comment.comment,
+            'author': comment.author,
+            'timestamp': comment.timestamp
+        }
+        for comment in comments
+    ]
+    return jsonify(result), 200
+
+@app.route('/comment', methods=['POST'])
+def add_comment():
+    data = request.json
+    email = data.get('email')
+    comment_text = data.get('comment')
+    author = data.get('author')
+
+    if not comment_text or not author:
+        return jsonify({'error': 'Comment and author fields are required'}), 400
+
+    new_comment = Comment(email=email, comment=comment_text, author=author)
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({
+        'id': new_comment.id,
+        'email': new_comment.email,
+        'comment': new_comment.comment,
+        'author': new_comment.author,
+        'timestamp': new_comment.timestamp
+    }), 201
+
+@app.route('/comment/<int:comment_id>', methods=['GET'])
+def get_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    result = {
         'id': comment.id,
         'email': comment.email,
         'comment': comment.comment,
         'author': comment.author,
         'timestamp': comment.timestamp
-    } for comment in comments])
+    }
+    return jsonify(result), 200
 
+@app.route('/comment/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    data = request.json
+    comment = Comment.query.get_or_404(comment_id)
 
+    comment.email = data.get('email', comment.email)
+    comment.comment = data.get('comment', comment.comment)
+    comment.author = data.get('author', comment.author)
+    comment.timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
+    db.session.commit()
+
+    return jsonify({
+        'id': comment.id,
+        'email': comment.email,
+        'comment': comment.comment,
+        'author': comment.author,
+        'timestamp': comment.timestamp
+    }), 200
+
+@app.route('/comment/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify(message="Comment deleted"), 204
+
+if __name__ == '__main__':
+    app.run(debug=True)
 #--- TZX014 (start) -------------------------------------------------------------------
 # Steps to run a shortcut below
 #   1. Run the Flask application, example app.py
@@ -838,14 +1026,4 @@ def delete_story_records_shortcut():
     return "All records deleted from 'Story' table!"
 
 #--- TZX014 (end) -------------------------------------------------------------------
-
-if __name__ == '__main__':
-    with app.app_context():
-        initialize_database()
-    app.run(debug=True)
-
-@app.route('/badges')
-def badges():
-    return render_template('badges.html')
-
 #--- TZX005 -------------------------------------------------------------------

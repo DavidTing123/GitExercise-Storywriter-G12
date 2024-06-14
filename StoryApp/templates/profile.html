@@ -7,6 +7,7 @@
     {% extends "nav.html" %}
 </head>
 <body>
+<!--show message of successfully or fail to update your profile -->
 {% block title %}Profile Page{% endblock %}
 {% block content %}
     <div class="container mt-4">
@@ -82,6 +83,7 @@
                         {% endif %}
                     </div>
                     <div class="form-group">
+                        <!--for them to upload their profile picture-->
                         {{ form.picture.label(class="form-control-label") }}
                         {{ form.picture(class="form-control-file") }}
                         {% if form.picture.errors %}

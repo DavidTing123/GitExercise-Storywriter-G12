@@ -1,5 +1,4 @@
 from flask import current_app
-from itsdangerous import URLSafeTimedSerializer 
 from StoryApp import db, login_manager, app
 from flask_login import UserMixin
 from datetime import datetime 
@@ -15,21 +14,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default="default.jpg")
     bio = db.Column(db.Text)
-    
-'''
-    #def get_reset_token(self):
-        s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id}).encode('utf-8')
-    
-    @staticmethod
-    def verify_reset_token(token):
-        s = URLSafeTimedSerializer(app.config['SECRET_KEY'], )
-        try:
-            user_id = s.loads(token)['user_id']
-        except:
-            return None
-        return User.query.get(user_id)
-'''
+
 def __repr__(self):
         return f"User('{self.username}, '{self.email}' ,'{self.image_file}')"
 
@@ -67,43 +52,25 @@ class Rating(db.Model):
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.String(50))
-    comment = db.Column(db.String(1000))
+    email = db.Column(db.String(50), nullable=True)
+    comment = db.Column(db.String(1000), nullable=False)
     author = db.Column(db.String(50), nullable=False)
-    timestamp = db.Column(db.String(19))
+    timestamp = db.Column(db.String(19), nullable=False, default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    def __init__(self, id, email, comment, author, timestamp):  # Roel02
-        self.id = id                                            # Roel02
+    def __init__(self, email, comment, author, timestamp=None):
         self.email = email
         self.comment = comment
         self.author = author
-        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.timestamp = timestamp or datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def initialize_database():
     db.create_all()
+
+if __name__ == '__main__':
+    from StoryApp import app  # Ensure to import your Flask app instance here
+    with app.app_context():
+        initialize_database()
 
 if __name__ == '__main__':
     with app.app_context():
         initialize_database()
-
-
-class Badges(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    email = db.Column(db.String(50))
-    Badges = db.Column(db.String(1000))
-    author = db.Column(db.String(50), nullable=False)
-    timestamp = db.Column(db.String(19))
-
-    def __init__(self, id, email, Badges, author, timestamp):  # Roel02
-        self.id = id                                            # Roel02
-        self.email = email
-        self.comment = Badges 
-        self.author = author
-        self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-def initialize_database():
-    db.create_all()
-
-if __name__ == '__main__':
-    with app.app_context():
-        initialize_database()                                                       

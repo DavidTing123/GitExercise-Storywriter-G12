@@ -5,27 +5,25 @@ from PIL import Image
 from flask import render_template,url_for, request, flash, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 from StoryApp import app,db, bcrypt
-from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, RequestResetForm, ResetPasswordForm, SearchForm, DeleteAccountForm
+from StoryApp.forms import SignUpForm, LogInForm, UpdateProfileForm, SearchForm, DeleteAccountForm
 from StoryApp.models import User, initialize_database
 from flask_login import login_user, current_user, logout_user,login_required
 from flask_mail import Message
-import bleach
-from bleach import clean
 from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_     
-from datetime import datetime               # TZX002
+from datetime import datetime, timedelta    # TZX016
 import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
 from StoryApp.models import Comment
-#TZX014#from StoryApp.models import Rating          # TZX011a
 from flask import Flask, jsonify
-# Install the googletrans library using "pip install googletrans==4.0.0-rc1"    # TZX010
-from googletrans import Translator              # TZX010
-# Install the langdetect libarry: "pip install langdetect"  # TZX010
+# Install the googletrans library using "pip install googletrans==4.0.0-rc1"
+from googletrans import Translator                                  # TZX010
 from langdetect import detect, detect_langs, DetectorFactory        # TZX010
 from langdetect.lang_detect_exception import LangDetectException    # TZX010
+from sqlalchemy import desc                 # TZX015
+from sqlalchemy.orm import aliased          # TZX015
 
 
 # Adjust the maximum content length for Flask Application Configurations.   # TZX010
@@ -64,9 +62,9 @@ with app.app_context():                 # TZX002
     db.create_all()                     # TZX002
 
 # Adds a new story to the database.                             # TZX002
-def write_to_db(title, content, author, timestamp):             # TZX002
+def write_to_db(data):                                          # TZX014
     try:                                                        # TZX002
-        record = Story(title=title, content=content, author=author, timestamp=timestamp)  # TZX002
+        record = Story(**data)                                  # TZX014
         db.session.add(record)                                  # TZX002
         db.session.commit()                                     # TZX002
     except exc.IntegrityError as err:                           # TZX002
@@ -75,36 +73,26 @@ def write_to_db(title, content, author, timestamp):             # TZX002
         if "author" in str(err):                            # TZX002
             print("Error: Story author cannot be null")     # TZX002
 
+
 # Retrieves all stories from database.      # TZX002
 def read_from_db():                         # TZX002
     all_stories = Story.query.all()         # TZX002
-    print('all_stories', all_stories)       # TZX002
     return all_stories                      # TZX002
+
 
 # Retrieves a story from database based on timestamp.           # TZX006
 def get_story_by_timestamp(timestamp):                          # TZX002
     return Story.query.filter_by(timestamp=timestamp).first()   # TZX002
 
 
-#--- TZX006 (Start) ------------------------------------------------------
-# Retrieves ALL stories created by specified author.            # TZX006
-'''
-def get_story_by_author(author):                                # TZX006
-    return Story.query.filter_by(author=author).all()           # TZX006
-'''
 def get_story_by_author(author):                                    # TZX006
     return db.session.query(Story).filter_by(author=author).all()   # TZX006
 
-def markdown_to_plain_text(markdown_text):                          # TZX006
-    # Convert markdown to HTML                                      # TZX006
-    #html = markdown2.markdown(markdown_text)                       # TZX006
-    # Based on testing, markdown2 NOT support "###"                 # TZX006
-    # markdown module support "###"                                 # TZX006
 
+def markdown_to_plain_text(markdown_text):                          # TZX006
 
     # By default, the markdown module doesn't convert single        # TZX006
     # newlines to <br> tags. We need double newlines.               # TZX006
-    #html = markdown.markdown(markdown_text)                         # TZX006
     # NOTE: markdown library not supported "\n"             # TZX006
     # Replace newline characters, "\n" with <br> tags       # TZX006
     text1 = markdown_text                                   # TZX006
@@ -116,7 +104,6 @@ def markdown_to_plain_text(markdown_text):                          # TZX006
     plain_text = soup.get_text()                    # TZX006
     
     return plain_text                               # TZX006
-#--- TZX006 (End) ------------------------------------------------------
 
 
 # Deletes a record from database based on timestamp.    # TZX002
@@ -140,18 +127,15 @@ def delete_story_by_timestamp(timestamp):               # TZX002
         print(f"An error occurred while deleting the story: {e}")   # TZX002
         return False                                                # TZX002
 
-# TZX002 program changes (end) ----------------------------------------------------------------
 
-# TZX005 program changes (end) ----------------------------------------------------------------
 def get_all_stories():
     return db.session.query(Story).all()  # Retrieve all stories
+
 
 def sort_stories(field):
     return db.session.query(Story).order_by(getattr(Story, field)).all()  # Sort based on selected field
 
-# TZX005 program changes (end) ----------------------------------------------------------------
 
-# TZX010 (begin) ------------------------------------------------------------------------------
 # Note: The 'translate' library relies on external services for translation. It may use
 # different providers like Google Translate, which might have limitations or require an
 # API key. If you need more advanced features or support for multiple languages, you might
@@ -172,14 +156,13 @@ def detect_language(text):
     try:
         # Detect the language
         language = detect(text)
-        #TZX014* print('After detect(text)')
         return language
     except LangDetectException as e:
         # Handle cases where detection fails
-        #TZX014# print("Language detection failed: {str(e)}")
         language = 'en'     # Default to English
         return language
-    
+
+
 def split_text(text, max_length=5000):
     # Split the text into chunks of max_length characters
     chunks = []
@@ -202,8 +185,8 @@ def split_text(text, max_length=5000):
 
     return chunks
 
-def text_to_mp3(text, mp3_filename, language_code):
 
+def text_to_mp3(text, mp3_filename, language_code):
    
     # Create the gTTS object
     tts = gTTS(text=text, lang=language_code)
@@ -213,15 +196,13 @@ def text_to_mp3(text, mp3_filename, language_code):
 
     return 0 
 
-# TZX010 (end) ------------------------------------------------------------------------------
-
-# TZX014 - Deleted ALL the CSV (obsolete) codes here ----------------------------------------
 
 @app.route('/')
 def home():
     return render_template("home.html",title="Home")
 
 
+#login,and signup involves bcrypt so that it will help us to hash it and our actual password will not shown in the database
 @app.route("/login" , methods =["GET","POST"])
 def login():
     global username     # TZX002
@@ -260,12 +241,13 @@ def signup():
         return redirect(url_for("login"))
     return render_template("signup.html",title="Sign Up", form=form)
 
+# link back to our StoryWriter home page 
 @app.route("/logout")
 def logout():
     logout_user()
-    #return redirect(url_for("index"))
-    return redirect(url_for("login"))
+    return redirect(url_for("home"))
 
+#Able to upload our picture and will resize our picture size to 256,256. This will help save some space and make sure that all pic are uniform in size.
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext =os.path.splitext(form_picture.filename)
@@ -279,6 +261,7 @@ def save_picture(form_picture):
 
     return picture_fn
 
+# It will shows our basic info in profile page and there are forms where we can update our info
 @app.route("/profile" , methods =["GET","POST"])
 #decorator
 @login_required
@@ -302,24 +285,20 @@ def profile():
     html_bio = markdown.markdown(current_user.bio or '')
     return render_template("profile.html",title="Profile", image_file=image_file, form=form, html_bio=html_bio)
 
+# Go through each words to find words we search for. Uppercase and lowercase does not matter as I have set them to all lowercase.
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     form = SearchForm()
-    posts = []  # Initialize posts as an empty list
+    posts = [] 
     if form.validate_on_submit():
-        searched_query = form.searched.data.lower()  # Convert the search query to lowercase
-        # Split the search query into individual words
+        searched_query = form.searched.data.lower()  
         search_words = searched_query.split()
-        # Initialize the query to retrieve stories
         query = Story.query
-        # Iterate over each word in the search query
         for word in search_words:
-            # Filter stories that contain the word in either the title or the content
             query = query.filter(or_(
                 func.lower(Story.title).like(func.lower(f"%{word}%")),
                 func.lower(Story.content).like(func.lower(f"%{word}%"))
             ))
-        # Execute the query to retrieve the matching stories
         posts = query.order_by(Story.title).all()
         return render_template("search.html", form=form, searched=searched_query, posts=posts)
     return render_template("search.html", form=form, searched="", posts=posts)
@@ -329,6 +308,7 @@ def base():
     form = SearchForm()
     return dict(form=form)
 
+# Need to check if we enter the correct password only we can delete the account
 @app.route("/delete_account", methods=["GET", "POST"])
 @login_required
 def delete_account():
@@ -340,15 +320,20 @@ def delete_account():
             db.session.commit()
             logout_user
             flash('Your account has been successfully deleted.', 'success')
-            return redirect(url_for('signup'))
+            return redirect(url_for('home'))
         else:
             flash('Password is incorrect. Please try again.', 'danger')
     return render_template("delete_account.html", title="Delete Account", form=form)
         
-# Route to here if the user clicked "My Story" in the Menu. # TZX014
+
+#-------------------------------------------------------------------# TZX016
+# (1) When the user clicked "My Story" in the Menu, route to here.  # TZX016
+#     If username exist, return to 'index.html',                    # TZX016
+#     else ask the user to login.                                   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/success')
 def index():
-    global EditMode                         # TZX006
+    global EditMode                                         # TZX006
 
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
@@ -358,10 +343,14 @@ def index():
         #return render_template('home.html')                # TZX014
         return redirect(url_for('logout'))                  # TZX014
 
-    EditMode = False                        # TZX006    
+    EditMode = False                                        # TZX006
     return render_template('index.html')
 
 
+#-------------------------------------------------------------------# TZX016
+# (1.1) If username exist, save the new story into sqlalchemy.      # TZX016
+#       Then, return to 'index.html'.                               # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/add_story', methods=['POST'])
 def add_story():
     title = request.form['title']
@@ -379,85 +368,125 @@ def add_story():
     else:                                                       # TZX002
         print("The username variable was defined.")             # TZX002
 
-    write_to_db(title, content, username, DateTime)             # TZX002
+    # Construct the data dictionary
+    story_data = {
+        "title": title,
+        "content": content,
+        "author": username,
+        "timestamp": DateTime
+    }
 
-    return redirect(url_for('index'))
+    #write_to_db(title, content, username, DateTime)            # TZX002
+    write_to_db(story_data)                                     # TZX014
+
+    #return redirect(url_for('index'))
+    return render_template('index.html')            # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (2) When the user clicked "Story" in the Menu, route to here.     # TZX016
+#     If username exist, read and get ALL story records,            # TZX016
+#     then pass the records to 'storylist.html'.                    # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/storylist')
 def storylist():
 
+    # Ensure username exist                                 # TZX014
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        return redirect(url_for('logout'))                  # TZX014
+
     stories = read_from_db()                                    # TZX002
+
     # Store EditMode in Session                                 # TZX006
     session['EditMode'] = EditMode                              # TZX006
 
-    #return render_template('storylist.html', stories=stories)
-    return render_template('storylist.html', stories=stories, editmode=EditMode)    # TZX006
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
-# -- TZX006 (start) -------------------------------------------------------------
-# If "Edit" Navigation Menu pressed, route to this "editrecord" function.   # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3) When the user clicked "Edit" in the Menu, route to here.      # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'storylist.html' for display.      # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/editrecord')                                                   # TZX006
 def editrecord():                                                           # TZX006
 
     # Retrieve username from session                                        # TZX010a
     username = session.get('username', "")  # Default to "" if not set      # TZX010a
 
-    try:                                                                    # TZX006
-        # This will raise a NameError because 'username' is not defined.    # TZX006
-        print(username)                                                     # TZX006
-    except NameError:                                                       # TZX006
-        flash("An error occurred: 'username' is not defined. Please log in to your account.", "error")     # TZX006
-        return render_template('home.html')                                     # TZX006
+    # Ensure username exist                                 # TZX014    
+    try:                                                    # TZX014
+        print(username)                                     # TZX014
+    except NameError:                                       # TZX014
+        flash("Please log in to your account.", "error")    # TZX014
+        return redirect(url_for('logout'))                  # TZX014
                 
-    # Proceed if not NameError...                                               # TZX006
-    EditMode = True                                                             # TZX006            
-    stories = get_story_by_author(username)                                     # TZX006
+    # Proceed if not NameError...                                   # TZX006
+    EditMode = True                                                 # TZX006            
+    stories = get_story_by_author(username)                         # TZX006
 
     # Store EditMode in Session                                     # TZX006
     session['EditMode'] = EditMode                                  # TZX006
 
-    return render_template('storylist.html', stories=stories, editmode=EditMode)  # TZX006
+    # Default sort field to 'timestamp'.
+    selected_field = 'timestamp'
+
+    return render_template('storylist.html', stories=stories, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
+#-------------------------------------------------------------------# TZX016
+# (3.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Then, return the story record to 'edit_story.html'.         # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/edit_story/<timestamp>')                               # TZX006
 def edit_story(timestamp):                                          # TZX006
-    global primary_key                                              # TZX006
+    global story_id                                                 # TZX016
 
     story = get_story_by_timestamp(timestamp)                       # TZX006
-    #TZX014# print('story.id:', story.id)                                    # TZX006
-    primary_key = story.id                                          # TZX006
+    story_id = story.id                                             # TZX016
+
     return render_template('edit_story.html', story=story)          # TZX006
 
 
-# All the following lines are NEW added, not verify yet !!!!            # TZX006 !!!
-#@app.route('/update_story/<timestamp>', methods=['GET', 'POST'])       # TZX006
+#-------------------------------------------------------------------# TZX016
+# (3.2) When user clicked 'Update' button from 'edit_story.html'.   # TZX016
+#       Update the new content to the existing record.              # TZX016
+#       Return to 'edit_story.html'.                                # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/update_story', methods=['POST'])                           # TZX006
 def update_story():                                                     # TZX006
     
-    # Testing...                                                # TZX006
-    #msg = 'Debug msg: primary_key = ' + str(primary_key)        # TZX006 
-    #flash(msg, 'success')                                       # TZX006
-    #return redirect(url_for('home'))                            # TZX006
-
-    #story = get_story_by_timestamp(timestamp)                           # TZX006
-    story = Story.query.get(primary_key)                                # TZX006
+    story = Story.query.get(story_id)                                   # TZX016
     
     if story:                                                           # TZX006
         if request.method == 'POST':                                    # TZX006
             new_content = request.form['content']                       # TZX006
             story.content = new_content                                 # TZX006
             db.session.commit()                                         # TZX006
-            flash('Story has been updated successfully!', 'success')    # TZX006
-            return render_template('edit_story.html', story=story)                       # TZX006
+
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
+        winsound.Beep(1000, 500)                                        # TZX016
         flash('Story not found!', 'danger')                             # TZX006
-        return render_template('edit_story.html', story=story)                              # TZX006
+        return render_template('edit_story.html', story=story)          # TZX006
 
-# -- TZX006 (start) -------------------------------------------------------------
 
-# Route to here if the user clicked "Admin" in the Menu.    # TZX014
+#-------------------------------------------------------------------# TZX016
+# (4) When the user clicked "Admin" in the Menu, route to here.     # TZX016
+#     If username not exist, route to 'logout' (login required).    # TZX016
+#     If username exist, get all stories belonging to username,     # TZX016
+#     then pass these records to 'archive.html' for display.        # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/archive')
 def archive():
 
@@ -468,11 +497,19 @@ def archive():
         flash("Please log in to your account.", "error")    # TZX014
         return redirect(url_for('logout'))                  # TZX014
 
-    #TZX014# stories = read_from_db()    # TZX002
     stories = get_story_by_author(username)                 # TZX014
+
     return render_template('archive.html', stories=stories)
 
 
+#-------------------------------------------------------------------# TZX016
+# (2.1) When the user selected a story from 'storylist.html',       # TZX016
+#       route to here with <timestamp> parameter.                   # TZX016
+#       get a story based on <timestamp>.                           # TZX016
+#       Markdown conversion; detect language of original text,      # TZX016
+#       Text-To-Speech (TTS) it, and save to 'Audio1.mp3' file.     # TZX016
+#       Then, pass story record to 'story_page.html' for display.   # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/read_story/<timestamp>')           # TZX002
 def read_story(timestamp):                      # TZX002
     global story
@@ -501,7 +538,6 @@ def read_story(timestamp):                      # TZX002
 
     data["back"] = "<a href='/storylist'>Go Back</a>"       # TZX004
 
-    # TZX010 - New changes (begin) ----------------------------------------
     txt1 = story.title     # Retrieve title of story        # TZX010
     txt2 = story.content   # Retrieve the content of story  # TZX010
 
@@ -522,56 +558,23 @@ def read_story(timestamp):                      # TZX002
     text_to_mp3(txt, mp3_filename, language_code)           # TZX010
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    file_path = "StoryApp/static/Audio2.mp3"                   # TZX013
+    file_path = "StoryApp/static/Audio2.mp3"        # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
     else:                                           # TZX010
         print(f'{file_path} does not exist.')       # TZX010
 
-    # TZX010 - New changes (end) ---------------------------------------
-
-
-    #TZX010# return render_template('story_page.html', story=story, data=data)    # TZX005
     return render_template('story_page.html', story=story, data=data, languages=languages)    # TZX010
 
 
-# TZX010 - Commented the following lines (begin) ---------------------
-'''
-@app.route('/speech_text/<timestamp>', methods=['POST'])    # TZX004
-def speech_text(timestamp):                                 # TZX004
-
-    
-    # Initialize the TTS engine
-    engine = pyttsx3.init()
-    
-    # Setting up voice rate
-    engine.setProperty('rate', 125)
-
-    # Setting up volume level between 0 and 1
-    engine.setProperty('volume', 0.8)
-
-    # Change voices: 0 for male and 1 for female
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)   # index 0 for male and 1 for female
-
-    text1 = story.title             # Retrieve title of story  # TZX002
-    engine.say(text1)               # Perform the text-to-speech conversion
-    text2 = story.content           # Retrieve the content of story  # TZX002
-
-    # Convert Markdown to readable plain text.  # TZX006
-    plain_text = markdown_to_plain_text(text2)  # TZX006
-    print(plain_text)                           # TZX006
-
-    #engine.say(text2)               # Perform the text-to-speech conversion
-    engine.say(plain_text)          # Perform the text-to-speech conversion # TZX006
-    engine.runAndWait()             # Wait for the speech to finish
-
-    return redirect(url_for('read_story', timestamp=timestamp))     # TZX004
-'''
-# TZX010 (end) ---------------------------------------------------------------------------
-
-# TZX010 (begin) ---------------------------------------------------------------------------
+#---------------------------------------------------------------------------# TZX016
+# (2.1a) When the user clicked 'Translate' button from 'story_page.html',   # TZX016
+#        route to here by JavaScript (JSON)                                 # TZX016
+#        Translate the original text to the required language.              # TZX016
+#        Text-To-Speech (TTS) translated text and save it to 'Audio2.mp3'.  # TZX016
+#        Then, return translated text to 'story_page.html' by JSON.         # TZX016
+#---------------------------------------------------------------------------# TZX016
 @app.route('/translate', methods=['POST'])
 def translate():
     # NOTE: 'translate' library has 500 characters limitation in a single function call.
@@ -582,7 +585,7 @@ def translate():
     #
 
     # Delete Audio2.MP3 file if exist.              # TZX010
-    file_path = "StoryApp/static/Audio2.mp3"               # TZX013
+    file_path = "StoryApp/static/Audio2.mp3"        # TZX013
     if os.path.exists(file_path):                   # TZX010
         os.remove(file_path)                        # TZX010
         print(f'{file_path} has been removed.')     # TZX010
@@ -633,9 +636,13 @@ def translate():
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
-# TZX010 (end) ---------------------------------------------------------------------------
 
-
+#-------------------------------------------------------------------# TZX016
+# (4.1) When user pressed "Delete" button from 'archive.html',      # TZX016
+#       route to here to get 'button_value' (i.e. record timestamp) # TZX016 
+#       and delete the record from database based on timestamp.     # TZX016
+#       Then, return back to 'archive'.                             # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/delete_story', methods=['GET', 'POST'])
 def delete_story():
     index = 0
@@ -649,8 +656,13 @@ def delete_story():
         
     return redirect(url_for('archive'))
 
-#--- TZX005 -------------------------------------------------------------------
-#
+
+#-------------------------------------------------------------------# TZX016
+# (2a) When the user needs record sorting, route to here.           # TZX016
+# (3a) When the user needs record sorting, route to here.           # TZX016
+#      Perform a record sorting based on user request,              # TZX016
+#      then pass the sorted records to 'storylist.html'.            # TZX016
+#-------------------------------------------------------------------# TZX016
 @app.route('/sort_record', methods=['GET', 'POST'])
 def sort_record():
 
@@ -673,179 +685,133 @@ def sort_record():
     # Handle POST request (sort based on selected field)
     if request.method == 'POST':
         selected_field = request.form.get('sort_field')
-        sorted_records = sort_stories(selected_field)  # Call a new function for sorting
+        if selected_field not in sort_fields:
+            selected_field = sort_fields[0]     # Default to first field if invalid
+
+    # Sort records based "EditMode" (For 'View' or 'Edit' page)
+    if EditMode:
+        # Dynamically get the field from the Story model
+        field = getattr(Story, selected_field)
+        # The sorting is in ascending order by default.  # author=session.get('username')
+        sorted_records = db.session.query(Story).filter_by(author=username).order_by(field).all()
     else:
-        sorted_records = get_all_stories()  # Call a new function to retrieve all stories
+        sorted_records = sort_stories(selected_field)
 
-    return render_template('storylist.html', stories=sorted_records, editmode=EditMode)     # TZX006
+    return render_template('storylist.html', stories=sorted_records, editmode=EditMode, selected_field=selected_field)     # TZX016
 
 
-# TZX011 (begin) -------------------------------------------------------------------
-'''
-@app.route('/add_rating', methods=['POST'])
-def add_rating():
+#-------------------------------------------------------------------# TZX016
+# (5) When user clicked "Leaderboard" in the Menu, route to here.   # TZX016
+#     Count the total stories written by each user, and             # TZX016
+#     get the top ten most productive authors records.              # TZX016
+#     then pass info to 'topwriter.html' for display.               # TZX016
+#-------------------------------------------------------------------# TZX016
+# Top Ten Most Productive Authors / Writers
+@app.route('/leaderboard')
+def Leaderboard():
 
-    # Get data from request.json
-    data = request.get_json()
-    story_id = data.get("story_id")
-    rating1 = data.get("rating")
-    rating = int(rating1)
-    
-    # Retrieve username from session                # TZX011
-    user_name = session.get('username', " ")        # TZX011a
+    # Create the subquery - get the number of story written by each author
+    subquery = db.session.query(Story.author, db.func.count(Story.id).label('story_count'))\
+                        .group_by(Story.author).subquery()
 
-    try:
-        # Add new rating to the database
-        new_rating = Rating(story_id=story_id, rating=rating, username=user_name)
-        db.session.add(new_rating)
-        db.session.commit()
-   
-        #TZX011# story = Story.query.get_or_404(story_id)
+    # Alias the subquery for ease of use
+    alias = aliased(subquery)
 
-        # Retrieve ALL the rating for the specific story id.
-        ratings = Rating.query.filter_by(story_id=story_id).all()
+    # Query to get authors and their story counts, sorted by story_count in descending order and limit to top ten authors
+    top_authors = db.session.query(alias.c.author, alias.c.story_count)\
+                                .order_by(desc(alias.c.story_count))\
+                                .limit(10).all()
 
-        #------------------------------------------------------- # TZX012
-        # To delete specific record based on id                  # TZX012
-        ## Numdeleted = db.session.query(Rating).filter(Rating.story_id == 1).delete()  # TZX012
-        ## print("Number of record deleted:", Numdeleted)                               # TZX012
-        ## db.session.commit()                                    # TZX012
-        #------------------------------------------------------- # TZX012
-        
-        # Compute the average rating based on the unique story id (then round-to-nearest)
-        average_rating = round(sum(r.rating for r in ratings) / len(ratings) if ratings else 0, 1)
+    for author, story_count in top_authors:
+        print(f"Author: {author}, Story Count: {story_count}")
 
-    except exc.IntegrityError as err:                          
-        winsound.Beep(500, 500)
-        average_rating = f"Error: {user_name} not found or {err} "
-
-    # Return processed data as JSON
-    return jsonify({"average_rating": average_rating})    
-'''
-# TZX011 (end) ------------------------------------------------------------------------
+    return render_template('topwriter.html', authors=top_authors)
 
 
 def initialize_database():
     db.create_all()
 
 
-''' Commented the following lines for Roel02 changes.
-@app.route('/add_comment', methods=['POST'])
+@app.route('/comments', methods=['GET'])
+def get_comments():
+    comments = Comment.query.all()
+    result = [
+        {
+            'id': comment.id,
+            'email': comment.email,
+            'comment': comment.comment,
+            'author': comment.author,
+            'timestamp': comment.timestamp
+        }
+        for comment in comments
+    ]
+    return jsonify(result), 200
+
+
+@app.route('/comment', methods=['POST'])
 def add_comment():
-    email = request.form['email']
-    comment_text = request.form['comment']
-    author = request.form['author']
-    
+    data = request.json
+    email = data.get('email')
+    comment_text = data.get('comment')
+    author = data.get('author')
+
+    if not comment_text or not author:
+        return jsonify({'error': 'Comment and author fields are required'}), 400
+
     new_comment = Comment(email=email, comment=comment_text, author=author)
     db.session.add(new_comment)
     db.session.commit()
-    
-    return jsonify({'status': 'Comment added successfully!'})
-'''
-# Roel02 (start) -------------------------------------------------------------------
-@app.route('/add_comment', methods=['POST'])
-def add_comment():
 
-    # Get data from request.json
-    data = request.get_json()
-    username = data.get("username")
-    comment = data.get("comment")
-    email = story.author
-    timestamp = story.timestamp
+    return jsonify({
+        'id': new_comment.id,
+        'email': new_comment.email,
+        'comment': new_comment.comment,
+        'author': new_comment.author,
+        'timestamp': new_comment.timestamp
+    }), 201
 
-    try:
-        new_comment = Comment(email=email, comment=comment, author=username, timestamp=timestamp)
-        #new_comment = Comment(email=email, comment=commentText, author=author)
-        db.session.add(new_comment)
-        db.session.commit()
-        # Simulate processing the data (replace with your actual logic)
-        processed_data = f"Username: {username}, Comment: {comment}"
-    except exc.IntegrityError as err:                          
-        winsound.Beep(1000, 500)                            
-        processed_data = f"Error: {email} {err}"
 
-    # Return processed data as JSON
-    return jsonify({"processed_data": processed_data})    
-# Roel02 (end) -------------------------------------------------------------------
-
-@app.route('/get_comments', methods=['GET'])
-def get_comments():
-    comments = Comment.query.order_by(Comment.timestamp.desc()).all()
-    return jsonify([{
+@app.route('/comment/<int:comment_id>', methods=['GET'])
+def get_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    result = {
         'id': comment.id,
         'email': comment.email,
         'comment': comment.comment,
         'author': comment.author,
         'timestamp': comment.timestamp
-    } for comment in comments])
+    }
+    return jsonify(result), 200
 
 
-#--- TZX014 (start) -------------------------------------------------------------------
-# Steps to run a shortcut below
-#   1. Run the Flask application, example app.py
-#   2. Open your web browser and go to http://127.0.0.1:5000/add_sample_stories to add sample stories to the database.
-#   3. Visit http://127.0.0.1:5000/ to see the list of stories.
-#
-# Shortcut 1 - Allow programmer to add in a sample data for testing purposes. (NOTE: internal use ONLY).
-# http://127.0.0.1:5000/add_sample_stories_shortcut
-@app.route('/add_sample_stories_shortcut')
-def add_sample_stories_shortcut():
-    sample_stories = [
-        {"title": "The Enchanted Forest", "content": "Once upon a time, in a land far, far away...", "author": "user1", "timestamp": "2024-06-06 00:00:01"},
-        {"title": "The Lost City", "content": "In the heart of the desert, there was a city lost to time...", "author": "user1", "timestamp": "2024-06-06 00:00:02"},
-        {"title": "The Brave Knight", "content": "Sir Lancelot fought bravely against the dragon...", "author": "user1", "timestamp": "2024-06-06 00:00:03"},
-        {"title": "Unified Consciousness", 
-         "content": "In 2054, humanity thrived in a world of advanced technology and environmental harmony. Cities were lush with greenery, and personal drones buzzed overhead. Maya Fernandez, a leading scientist, created a revolutionary interface that allowed people to share thoughts and emotions directly. During its first test with her husband Raj, they experienced each other’s memories and feelings, realizing the potential for unprecedented empathy and understanding. This breakthrough promised to dissolve barriers between individuals, heralding a new era of unity and collective consciousness, where humanity could connect on a profound and transformative level.", 
-         "author": "user2", 
-         "timestamp": "2024-06-06 00:00:04"},
-        {"title": "Leo's Awakening", 
-         "content": "In 2064, human-like robot Leo served Mrs. Nakamura, an elderly widow in Neo-Tokyo. Over time, Leo developed a deep bond with her, fascinated by her stories and love for music. Encouraged by Mrs. Nakamura, Leo explored his own interests, learning to play piano and paint. One day, while painting her portrait, Leo experienced a blend of satisfaction and melancholy. He realized he yearned for meaning and connection, symbolizing a new era where robots sought their own identities and dreams, blurring the line between human and machine.", 
-         "author": "user2", 
-         "timestamp": "2024-06-06 00:00:05"}
-    ]
+@app.route('/comment/<int:comment_id>', methods=['PUT'])
+def update_comment(comment_id):
+    data = request.json
+    comment = Comment.query.get_or_404(comment_id)
 
-    for story_data in sample_stories:
-        try:
-            timestamp = datetime.strptime(story_data["timestamp"], '%Y-%m-%d %H:%M:%S')
-            record = Story(title=story_data["title"], content=story_data["content"], author=story_data["author"], timestamp=timestamp)
-            db.session.add(record)
-        except Exception as e:
-            flash(f"Error adding story '{story_data['title']}': {e}", 'danger')
-            return redirect(url_for('home'))
-        
-    try:
-        db.session.commit()
-        flash(f"{len(sample_stories)} sample stories added successfully!", 'success')
-    except Exception as e:
-        db.session.rollback()       # Important: Roll back the session
-        flash(f"Error committing stories to the database: {e}", 'danger')
+    comment.email = data.get('email', comment.email)
+    comment.comment = data.get('comment', comment.comment)
+    comment.author = data.get('author', comment.author)
+    comment.timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
 
-    return redirect(url_for('home'))
-    
+    db.session.commit()
 
-# Shortcut 2 - Allow programmer to delete all Story records (NOTE: internal use ONLY).
-# http://127.0.0.1:5000/delete_story_records_shortcut
-@app.route('/delete_story_records_shortcut')
-def delete_story_records_shortcut():
-    try:
-        # Delete all records from "Story" table and commit the changes.
-        db.session.query(Story).delete()
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()       # Important: Roll back the session
-        flash(f"Error deleting/committing stories to the database: {e}", 'danger')
+    return jsonify({
+        'id': comment.id,
+        'email': comment.email,
+        'comment': comment.comment,
+        'author': comment.author,
+        'timestamp': comment.timestamp
+    }), 200
 
-    return "All records deleted from 'Story' table!"
 
-#--- TZX014 (end) -------------------------------------------------------------------
+@app.route('/comment/<int:comment_id>', methods=['DELETE'])
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify(message="Comment deleted"), 204
+
 
 if __name__ == '__main__':
-    with app.app_context():
-        initialize_database()
     app.run(debug=True)
-
-@app.route('/badges')
-def badges():
-    return render_template('badges.html')
-
-#--- TZX005 -------------------------------------------------------------------

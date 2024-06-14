@@ -12,7 +12,7 @@ from flask_mail import Message
 from gtts import gTTS                       # TZX010
 from sqlalchemy import exc, func , or_     
 from datetime import datetime, timedelta    # TZX016
-import winsound                             # TZX002
+#import winsound                             # TZX002
 import markdown                             # TZX003
 from bs4 import BeautifulSoup               # TZX006
 from StoryApp.models import Story           # TZX003a
@@ -68,7 +68,7 @@ def write_to_db(data):                                          # TZX014
         db.session.add(record)                                  # TZX002
         db.session.commit()                                     # TZX002
     except exc.IntegrityError as err:                           # TZX002
-        winsound.Beep(1000, 500)                            # TZX002
+        #winsound.Beep(1000, 500)                            # TZX002
         # check if error is related to author.              # TZX002
         if "author" in str(err):                            # TZX002
             print("Error: Story author cannot be null")     # TZX002
@@ -119,7 +119,7 @@ def delete_story_by_timestamp(timestamp):               # TZX002
 
             return True                                     # TZX002
         else:                                               # TZX002
-            winsound.Beep(1000, 500)                        # TZX002
+            #winsound.Beep(1000, 500)                        # TZX002
             print("Timestamp not found.")                   # TZX002
             return False                                    # TZX002
         
@@ -476,7 +476,7 @@ def update_story():                                                     # TZX006
 
         return render_template('edit_story.html', story=story)          # TZX006
     else:                                                               # TZX006
-        winsound.Beep(1000, 500)                                        # TZX016
+        #winsound.Beep(1000, 500)                                        # TZX016
         flash('Story not found!', 'danger')                             # TZX006
         return render_template('edit_story.html', story=story)          # TZX006
 

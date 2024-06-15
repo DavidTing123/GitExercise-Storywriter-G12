@@ -244,6 +244,9 @@ def signup():
 # link back to our StoryWriter home page 
 @app.route("/logout")
 def logout():
+    # Clear the user session when user logout.                              # TZX017
+    session.pop('username', None)  # Remove the username from the session   # TZX017
+
     logout_user()
     return redirect(url_for("home"))
 
@@ -361,6 +364,10 @@ def add_story():
     # Format it as a string (e.g., "YYYY-MM-DD HH:MM:SS")       # TZX002
     DateTime = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")  # TZX002
 
+    # Retrieve username from Flask's session. If username does  # TZX017
+    # NOT exist in the session, username will be 'None'.        # TZX017
+    username = session.get('username')                          # TZX017
+
     try:                                                        # TZX002
         print('username', username)                             # TZX002
     except NameError:                                           # TZX002
@@ -392,6 +399,10 @@ def add_story():
 @app.route('/storylist')
 def storylist():
 
+    # Retrieve username from Flask's session. If username does  # TZX017
+    # NOT exist in the session, username will be 'None'.        # TZX017
+    username = session.get('username')                          # TZX017
+
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
         print(username)                                     # TZX014
@@ -420,7 +431,11 @@ def storylist():
 def editrecord():                                                           # TZX006
 
     # Retrieve username from session                                        # TZX010a
-    username = session.get('username', "")  # Default to "" if not set      # TZX010a
+    #username = session.get('username', "")  # Default to "" if not set      # TZX010a
+
+    # Retrieve username from Flask's session. If username does  # TZX017
+    # NOT exist in the session, username will be 'None'.        # TZX017
+    username = session.get('username')                          # TZX017
 
     # Ensure username exist                                 # TZX014    
     try:                                                    # TZX014
@@ -489,6 +504,19 @@ def update_story():                                                     # TZX006
 #-------------------------------------------------------------------# TZX016
 @app.route('/archive')
 def archive():
+
+    # Caution: Based on ChatGPT, using a global variable to keep track      # TZX017
+    # of the logged-in is NOT a good practise, especially in web            # TZX017
+    # application where multiple users can be interacting with the          # TZX017
+    # system simultaneously. Global variables are shared across all         # TZX017
+    # requests, which can lead to conflicts and incorrect behavior when     # TZX017
+    # multiple users are using the application concurrently.                # TZX017
+    # The best way to keep track of user sessions in Flask web application  # TZX017
+    # is by using Flask's built-in session management.                      # TZX017         
+
+    # Retrieve username from Flask's session. If username does  # TZX017
+    # NOT exist in the session, username will be 'None'.        # TZX017
+    username = session.get('username')                          # TZX017
 
     # Ensure username exist                                 # TZX014
     try:                                                    # TZX014
@@ -692,6 +720,7 @@ def sort_record():
     if EditMode:
         # Dynamically get the field from the Story model
         field = getattr(Story, selected_field)
+        username = session.get('username')                          # TZX017
         # The sorting is in ascending order by default.  # author=session.get('username')
         sorted_records = db.session.query(Story).filter_by(author=username).order_by(field).all()
     else:
